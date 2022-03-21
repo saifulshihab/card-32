@@ -1,0 +1,17 @@
+{
+  "name": "card-32",
+  "version": "1.0.0",
+  "description": "A card game",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "husky install"
+  },
+  "author": "Saiful Islam Shihab",
+  "license": "ISC",
+  "devDependencies": {
+    "@commitlint/cli": "^16.2.3",
+    "@commitlint/config-conventional": "^16.2.1",
+    "husky": "^7.0.4",
+    "prettier": "^2.6.0"
+  }
+}
