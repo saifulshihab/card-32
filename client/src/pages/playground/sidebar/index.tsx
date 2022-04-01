@@ -72,7 +72,7 @@ const Sidebar: React.FC = () => {
         {/* bid select */}
         <FlexContainer>
           <div className="flex-1">
-            <select className="w-full bg-gray-700 rounded-tl-sm rounded-bl-sm py-1.5 text-center outline-hidden">
+            <select className="w-full bg-gray-700 rounded-tl-sm rounded-bl-sm py-1.5 text-center outline-none">
               <option value={1}>1</option>
               <option value={2}>2</option>
               <option value={3}>3</option>
@@ -83,7 +83,7 @@ const Sidebar: React.FC = () => {
               <option value={8}>8</option>
             </select>
           </div>
-          <button className="bg-blue-600 text-xs rounded-tr-sm rounded-br-sm py-2 px-3">
+          <button className="bg-blue-700 text-xs rounded-tr-sm rounded-br-sm py-2 px-3">
             Bid
           </button>
         </FlexContainer>
