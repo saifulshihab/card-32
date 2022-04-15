@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 import FlexContainer from "../../../components/atoms/box/FlexContainer";
-import Button from "../../../components/atoms/button";
 import { PlayerCard } from "../../../components/organisms/playerCard";
 import { useThemeContext } from "../../../contexts/ThemeContext";
 
@@ -30,7 +29,8 @@ const Sidebar: React.FC = () => {
           </div>
         </FlexContainer>
         <FlexContainer className="gap-1">
-          <Button
+          <button
+            className="btn-primary"
             onClick={() =>
               setSidebarOrder(
                 sidebarOrder === 1 ? 2 : sidebarOrder === 2 ? 1 : 1
@@ -38,10 +38,10 @@ const Sidebar: React.FC = () => {
             }
           >
             <i className="fa-solid fa-table-cells-large"></i>
-          </Button>
-          <Button>
+          </button>
+          <button className="btn-primary">
             <i className="fa-solid fa-arrow-right-from-bracket"></i>
-          </Button>
+          </button>
         </FlexContainer>
       </FlexContainer>
 
@@ -71,7 +71,7 @@ const Sidebar: React.FC = () => {
       <div className="w-full absolute bottom-0 p-2 flex flex-col gap-2">
         {/* bid select */}
         <FlexContainer>
-          <div className="flex-1">
+          <div className="flex-1 py-2">
             <select className="w-full bg-gray-700 rounded-tl-sm rounded-bl-sm py-1.5 text-center outline-none">
               <option value={1}>1</option>
               <option value={2}>2</option>
@@ -83,17 +83,17 @@ const Sidebar: React.FC = () => {
               <option value={8}>8</option>
             </select>
           </div>
-          <button className="bg-blue-700 text-xs rounded-tr-sm rounded-br-sm py-2 px-3">
+          <button className="btn-primary bg-blue-700 text-xs rounded-tl-none rounded-bl-none py-2 px-3">
             Bid
           </button>
         </FlexContainer>
         <FlexContainer className="gap-2 justify-center">
-          <Button className="border border-blue-600 shadow-blue-600">
+          <button className="btn-primary border border-blue-600 shadow-blue-600">
             Start Game
-          </Button>
-          <Button className="border border-purple-600 shadow-purple-600">
+          </button>
+          <button className="btn-primary border border-purple-600 shadow-purple-600">
             Restart
-          </Button>
+          </button>
         </FlexContainer>
       </div>
     </SidebarContainer>

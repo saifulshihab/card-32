@@ -1,6 +1,4 @@
 import React from "react";
-import FlexContainer from "../../components/atoms/box/FlexContainer";
-import { Card } from "../../components/organisms/card";
 import { useThemeContext } from "../../contexts/ThemeContext";
 import Board from "./board";
 import Sidebar from "./sidebar";
