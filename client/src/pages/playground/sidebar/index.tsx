@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import FlexContainer from "../../../components/atoms/box/FlexContainer";
 import { PlayerCard } from "../../../components/organisms/playerCard";
-import { useThemeContext } from "../../../contexts/ThemeContext";
+import { useThemeContext } from "../../../contexts/ThemeProvider";
 
 const SidebarContainer = styled.div`
   width: 320px;

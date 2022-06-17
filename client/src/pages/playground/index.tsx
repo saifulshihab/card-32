@@ -1,10 +1,13 @@
 import React from "react";
-import { useThemeContext } from "../../contexts/ThemeContext";
+import { useSocketContext } from "../../contexts/SocketProvider";
+import { useThemeContext } from "../../contexts/ThemeProvider";
 import Board from "./board";
 import Sidebar from "./sidebar";
 
 const Playground: React.FC = () => {
   const { sidebarOrder } = useThemeContext();
+  const { socket } = useSocketContext();
+  console.log(socket);
   return (
     <div className="w-full h-screen flex gap-1">
       <Sidebar />
