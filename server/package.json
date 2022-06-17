@@ -1,0 +1,33 @@
+{
+  "name": "card-32-server",
+  "version": "1.0.0",
+  "description": "Server of card-32 game",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon",
+    "build": "tsc"
+  },
+  "keywords": [
+    "card-game",
+    "socket.io",
+    "socket"
+  ],
+  "author": "Saiful Islam Shihab",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.28.0",
+    "@typescript-eslint/parser": "^5.28.0",
+    "eslint": "^7.32.0 || ^8.2.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "nodemon": "^2.0.16",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.3"
+  },
+  "dependencies": {
+    "express": "^4.18.1",
+    "socket.io": "^4.5.1"
+  }
+}
