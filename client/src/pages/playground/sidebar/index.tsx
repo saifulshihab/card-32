@@ -25,7 +25,7 @@ const Sidebar: React.FC = () => {
           </div>
           <div>
             <p className="text-lg leading-6">shihab</p>
-            <p className="text-xs">don't freeze</p>
+            <p className="text-xs">don&apos;t freeze</p>
           </div>
         </FlexContainer>
         <FlexContainer className="gap-1">

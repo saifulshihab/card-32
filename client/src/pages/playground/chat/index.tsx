@@ -265,8 +265,8 @@ const Chat: React.FC = () => {
       {/* messages */}
       <div className="flex flex-grow overflow-hidden">
         <div className="flex h-full flex-col gap-1.5 p-2 text-xs overflow-y-scroll scrollbar-hide">
-          {messages.map((m) => (
-            <div className="flex items-center">
+          {messages.map((m, idx) => (
+            <div key={idx} className="flex items-center">
               <p>
                 <span className="text-blue-500">{m.user}</span> : {m.message}
               </p>
