@@ -3,8 +3,12 @@
   "version": "1.0.0",
   "description": "A card game",
   "main": "index.js",
+  "private": true,
   "scripts": {
-    "postinstall": "husky install"
+    "postinstall": "husky install",
+    "start:web": "lerna exec --scope card-32-web -- yarn start",
+    "start:server": "lerna exec --scope card-32-server -- yarn dev",
+    "lerna:bootstrap": "lerna bootstrap"
   },
   "author": "Saiful Islam Shihab",
   "license": "ISC",
@@ -12,6 +16,10 @@
     "@commitlint/cli": "^16.2.3",
     "@commitlint/config-conventional": "^16.2.1",
     "husky": "^7.0.4",
+    "lerna": "^5.1.4",
     "prettier": "^2.6.0"
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }
