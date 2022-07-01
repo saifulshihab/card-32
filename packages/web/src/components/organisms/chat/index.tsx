@@ -1,4 +1,5 @@
 import React from "react";
+import { generateRandomColor } from "../../../utils/color";
 
 const messages: {
   user: string;
@@ -258,25 +259,33 @@ const messages: {
 
 const Chat: React.FC = () => {
   return (
-    <div className="w-96 h-full bg-gray-800 flex flex-col">
-      <div className="relative py-2 px-3 border-b-4 border-gray-900">
+    <div className="flex flex-col w-64 lg:w-80 h-full bg-zinc-800">
+      <div className="relative py-2 px-3 border-b-4 border-zinc-900">
         <p className="text-2xl font-bold">Chat</p>
       </div>
       {/* messages */}
       <div className="flex flex-grow overflow-hidden">
         <div className="flex h-full flex-col gap-1.5 p-2 text-xs overflow-y-scroll scrollbar-hide">
           {messages.map((m, idx) => (
-            <div key={idx} className="flex items-center">
+            <div key={idx} className="flex">
               <p>
-                <span className="text-blue-500">{m.user}</span> : {m.message}
+                <span
+                  style={{
+                    color: generateRandomColor(),
+                  }}
+                  className="font-semibold"
+                >
+                  {m.user}
+                </span>{" "}
+                : {m.message}
               </p>
             </div>
           ))}
         </div>
       </div>
       {/* bottom input */}
-      <div className="h-16 border-t-4 border-gray-900">
-        <div className="flex items-center h-full px-2">
+      <div className="h-16 border-t-4 border-zinc-900">
+        <div className="flex h-full px-2">
           <input
             className="w-full bg-transparent text-sm h-full outline-none"
             placeholder="Write your message here..."

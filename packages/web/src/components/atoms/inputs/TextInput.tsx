@@ -12,13 +12,15 @@ interface IProps {
 }
 
 const TextInput: React.FC<IProps> = (props) => {
-  const { label, error } = props;
+  const { label, error, className } = props;
   return (
     <div className="w-full">
       {label ? <p className="text-sm mb-2 font-semibold">{label}</p> : null}
       <input
         {...(props as any)}
-        className="w-full outline-none bg-transparent border border-yellow-500 p-1 px-3 rounded-sm text-sm"
+        className={`w-full outline-none bg-transparent p-1 px-3 text-sm ${
+          className ? className : ""
+        }`}
       />
       {error ? (
         <div className="mt-1">

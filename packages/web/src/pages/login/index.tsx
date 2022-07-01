@@ -47,30 +47,34 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="flex justify-center">
-      <div className="mt-5 w-96 p-4 rounded-md border border-yellow-500 bg-zinc-800 shadow shadow-yellow-400">
-        <p className="text-2xl mb-3 font-bold">Login</p>
+      <div className="w-full sm:w-96 mt-5 m-3 p-4 rounded-md border border-purple-500 bg-zinc-800 shadow shadow-purple-400">
+        <p className="text-2xl mb-4 font-bold">Login</p>
         <FlexContainer className="w-full flex-col gap-3">
           <TextInput
             label="Username"
             placeholder="Enter username"
             value={loginInput.username}
+            className="border-b border-purple-500"
             onChange={(e) => onLoginInputChange("username", e.target.value)}
           />
           <TextInput
             label="Room ID"
             placeholder="Enter room id eg. discord89"
             value={loginInput.roomId}
+            className="border-b border-purple-500"
             onChange={(e) => onLoginInputChange("roomId", e.target.value)}
           />
           {formError ? (
             <p className="text-xs font-semibold text-red-500">{formError}</p>
           ) : null}
-          <button
-            className="mt-2 inline-block btn-primary bg-yellow-500"
-            onClick={onFormSubmit}
-          >
-            Enter
-          </button>
+          <FlexContainer>
+            <button
+              className="mt-2 inline-block btn-primary bg-purple-500"
+              onClick={onFormSubmit}
+            >
+              Enter
+            </button>
+          </FlexContainer>
         </FlexContainer>
       </div>
     </div>

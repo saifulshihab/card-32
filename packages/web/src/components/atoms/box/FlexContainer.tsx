@@ -6,7 +6,11 @@ interface IProps {
 
 const FlexContainer: React.FC<IProps> = (props) => {
   const { className, children } = props;
-  return <div className={`flex ${className}`}>{children}</div>;
+  return (
+    <div className={`flex items-center ${className ? className : ""}`}>
+      {children}
+    </div>
+  );
 };
 
 export default FlexContainer;
