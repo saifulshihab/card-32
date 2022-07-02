@@ -1,12 +1,12 @@
 import { Dialog, Transition } from "@headlessui/react";
-import React, { Fragment, useRef } from "react";
+import React, { Fragment, PropsWithChildren, useRef } from "react";
 
 interface IProps {
   visible: boolean;
   setVisible: (value: boolean) => void;
 }
 
-const Modal: React.FC<IProps> = (props) => {
+const Modal: React.FC<PropsWithChildren<IProps>> = (props) => {
   const { visible, setVisible, children } = props;
   const cancelButtonRef = useRef(null);
   return (

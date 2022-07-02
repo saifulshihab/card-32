@@ -7,8 +7,12 @@ interface IProps {
 
 const PlayerCard: React.FC<IProps> = (props) => {
   const { name } = props;
+
   return (
-    <div className="relative w-14 h-24 sm:w-20 sm:h-32 rounded-md shadow bg-zinc-700">
+    <div
+      draggable
+      className="relative w-14 h-24 sm:w-20 sm:h-32 rounded-md shadow bg-zinc-700"
+    >
       <FlexContainer className="flex-col gap-1 justify-center p-1 sm:p-2 pt-1 sm:pt-4">
         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full shadow">
           <img

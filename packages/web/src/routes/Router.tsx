@@ -5,7 +5,7 @@ import Playground from "../pages/playground";
 
 const Router: React.FC = () => {
   return (
-    <div className="w-full h-screen bg-zinc-900 text-zinc-100 select-none">
+    <div className="w-full h-screen bg-zinc-900 text-zinc-100">
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LoginPage />} />

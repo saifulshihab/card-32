@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { PropsWithChildren, useState } from "react";
 
 interface IThemeContext {
   sidebarOrder: number;
@@ -7,7 +7,7 @@ interface IThemeContext {
 
 const ThemeContext = React.createContext<IThemeContext | null>(null);
 
-export const ThemeProvider: React.FC = (props) => {
+export const ThemeProvider: React.FC<PropsWithChildren> = (props) => {
   const [sidebarOrder, setSidebarOrder] = useState(1);
 
   return (

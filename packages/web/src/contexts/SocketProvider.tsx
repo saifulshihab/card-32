@@ -1,4 +1,4 @@
-import React from "react";
+import React, { PropsWithChildren } from "react";
 import { io, Socket } from "socket.io-client";
 
 interface ISocketContext {
@@ -7,7 +7,7 @@ interface ISocketContext {
 
 const SocketContext = React.createContext<ISocketContext | null>(null);
 
-export const SocketProvider: React.FC = (props) => {
+export const SocketProvider: React.FC<PropsWithChildren> = (props) => {
   const socket = io("http://localhost:5000");
   return (
     <SocketContext.Provider

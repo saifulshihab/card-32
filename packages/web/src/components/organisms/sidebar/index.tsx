@@ -35,9 +35,7 @@ const Sidebar: React.FC = () => {
   const { sidebarOrder, setSidebarOrder } = useThemeContext();
   const [bidModalVisible, setBidModalVisible] = useState(false);
   return (
-    <SidebarContainer
-      className={`h-full bg-zinc-800 relative order-${sidebarOrder}`}
-    >
+    <SidebarContainer className={`bg-zinc-800 relative order-${sidebarOrder}`}>
       <FlexContainer className="justify-between bg-zinc-700 px-2 shadow">
         <FlexContainer className="my-1 sm:my-2 gap-2">
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full shadow">
