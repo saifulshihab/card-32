@@ -1,0 +1,14 @@
+{
+  "name": "@card-32/common",
+  "version": "1.0.0",
+  "description": "Shared types and validators of card-32 game",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Saiful Islam Shihab",
+  "license": "ISC",
+  "dependencies": {
+    "yup": "^0.32.11"
+  }
+}
