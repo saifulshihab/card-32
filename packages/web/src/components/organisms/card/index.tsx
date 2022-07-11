@@ -1,8 +1,8 @@
+import { ICard } from "@card-32/common/types/card";
+import { DNDType } from "@card-32/common/types/dnd";
 import React, { PropsWithChildren } from "react";
 import { useDrag } from "react-dnd";
 import FlexContainer from "../../atoms/box/FlexContainer";
-import { DNDType } from "../../../types/dnd";
-import { ICard } from "../../../types/card";
 
 interface IProps {
   card: ICard;

@@ -2,12 +2,11 @@ import React from "react";
 import FlexContainer from "../../atoms/box/FlexContainer";
 
 interface IProps {
-  name: string;
+  username: string;
 }
 
 const PlayerCard: React.FC<IProps> = (props) => {
-  const { name } = props;
-
+  const { username } = props;
   return (
     <div
       draggable
@@ -21,7 +20,7 @@ const PlayerCard: React.FC<IProps> = (props) => {
             className="w-full h-full rounded-full"
           />
         </div>
-        <p className="text-sm">{name}</p>
+        <p className="text-sm">{username}</p>
       </FlexContainer>
       <div className="absolute bottom-0 w-full bg-zinc-900 rounded-md rounded-tl-none rounded-tr-none text-xs">
         <FlexContainer>

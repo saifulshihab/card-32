@@ -1,33 +1,16 @@
+import { DNDType } from "@card-32/common/types/dnd";
 import React from "react";
 import { useDrop } from "react-dnd";
-import { ICard } from "../../../types/card";
-import { DNDType } from "../../../types/dnd";
+import { useCardsContext } from "../../../contexts/CardsProvider";
+import { useRoomContext } from "../../../contexts/RoomProvider";
+
 import FlexContainer from "../../atoms/box/FlexContainer";
 import { Card } from "../card";
 import Chat from "../chat";
 
-const cards: ICard[] = [
-  {
-    id: "1",
-    used: false,
-    user: "shiahb",
-    value: 5,
-  },
-  {
-    id: "2",
-    used: false,
-    user: "shiahb",
-    value: 15,
-  },
-  {
-    id: "2",
-    used: false,
-    user: "shiahb",
-    value: 8,
-  },
-];
-
 const Board: React.FC = () => {
+  const { player } = useRoomContext();
+  const { cards } = useCardsContext();
   const [{ isOver }, drop] = useDrop(
     {
       accept: DNDType.CARD,
@@ -63,9 +46,13 @@ const Board: React.FC = () => {
         <div className="w-full bg-zinc-800 h-40 sm:h-48">
           <FlexContainer className="h-full justify-center p-2 sm:p-0">
             <div className="inline-grid grid-cols-4 lg:grid-cols-8 grid-rows-1 sm:grid-rows-1 lg:grid-rows-1 gap-2 sm:gap-3">
-              {cards.map((card, idx) => (
-                <Card key={idx} card={card} />
-              ))}
+              {cards
+                .filter(
+                  (card) => !card.used && card.playerId === player?.playerId
+                )
+                .map((card, idx) => (
+                  <Card key={idx} card={card} />
+                ))}
             </div>
           </FlexContainer>
         </div>

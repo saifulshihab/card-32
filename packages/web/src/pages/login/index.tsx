@@ -1,9 +1,11 @@
+import { ILoginInput } from "@card-32/common/types";
+import { IPlayer } from "@card-32/common/types/player";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FlexContainer from "../../components/atoms/box/FlexContainer";
 import TextInput from "../../components/atoms/inputs/TextInput";
 import { useSocketContext } from "../../contexts/SocketProvider";
-import { ILoginInput } from "../../types";
+import { setPlayerOnLocalStorage } from "../../utils/localStorage";
 
 const initialLoginInput: ILoginInput = {
   username: "",
@@ -27,12 +29,13 @@ const LoginPage: React.FC = () => {
     socket.emit(
       "login",
       loginInput,
-      (error: string | null, result: { userId: string } | null) => {
+      (error: string | null, player: IPlayer | null) => {
         if (error) {
           return setFormError(error);
         }
-        if (!result) return;
+        if (!player) return;
         navigate("/playground");
+        setPlayerOnLocalStorage(player);
       }
     );
     setFormError(undefined);
