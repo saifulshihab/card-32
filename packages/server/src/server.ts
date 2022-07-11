@@ -1,21 +1,38 @@
+import dotenv from "dotenv";
 import express from "express";
 import { createServer } from "http";
-import { Server } from "socket.io";
+import { connectDatabase } from "./config/dbConnection";
+import { PORT } from "./config/env";
+import errorHandler from "./middlewares/errorHandler";
+import userRouter from "./routes/userRouter";
+
+dotenv.config();
+require("express-async-errors");
 
 const app = express();
-const PORT = 5000;
+export const httpServer = createServer(app);
 
-const httpServer = createServer(app);
+// database connection
+connectDatabase();
 
-export const io = new Server(httpServer, {
-  cors: {
-    origin: ["http://localhost:3000"],
-  },
+process.on("unhandledRejection", (error) => {
+  throw error;
 });
 
+// middleware
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// all apis
+app.use("/api/v1/user", userRouter);
+
+// error handler
+app.use(errorHandler);
+
+// invoke socket events
 require("./socket.ts");
 
+// listening server
 httpServer.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Server running on port: ${PORT}`);
+  console.log(`Server running and up on port ${PORT} 🚀`);
 });

@@ -1,5 +1,8 @@
-import { IUser } from "../types/user";
+import { ICard } from "@card-32/common/types/card";
+import { IPlayer } from "@card-32/common/types/player";
 
-export const users: IUser[] = [];
-export const roomUsers = (roomId: string) =>
-  users.filter((user) => user.roomId === roomId);
+export const players: IPlayer[] = [];
+export const roomPlayers = (roomId: string) =>
+  players.filter((player) => player.roomId === roomId);
+
+export const cards: ICard[] = [];

@@ -11,6 +11,7 @@
   },
   "plugins": ["@typescript-eslint"],
   "rules": {
+    "no-console": [0],
     "quotes": "off",
     "no-shadow": "off",
     "import/extensions": [0],
