@@ -6,8 +6,8 @@
   "private": true,
   "scripts": {
     "postinstall": "husky install",
-    "start:web": "lerna exec --scope card-32-web -- yarn start",
-    "start:server": "lerna exec --scope card-32-server -- yarn dev",
+    "start:web": "lerna exec --scope @card-32/web -- yarn start",
+    "start:server": "lerna exec --scope @card-32/server -- yarn dev",
     "lerna:bootstrap": "lerna bootstrap"
   },
   "author": "Saiful Islam Shihab",
