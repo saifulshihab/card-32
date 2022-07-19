@@ -23,7 +23,7 @@ process.on("unhandledRejection", (error) => {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// all apis
+// APIs
 app.use("/api/v1/user", userRouter);
 
 // error handler

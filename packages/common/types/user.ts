@@ -6,7 +6,7 @@ export interface IUser {
   updatedAt: Date;
 }
 
-export interface ISignUpInput {
+export interface ISignInOrUpInput {
   username: string;
   password: string;
 }
