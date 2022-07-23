@@ -1,21 +1,10 @@
-import React, { useEffect } from "react";
-import { useThemeContext } from "../../contexts/ThemeProvider";
+import React from "react";
 import Board from "../../components/organisms/board";
 import Sidebar from "../../components/organisms/sidebar";
-import { useNavigate } from "react-router-dom";
-import { getPlayerFromLocalStorage } from "../../utils/localStorage";
+import { useThemeContext } from "../../contexts/ThemeProvider";
 
 const Playground: React.FC = () => {
-  const navigate = useNavigate();
   const { sidebarOrder } = useThemeContext();
-  const playerFromLocalStorage = getPlayerFromLocalStorage();
-
-  useEffect(() => {
-    if (!playerFromLocalStorage?.player) {
-      navigate("/");
-    }
-  }, []);
-
   return (
     <div className="w-full h-full flex flex-col sm:flex-row gap-1">
       {/* left sidebar */}

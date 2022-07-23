@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer components {
+  .flexX {
+    @apply flex items-center gap-2;
+  }
+
   .btn-primary {
     @apply bg-zinc-800 rounded shadow border border-transparent active:scale-95 py-1.5 px-2.5 text-sm font-semibold;
   }

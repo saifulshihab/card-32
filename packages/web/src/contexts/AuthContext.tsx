@@ -72,6 +72,9 @@ export const AuthProvider: React.FC<PropsWithChildren> = (props) => {
   }, []);
 
   const logout = useCallback(() => {
+    setIsAuthenticated(false);
+    setUser(null);
+    setAccessToken(undefined);
     removeDataOnLocalStorage();
   }, []);
 
