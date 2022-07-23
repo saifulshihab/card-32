@@ -25,12 +25,12 @@ const Profile: React.FC = () => {
             <TextInput
               label="Old password"
               placeholder="Enter old password"
-              className="border-b border-purple-600"
+              className="border-b border-primary"
             />
             <TextInput
               label="New password"
               placeholder="Enter new password"
-              className="border-b border-purple-600"
+              className="border-b border-primary"
             />
 
             <button className="btn-primary">Change</button>

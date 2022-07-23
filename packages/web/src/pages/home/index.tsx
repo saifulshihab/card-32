@@ -6,10 +6,8 @@ const HomePage: React.FC = () => {
     <div className="">
       <FlexContainer className="justify-between items-center my-2">
         <p className="text-lg font-bold">Active Rooms</p>
-        <button className="btn-primary bg-purple-600">Create Room</button>
+        <button className="btn-primary bg-primary">Create Room</button>
       </FlexContainer>
-
-      <div></div>
     </div>
   );
 };

@@ -31,7 +31,7 @@ const Appearance: React.FC = () => {
       <FlexContainer className="mt-3 gap-2">
         <ColorButton className="bg-blue-600" />
         <ColorButton className="bg-orange-600" />
-        <ColorButton className="bg-purple-600" active />
+        <ColorButton className="bg-primary" active />
         <ColorButton className="bg-green-600" />
         <ColorButton className="bg-yellow-500" />
       </FlexContainer>

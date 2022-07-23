@@ -68,7 +68,7 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="flex justify-center">
-      <div className="w-full sm:w-96 mt-5 m-3 p-4 rounded-md border border-purple-500 bg-zinc-800 shadow shadow-purple-400">
+      <div className="w-full sm:w-96 mt-5 m-3 p-4 rounded-md border border-primary bg-zinc-800 shadow shadow-primary-400">
         <p className="text-2xl mb-5 font-bold">
           {mode === "login" ? "Login" : "Sign Up"}
         </p>
@@ -77,7 +77,7 @@ const LoginPage: React.FC = () => {
             label="Username"
             placeholder="Enter username"
             value={loginInput.username}
-            className="border-b border-purple-500"
+            className="border-b border-primary"
             onChange={(e) => onLoginInputChange("username", e.target.value)}
             error={formErrors?.username}
           />
@@ -86,14 +86,14 @@ const LoginPage: React.FC = () => {
             label="Password"
             placeholder="Enter password"
             value={loginInput.password}
-            className="border-b border-purple-500"
+            className="border-b border-primary"
             onChange={(e) => onLoginInputChange("password", e.target.value)}
             error={formErrors?.password}
           />
 
           <FlexContainer>
             <button
-              className="mt-2 inline-block btn-primary bg-purple-500"
+              className="mt-2 inline-block btn-primary bg-primary"
               onClick={onFormSubmit}
             >
               {mode === "login" ? "Login" : "Sign up"}
@@ -104,13 +104,13 @@ const LoginPage: React.FC = () => {
           <FlexContainer>
             {mode === "login" ? (
               <button onClick={() => setMode("signup")}>
-                <p className="text-xs text-purple-300">
+                <p className="text-xs text-primary-300">
                   Not registered? Sign up
                 </p>
               </button>
             ) : (
               <button onClick={() => setMode("login")}>
-                <p className="text-xs text-purple-300">Login</p>
+                <p className="text-xs text-primary-300">Login</p>
               </button>
             )}
           </FlexContainer>

@@ -149,7 +149,7 @@ const Sidebar: React.FC = () => {
             >
               Start Game
             </button>
-            <button className="btn-primary p-1 text-xs border-2 border-purple-600 shadow-purple-600">
+            <button className="btn-primary p-1 text-xs border-2 border-primary shadow-primary">
               Restart
             </button>
           </FlexContainer>
@@ -173,7 +173,7 @@ const Sidebar: React.FC = () => {
           >
             Start Game
           </button>
-          <button className="btn-primary border-2 border-purple-600 shadow-purple-600">
+          <button className="btn-primary border-2 border-primary shadow-primary">
             Restart
           </button>
         </FlexContainer>

@@ -12,8 +12,8 @@ const ListItem: React.FC<PropsWithChildren<IListItemProps>> = ({
   active,
 }) => (
   <li
-    className={`py-2.5 px-3 hover:bg-zinc-700 cursor-pointer border-r-2 hover:border-r-purple-600 ${
-      active ? "border-purple-600" : "border-transparent"
+    className={`py-2.5 px-3 hover:bg-zinc-700 cursor-pointer border-r-2 hover:border-r-primary ${
+      active ? "border-primary" : "border-transparent"
     } border-b border-b-zinc-700 border-t border-t-zinc-900`}
   >
     {children}

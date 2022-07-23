@@ -28,7 +28,7 @@ const PlayerCard: React.FC<IProps> = (props) => {
           <p className="text-center flex-1 font-semibold">0</p>
         </FlexContainer>
         <FlexContainer>
-          <p className="bg-purple-700 flex-1 text-center rounded-bl-md">
+          <p className="bg-primary-700 flex-1 text-center rounded-bl-md">
             Point
           </p>
           <p className="text-center flex-1 font-semibold">0</p>
