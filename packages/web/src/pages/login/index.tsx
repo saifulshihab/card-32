@@ -1,82 +1,118 @@
-import { ILoginInput } from "@card-32/common/types";
-import { IPlayer } from "@card-32/common/types/player";
+import { ISignInOrUpInput } from "@card-32/common/types/user";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+import { handlePublicApiError, ICommonApiError } from "../../api/apiRequest";
+import { userSignUpApi } from "../../api/userApi";
 import FlexContainer from "../../components/atoms/box/FlexContainer";
-import TextInput from "../../components/atoms/inputs/TextInput";
-import { useSocketContext } from "../../contexts/SocketProvider";
-import { setPlayerOnLocalStorage } from "../../utils/localStorage";
 
-const initialLoginInput: ILoginInput = {
+import TextInput from "../../components/atoms/inputs/TextInput";
+import { showToastMessage } from "../../components/atoms/toast";
+import { useAuthContext } from "../../contexts/AuthContext";
+import { HOME } from "../../routes/routes";
+import { userSignupValidator } from "../../validators/userValidator";
+
+const initialLoginInput: ISignInOrUpInput = {
   username: "",
-  roomId: "",
+  password: "",
 };
 
 const LoginPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { socket } = useSocketContext();
+  const { isAuthenticated, userLoginApiAction } = useAuthContext();
+  const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<"login" | "signup">("login");
 
-  const [loginInput, setLoginInput] = useState<ILoginInput>(initialLoginInput);
-  const [formError, setFormError] = useState<string | undefined>(undefined);
+  const [loginInput, setLoginInput] =
+    useState<ISignInOrUpInput>(initialLoginInput);
+  const [formErrors, setFormErrors] = useState<ISignInOrUpInput | null>(null);
 
-  const onFormSubmit = () => {
-    // form validation
-    if (!loginInput.username) {
-      return setFormError("Username required");
-    } else if (!loginInput.roomId) {
-      return setFormError("Room id required");
-    }
-    socket.emit(
-      "login",
-      loginInput,
-      (error: string | null, player: IPlayer | null) => {
-        if (error) {
-          return setFormError(error);
+  const onFormSubmit = async () => {
+    const { isValid, errors } = await userSignupValidator(loginInput);
+    if (isValid) {
+      try {
+        setLoading(true);
+        setFormErrors(null);
+        if (mode === "login") {
+          await userLoginApiAction(loginInput);
+        } else {
+          await userSignUpApi(loginInput);
+          showToastMessage({
+            type: "success",
+            message: "Successfully registered.",
+            position: "bottom-center",
+          });
+          setMode("login");
+          setLoginInput(initialLoginInput);
         }
-        if (!player) return;
-        navigate("/playground");
-        setPlayerOnLocalStorage(player);
+      } catch (err) {
+        const { error, data } = handlePublicApiError(err as ICommonApiError);
+        showToastMessage({
+          message: error || data?.message || "Something went wrong",
+          position: "bottom-center",
+          type: "error",
+        });
       }
-    );
-    setFormError(undefined);
+      setLoading(false);
+    } else {
+      setFormErrors(errors as any);
+    }
   };
 
-  const onLoginInputChange = (name: keyof ILoginInput, value: string) => {
+  const onLoginInputChange = (name: keyof ISignInOrUpInput, value: string) => {
     setLoginInput((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
+  if (isAuthenticated) return <Navigate to={HOME} />;
+
   return (
     <div className="flex justify-center">
       <div className="w-full sm:w-96 mt-5 m-3 p-4 rounded-md border border-purple-500 bg-zinc-800 shadow shadow-purple-400">
-        <p className="text-2xl mb-4 font-bold">Login</p>
-        <FlexContainer className="w-full flex-col gap-3">
+        <p className="text-2xl mb-5 font-bold">
+          {mode === "login" ? "Login" : "Sign Up"}
+        </p>
+        <FlexContainer className="w-full flex-col gap-4">
           <TextInput
             label="Username"
             placeholder="Enter username"
             value={loginInput.username}
             className="border-b border-purple-500"
             onChange={(e) => onLoginInputChange("username", e.target.value)}
+            error={formErrors?.username}
           />
+
           <TextInput
-            label="Room ID"
-            placeholder="Enter room id eg. discord89"
-            value={loginInput.roomId}
+            label="Password"
+            placeholder="Enter password"
+            value={loginInput.password}
             className="border-b border-purple-500"
-            onChange={(e) => onLoginInputChange("roomId", e.target.value)}
+            onChange={(e) => onLoginInputChange("password", e.target.value)}
+            error={formErrors?.password}
           />
-          {formError ? (
-            <p className="text-xs font-semibold text-red-500">{formError}</p>
-          ) : null}
+
           <FlexContainer>
             <button
               className="mt-2 inline-block btn-primary bg-purple-500"
               onClick={onFormSubmit}
             >
-              Enter
+              {mode === "login" ? "Login" : "Sign up"}
+              {loading ? "..." : null}
             </button>
+          </FlexContainer>
+
+          <FlexContainer>
+            {mode === "login" ? (
+              <button onClick={() => setMode("signup")}>
+                <p className="text-xs text-purple-300">
+                  Not registered? Sign up
+                </p>
+              </button>
+            ) : (
+              <button onClick={() => setMode("login")}>
+                <p className="text-xs text-purple-300">Login</p>
+              </button>
+            )}
           </FlexContainer>
         </FlexContainer>
       </div>

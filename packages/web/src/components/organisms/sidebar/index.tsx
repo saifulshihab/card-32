@@ -46,10 +46,12 @@ const Sidebar: React.FC = () => {
   const onStartGame = () => {
     if (!room) return;
     if (room.players.length < 4) {
-      showToastMessage(
-        `Invite ${4 - room.players.length} more players to start the game`,
-        "info"
-      );
+      showToastMessage({
+        message: `Invite ${
+          4 - room.players.length
+        } more players to start the game`,
+        type: "info",
+      });
       return;
     }
     // game start: send request for cards

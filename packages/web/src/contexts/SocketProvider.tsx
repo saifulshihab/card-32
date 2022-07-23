@@ -1,5 +1,6 @@
-import React, { PropsWithChildren } from "react";
+import React, { PropsWithChildren, useEffect } from "react";
 import { io, Socket } from "socket.io-client";
+import { useAuthContext } from "./AuthContext";
 
 interface ISocketContext {
   socket: Socket;
@@ -8,7 +9,21 @@ interface ISocketContext {
 const SocketContext = React.createContext<ISocketContext | null>(null);
 
 export const SocketProvider: React.FC<PropsWithChildren> = (props) => {
-  const socket = io("http://localhost:5000");
+  const { accessToken, logout } = useAuthContext();
+  const socket = io("http://localhost:5000", {
+    auth: {
+      token: accessToken,
+    },
+  });
+
+  useEffect(() => {
+    socket.on("connect_error", (err) => {
+      // eslint-disable-next-line no-console
+      console.error(err.message);
+      logout();
+    });
+  }, []);
+
   return (
     <SocketContext.Provider
       value={{

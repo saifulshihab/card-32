@@ -1,8 +1,15 @@
-import { toast, TypeOptions } from "react-toastify";
+import { toast, TypeOptions, ToastPosition } from "react-toastify";
 
-export const showToastMessage = (message: string, type?: TypeOptions) => {
+interface IToastMessage {
+  message: string;
+  type?: TypeOptions;
+  position?: ToastPosition;
+}
+
+export const showToastMessage = (props: IToastMessage) => {
+  const { message, position, type } = props;
   toast(message, {
-    position: "top-center",
+    position: position || "top-center",
     autoClose: 3000,
     hideProgressBar: false,
     closeOnClick: true,
