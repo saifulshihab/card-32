@@ -3,7 +3,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider } from "./contexts/AuthProvider";
 import { CardsProvider } from "./contexts/CardsProvider";
 import { RoomProvider } from "./contexts/RoomProvider";
 import { SocketProvider } from "./contexts/SocketProvider";

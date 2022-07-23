@@ -1,6 +1,6 @@
 import React, { ElementType, PropsWithChildren } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuthContext } from "../contexts/AuthContext";
+import { useAuthContext } from "../contexts/AuthProvider";
 import { LOGIN } from "./routes";
 
 interface IProps {

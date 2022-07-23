@@ -1,4 +1,4 @@
-import { IRoom } from "@card-32/common/types/room";
+import { IRoom, IActiveRoom } from "@card-32/common/types/room";
 import { IPlayer } from "@card-32/common/types/player";
 import React, { PropsWithChildren, useEffect, useState } from "react";
 import { getPlayerFromLocalStorage } from "../utils/localStorage";
@@ -8,6 +8,7 @@ interface IRoomContext {
   room: IRoom | null;
   isRoomFull: boolean;
   player: IPlayer | undefined;
+  activeRooms: IActiveRoom[];
 }
 
 const RoomContext = React.createContext<IRoomContext | null>(null);
@@ -15,6 +16,7 @@ const RoomContext = React.createContext<IRoomContext | null>(null);
 export const RoomProvider: React.FC<PropsWithChildren> = (props) => {
   const { socket } = useSocketContext();
   const [room, setRoom] = useState<IRoom | null>(null);
+  const [activeRooms] = useState<IActiveRoom[]>([]);
 
   useEffect(() => {
     socket.on("roomData", (roomData: IRoom) => {
@@ -28,6 +30,7 @@ export const RoomProvider: React.FC<PropsWithChildren> = (props) => {
     <RoomContext.Provider
       value={{
         room,
+        activeRooms,
         isRoomFull: room?.players.length === 4,
         player: playerFromLocalStorage?.player,
       }}

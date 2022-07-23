@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useEffect } from "react";
 import { io, Socket } from "socket.io-client";
-import { useAuthContext } from "./AuthContext";
+import { useAuthContext } from "./AuthProvider";
 
 interface ISocketContext {
   socket: Socket;

@@ -4,10 +4,9 @@ import { Navigate } from "react-router-dom";
 import { handlePublicApiError, ICommonApiError } from "../../api/apiRequest";
 import { userSignUpApi } from "../../api/userApi";
 import FlexContainer from "../../components/atoms/box/FlexContainer";
-
 import TextInput from "../../components/atoms/inputs/TextInput";
 import { showToastMessage } from "../../components/atoms/toast";
-import { useAuthContext } from "../../contexts/AuthContext";
+import { useAuthContext } from "../../contexts/AuthProvider";
 import { HOME } from "../../routes/routes";
 import { userSignupValidator } from "../../validators/userValidator";
 
@@ -18,6 +17,7 @@ const initialLoginInput: ISignInOrUpInput = {
 
 const LoginPage: React.FC = () => {
   const { isAuthenticated, userLoginApiAction } = useAuthContext();
+
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<"login" | "signup">("login");
 
@@ -64,7 +64,14 @@ const LoginPage: React.FC = () => {
     }));
   };
 
-  if (isAuthenticated) return <Navigate to={HOME} />;
+  if (isAuthenticated)
+    return (
+      <Navigate
+        to={{
+          pathname: HOME,
+        }}
+      />
+    );
 
   return (
     <div className="flex justify-center">

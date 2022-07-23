@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from "react";
 import { Link } from "react-router-dom";
-import { useAuthContext } from "../../../contexts/AuthContext";
+import { useAuthContext } from "../../../contexts/AuthProvider";
 import { HOME, PROFILE } from "../../../routes/routes";
 import FlexContainer from "../../atoms/box/FlexContainer";
 

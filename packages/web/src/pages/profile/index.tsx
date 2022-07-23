@@ -2,7 +2,7 @@ import React from "react";
 import FlexContainer from "../../components/atoms/box/FlexContainer";
 import TextInput from "../../components/atoms/inputs/TextInput";
 import { ContentHeading } from "../../components/atoms/texts/ContentHeading";
-import { useAuthContext } from "../../contexts/AuthContext";
+import { useAuthContext } from "../../contexts/AuthProvider";
 
 const Profile: React.FC = () => {
   const { user } = useAuthContext();

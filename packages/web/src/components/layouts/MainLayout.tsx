@@ -6,7 +6,7 @@ const MainLayout: React.FC<PropsWithChildren> = (props) => {
   return (
     <React.Fragment>
       <Header />
-      <div className="container px-28 m-auto py-2">{children}</div>
+      <div className="container px-28 m-auto py-8">{children}</div>
     </React.Fragment>
   );
 };
