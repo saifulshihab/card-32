@@ -1,4 +1,4 @@
 export interface ILoginInput {
   username?: string;
-  roomId?: string;
+  password?: string;
 }

@@ -1,3 +1,4 @@
+import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import { createServer } from "http";
@@ -22,6 +23,8 @@ process.on("unhandledRejection", (error) => {
 // middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+app.use(cors());
 
 // APIs
 app.use("/api/v1/user", userRouter);

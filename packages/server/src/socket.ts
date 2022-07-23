@@ -1,10 +1,10 @@
-/* eslint-disable no-console */
-import { ILoginInput } from "@card-32/common/types";
-import { Server } from "socket.io";
+import jwt from "jsonwebtoken";
+import { Socket, Server } from "socket.io";
+import { JWT_USER_SECRET } from "./config/env";
 import { cards, roomPlayers } from "./database";
 import { httpServer } from "./server";
 import { generateCards } from "./utils/card";
-import { getPlayer, getPlayerIntoRoom, removePlayer } from "./utils/player";
+import { getPlayer, removePlayer } from "./utils/player";
 
 const io = new Server(httpServer, {
   cors: {
@@ -12,35 +12,20 @@ const io = new Server(httpServer, {
   },
 });
 
-// io.engine.on("initial_headers", (headers: any, req: any) => {
-//   console.log(headers, "= headers");
-//   console.log(req, "= req");
-// });
+io.use((socket, next) => {
+  const { token } = socket.handshake.auth;
+  if (!token) {
+    return next(new Error("Not authorized! Token not found."));
+  }
+  const tokenVerified = jwt.verify(token, JWT_USER_SECRET);
+  if (!tokenVerified) {
+    return next(new Error("Not authorized! Token expired."));
+  }
+  return next();
+});
 
 // on socket connection
-io.on("connection", (socket) => {
-  // login
-  socket.on("login", (input: ILoginInput, callback) => {
-    const { error, player } = getPlayerIntoRoom({
-      playerId: socket.id,
-      username: input.username,
-      roomId: input.roomId,
-    });
-
-    if (error) {
-      return callback(error, null);
-    }
-    if (!player) return callback("Something went wrong", null);
-
-    socket.join(player.roomId);
-
-    io.to(player.roomId).emit("roomData", {
-      roomId: player.roomId,
-      players: roomPlayers(player.roomId),
-    });
-    return callback(null, player);
-  });
-
+io.on("connection", (socket: Socket) => {
   // generate cards
   socket.on("startGame", () => {
     const player = getPlayer(socket.id);

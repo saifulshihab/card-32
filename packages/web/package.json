@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@card-32/common": "*",
     "@headlessui/react": "^1.6.5",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.0.0",
@@ -11,6 +12,7 @@
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",
+    "axios": "^0.27.2",
     "react": "^18.2.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
@@ -22,8 +24,7 @@
     "styled-components": "^5.3.5",
     "tailwind-scrollbar-hide": "^1.1.7",
     "typescript": "^4.4.2",
-    "web-vitals": "^2.1.0",
-    "@card-32/common": "*"
+    "web-vitals": "^2.1.0"
   },
   "scripts": {
     "start": "react-scripts start",
