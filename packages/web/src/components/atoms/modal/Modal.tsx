@@ -3,11 +3,11 @@ import React, { Fragment, PropsWithChildren, useRef } from "react";
 
 interface IProps {
   visible: boolean;
-  setVisible: (value: boolean) => void;
+  onClose: (value: boolean) => void;
 }
 
 const Modal: React.FC<PropsWithChildren<IProps>> = (props) => {
-  const { visible, setVisible, children } = props;
+  const { visible, onClose, children } = props;
   const cancelButtonRef = useRef(null);
   return (
     <Transition.Root show={visible} as={Fragment}>
@@ -15,7 +15,7 @@ const Modal: React.FC<PropsWithChildren<IProps>> = (props) => {
         as="div"
         className="relative z-10"
         initialFocus={cancelButtonRef}
-        onClose={setVisible}
+        onClose={onClose}
       >
         <Transition.Child
           as={Fragment}

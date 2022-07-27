@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { useRoomContext } from "../../../contexts/RoomProvider";
 import { useSocketContext } from "../../../contexts/SocketProvider";
 import { useThemeContext } from "../../../contexts/ThemeProvider";
-import { removeDataOnLocalStorage } from "../../../utils/localStorage";
+import { HOME } from "../../../routes/routes";
 import FlexContainer from "../../atoms/box/FlexContainer";
 import Modal from "../../atoms/modal/Modal";
 import { showToastMessage } from "../../atoms/toast";
@@ -36,7 +36,7 @@ const StyledSelect = styled.select`
   }
 `;
 
-const Sidebar: React.FC = () => {
+const PlaygroundSidebar: React.FC = () => {
   const navigate = useNavigate();
   const { socket } = useSocketContext();
   const { room, player } = useRoomContext();
@@ -59,10 +59,7 @@ const Sidebar: React.FC = () => {
   };
 
   const onLeave = () => {
-    socket.disconnect();
-    removeDataOnLocalStorage();
-    navigate("/");
-    window.location.reload();
+    navigate(HOME);
   };
 
   return (
@@ -180,7 +177,7 @@ const Sidebar: React.FC = () => {
       </div>
 
       {/* bid select modal */}
-      <Modal visible={bidModalVisible} setVisible={setBidModalVisible}>
+      <Modal visible={bidModalVisible} onClose={setBidModalVisible}>
         <FlexContainer className="p-5 bg-zinc-900 text-white  flex-col gap-2">
           <p className="text-xl font-bold">Select your bid point</p>
           <StyledSelect className="my-3 w-20 h-20 bg-zinc-800 shadow-md border-2 border-blue-700 border-dotted rounded py-1.5 text-center outline-none cursor-pointer focus:ring-2 ring-blue-700 text-2xl">
@@ -202,4 +199,4 @@ const Sidebar: React.FC = () => {
   );
 };
 
-export default Sidebar;
+export default PlaygroundSidebar;
