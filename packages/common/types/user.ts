@@ -10,3 +10,8 @@ export interface ISignInOrUpInput {
   username: string;
   password: string;
 }
+
+export interface IProfileUpdateInput {
+  username: string;
+  email?: string;
+}

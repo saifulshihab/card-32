@@ -1,4 +1,7 @@
-import { ISignInOrUpInput } from "@card-32/common/types/user";
+import {
+  IProfileUpdateInput,
+  ISignInOrUpInput,
+} from "@card-32/common/types/user";
 import bcrypt from "bcryptjs";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
@@ -54,4 +57,36 @@ export const loginUser = async (req: Request, res: Response) => {
     user: tokenPayload,
     accessToken,
   });
+};
+
+// get user profile
+export const getUserProfile = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
+  return res.status(200).json(user);
+};
+
+// user profile update
+export const updateUserProfile = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
+
+  const { username, email } = req.body as IProfileUpdateInput;
+
+  user.username = username;
+  user.email = email;
+
+  await user.save();
+
+  return res.status(200).json(user);
 };

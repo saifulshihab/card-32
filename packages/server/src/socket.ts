@@ -1,10 +1,8 @@
 import jwt from "jsonwebtoken";
-import { Socket, Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { JWT_USER_SECRET } from "./config/env";
-import { cards, roomPlayers } from "./database";
 import { httpServer } from "./server";
-import { generateCards } from "./utils/card";
-import { getPlayer, removePlayer } from "./utils/player";
+import { removePlayer } from "./utils/player";
 
 const io = new Server(httpServer, {
   cors: {
@@ -26,25 +24,16 @@ io.use((socket, next) => {
 
 // on socket connection
 io.on("connection", (socket: Socket) => {
-  // generate cards
-  socket.on("startGame", () => {
-    const player = getPlayer(socket.id);
-    if (player) {
-      const { cards } = generateCards(player.roomId);
-      io.to(player.roomId).emit("receiveCards", { cards });
-    }
-  });
-
   // player disconnect
   socket.on("disconnect", () => {
     const player = removePlayer(socket.id);
     if (player) {
-      io.to(player.roomId).emit("roomPlayers", {
-        roomId: player.roomId,
-        players: roomPlayers(player.roomId),
-      });
-      cards.splice(0, cards.length);
-      io.to(player.roomId).emit("receiveCards", { cards: [] });
+      // io.to(player.roomId).emit("roomPlayers", {
+      //   roomId: player.roomId,
+      //   players: roomPlayers(player.roomId),
+      // });
+      // cards.splice(0, cards.length);
+      // io.to(player.roomId).emit("receiveCards", { cards: [] });
     }
   });
 });

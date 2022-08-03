@@ -11,7 +11,7 @@ const getRandomIntegers = () => {
 
 const generateCards = (roomId: string) => {
   const generatedNumbers = getRandomIntegers();
-  const roomPlayers = players.filter((player) => player.roomId === roomId);
+  const roomPlayers = players.filter((player) => player.playerId === roomId);
 
   roomPlayers.forEach((player, idx) => {
     const slicedNumbers = generatedNumbers.slice(

@@ -3,7 +3,7 @@ import { players } from "../database";
 export const getPlayerIntoRoom = (loginInput: any) => {
   const { username, roomId } = loginInput;
   const usernameTaken = players.find(
-    (player) => player.username === username && player.roomId === roomId
+    (player) => player.username === username && player.playerId === roomId
   );
 
   if (usernameTaken) {
@@ -18,7 +18,7 @@ export const getPlayerIntoRoom = (loginInput: any) => {
 };
 
 export const roomPlayers = (roomId: string) =>
-  players.filter((player) => player.roomId === roomId);
+  players.filter((player) => player.playerId === roomId);
 
 export const removePlayer = (id: string) => {
   const userIndex = players.findIndex((player) => player.playerId === id);
