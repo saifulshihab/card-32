@@ -6,17 +6,16 @@ import { ContentSubHeading } from "../../components/atoms/texts/ContentSubHeadin
 import { showToastMessage } from "../../components/atoms/toast";
 import RoomCard from "../../components/organisms/home/RoomCard";
 import { useRoomContext } from "../../contexts/RoomProvider";
-import { getCapitalizedText } from "../../utils/string";
 
 const HomePage: React.FC = () => {
   const { activeRooms } = useRoomContext();
   const [roomModal, setRoomModal] = useState<"create" | "join" | undefined>(
     undefined
   );
-  const [roomName, setRoomName] = useState<string | undefined>(undefined);
+  const [roomId, setRoomId] = useState<string | undefined>(undefined);
 
   const onRoomCreate = () => {
-    if (!roomName) {
+    if (!roomId) {
       return showToastMessage({
         message: "Enter room name",
       });
@@ -24,7 +23,7 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div>
+    <>
       <FlexContainer className="justify-between items-center my-2">
         <ContentSubHeading>Active Rooms</ContentSubHeading>
         <FlexContainer>
@@ -42,42 +41,60 @@ const HomePage: React.FC = () => {
           </button>
         </FlexContainer>
       </FlexContainer>
+
       <hr className="border-zinc-700 my-3" />
       <div className="grid grid-cols-6 gap-3">
         {activeRooms.length ? (
           activeRooms.map((room, key) => <RoomCard key={key} room={room} />)
         ) : (
-          <p className="text-sm text-gray-400">No rooms found!</p>
+          <p className="text-sm text-gray-400">No rooms available!</p>
         )}
       </div>
 
+      {/* create room modal */}
       <Modal
-        visible={roomModal !== undefined}
+        visible={roomModal === "create"}
         onClose={() => setRoomModal(undefined)}
       >
         <div className="bg-zinc-800 p-4 py-5 text-white">
-          <ContentSubHeading>
-            {getCapitalizedText(roomModal as string)} Room
-          </ContentSubHeading>
-          <p className="text-xs">
-            {roomModal === "create"
-              ? "Create room and play with other's"
-              : "Join a room"}
-          </p>
+          <ContentSubHeading>Create room</ContentSubHeading>
+          <p className="text-xs">Create room and invite other&apos;s</p>
           <FlexContainer className="mt-3">
             <TextInput
               placeholder="Enter room name"
-              className="border-b border-primary"
-              value={roomName}
-              onChange={(e) => setRoomName(e.target.value)}
+              className="border-b border-primary focus:border-b-2 shadow-md"
+              value={roomId}
+              onChange={(e) => setRoomId(e.target.value)}
             />
             <button className="btn-primary bg-primary" onClick={onRoomCreate}>
-              {roomModal === "create" ? "Create" : "Join"}
+              Create
             </button>
           </FlexContainer>
         </div>
       </Modal>
-    </div>
+
+      {/* join room modal */}
+      <Modal
+        visible={roomModal === "join"}
+        onClose={() => setRoomModal(undefined)}
+      >
+        <div className="bg-zinc-800 p-4 py-5 text-white">
+          <ContentSubHeading>Join room</ContentSubHeading>
+          <p className="text-xs">Join room and play with other&apos;s</p>
+          <FlexContainer className="mt-3">
+            <TextInput
+              placeholder="Enter room name"
+              className="border-b border-primary focus:border-b-2 shadow-md"
+              value={roomId}
+              onChange={(e) => setRoomId(e.target.value)}
+            />
+            <button className="btn-primary bg-primary" onClick={onRoomCreate}>
+              Join
+            </button>
+          </FlexContainer>
+        </div>
+      </Modal>
+    </>
   );
 };
 

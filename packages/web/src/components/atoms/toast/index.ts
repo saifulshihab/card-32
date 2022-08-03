@@ -17,6 +17,6 @@ export const showToastMessage = (props: IToastMessage) => {
     draggable: true,
     progress: undefined,
     theme: "dark",
-    type: type || "default",
+    type: type || "info",
   });
 };
