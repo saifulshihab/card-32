@@ -1,9 +1,13 @@
 import {
+  userEmailValidator,
   userProfileUpdateValidator,
   userSignupValidator,
+  userUsernameValidator,
 } from "@card-32/common/validators/userValidators";
 import { Router } from "express";
 import {
+  checkEmail,
+  checkUsername,
   getUserProfile,
   loginUser,
   signupUser,
@@ -18,6 +22,14 @@ const router = Router();
 router.post("/signup", inputValidator(userSignupValidator), signupUser);
 // login
 router.post("/login", inputValidator(userSignupValidator), loginUser);
+// check username
+router
+  .route("/profile/check/username")
+  .get(authenticator(), inputValidator(userUsernameValidator), checkUsername);
+// check email
+router
+  .route("/profile/check/email")
+  .get(authenticator(), inputValidator(userEmailValidator), checkEmail);
 // change username & email
 router
   .route("/:userId")

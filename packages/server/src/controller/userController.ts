@@ -59,6 +59,26 @@ export const loginUser = async (req: Request, res: Response) => {
   });
 };
 
+// check username
+export const checkUsername = async (req: Request, res: Response) => {
+  const { username } = req.body;
+  const userWithUsername = await User.findOne({ username });
+  if (userWithUsername) {
+    return res.status(403).json({ message: "Username taken" });
+  }
+  return res.status(200).json({ message: "Username available" });
+};
+
+// check email
+export const checkEmail = async (req: Request, res: Response) => {
+  const { email } = req.body;
+  const userWithEmail = await User.findOne({ email });
+  if (userWithEmail) {
+    return res.status(403).json({ message: "This email is not available" });
+  }
+  return res.status(200).json({ message: "Email available" });
+};
+
 // get user profile
 export const getUserProfile = async (req: Request, res: Response) => {
   const { userId } = req.params;
@@ -80,12 +100,24 @@ export const updateUserProfile = async (req: Request, res: Response) => {
       message: "User not found",
     });
   }
-
   const { username, email } = req.body as IProfileUpdateInput;
+
+  const userWithUsername = await User.findOne({ username });
+  if (userWithUsername && userWithUsername._id.toString() !== userId) {
+    return res.status(403).json({ message: "Username taken" });
+  }
+
+  if (email) {
+    const userWithEmail = await User.findOne({ email });
+    if (userWithEmail && userWithEmail._id.toString() !== userId) {
+      return res
+        .status(403)
+        .json({ message: "This email is already registered" });
+    }
+  }
 
   user.username = username;
   user.email = email;
-
   await user.save();
 
   return res.status(200).json(user);

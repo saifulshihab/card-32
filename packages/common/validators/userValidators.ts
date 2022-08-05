@@ -1,7 +1,7 @@
 import * as yup from "yup";
 import { EMAIL_FORMAT_REGEX, USERNAME_REGEX } from "../constant/regex";
 
-export const userUsernameValidator = {
+export const userUsernameValidatorSchema = {
   username: yup
     .string()
     .min(3, "Username must be at least 3 characters")
@@ -13,18 +13,26 @@ export const userUsernameValidator = {
 };
 
 export const userSignupValidator = yup.object().shape({
-  ...userUsernameValidator,
+  ...userUsernameValidatorSchema,
   password: yup
     .string()
     .min(4, "Password must be at least 4 characters")
     .required("Password is required"),
 });
 
-export const userEmailValidator = {
+export const userEmailValidatorSchema = {
   email: yup.string().matches(EMAIL_FORMAT_REGEX, "Invalid email"),
 };
 
+export const userUsernameValidator = yup.object().shape({
+  ...userUsernameValidatorSchema,
+});
+
+export const userEmailValidator = yup.object().shape({
+  email: yup.string().required().matches(EMAIL_FORMAT_REGEX, "Invalid email"),
+});
+
 export const userProfileUpdateValidator = yup.object().shape({
-  ...userUsernameValidator,
-  ...userEmailValidator,
+  ...userUsernameValidatorSchema,
+  ...userEmailValidatorSchema,
 });
