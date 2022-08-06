@@ -2,6 +2,7 @@ import React, { PropsWithChildren } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuthContext } from "../../../contexts/AuthProvider";
 import { APPEARANCE, PROFILE, SETTINGS } from "../../../routes/routes";
+import Button from "../../atoms/button/Button";
 
 interface IListItemProps {
   active?: boolean;
@@ -38,10 +39,10 @@ const ProfileSidebar: React.FC = () => {
           </Link>
         </ul>
       </div>
-      <button onClick={logout} className="btn-primary w-full mt-3">
+      <Button onClick={logout} className="w-full mt-3">
         <i className="fa-solid fa-arrow-right-from-bracket mr-2"></i>
         Logout
-      </button>
+      </Button>
     </div>
   );
 };

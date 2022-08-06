@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import FlexContainer from "../../components/atoms/box/FlexContainer";
+import Button from "../../components/atoms/button/Button";
 import TextInput from "../../components/atoms/inputs/TextInput";
 import Modal from "../../components/atoms/modal/Modal";
 import { ContentSubHeading } from "../../components/atoms/texts/ContentSubHeading";
@@ -27,18 +28,15 @@ const HomePage: React.FC = () => {
       <FlexContainer className="justify-between items-center my-2">
         <ContentSubHeading>Active Rooms</ContentSubHeading>
         <FlexContainer>
-          <button
-            className="btn-primary bg-primary"
-            onClick={() => setRoomModal("create")}
-          >
+          <Button className="bg-primary" onClick={() => setRoomModal("create")}>
             Create Room
-          </button>
-          <button
-            className="btn-primary border-2 border-primary"
+          </Button>
+          <Button
+            className="border-2 border-primary"
             onClick={() => setRoomModal("join")}
           >
             Join Room
-          </button>
+          </Button>
         </FlexContainer>
       </FlexContainer>
 
@@ -66,9 +64,9 @@ const HomePage: React.FC = () => {
               value={roomId}
               onChange={(e) => setRoomId(e.target.value)}
             />
-            <button className="btn-primary bg-primary" onClick={onRoomCreate}>
+            <Button className="bg-primary" onClick={onRoomCreate}>
               Create
-            </button>
+            </Button>
           </FlexContainer>
         </div>
       </Modal>
@@ -88,9 +86,9 @@ const HomePage: React.FC = () => {
               value={roomId}
               onChange={(e) => setRoomId(e.target.value)}
             />
-            <button className="btn-primary bg-primary" onClick={onRoomCreate}>
+            <Button className="bg-primary" onClick={onRoomCreate}>
               Join
-            </button>
+            </Button>
           </FlexContainer>
         </div>
       </Modal>

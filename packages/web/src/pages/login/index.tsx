@@ -1,10 +1,10 @@
 import { ISignInOrUpInput } from "@card-32/common/types/user";
 import React, { useState } from "react";
 import { Navigate } from "react-router-dom";
-import styled from "styled-components";
 import { handlePublicApiError, ICommonApiError } from "../../api/apiRequest";
 import { userSignUpApi } from "../../api/userApi";
 import FlexContainer from "../../components/atoms/box/FlexContainer";
+import Button from "../../components/atoms/button/Button";
 import TextInput from "../../components/atoms/inputs/TextInput";
 import { showToastMessage } from "../../components/atoms/toast";
 import { useAuthContext } from "../../contexts/AuthProvider";
@@ -15,12 +15,6 @@ const initialLoginInput: ISignInOrUpInput = {
   username: "",
   password: "",
 };
-
-const LoginForm = styled.form`
-  display: flex;
-  flex-flow: column;
-  gap: 4;
-`;
 
 const LoginPage: React.FC = () => {
   const { isAuthenticated, userLoginApiAction } = useAuthContext();
@@ -86,7 +80,7 @@ const LoginPage: React.FC = () => {
         <p className="text-2xl mb-5 font-bold">
           {mode === "login" ? "Login" : "Sign Up"}
         </p>
-        <LoginForm onSubmit={onFormSubmit}>
+        <FlexContainer className="w-full flex-col gap-4">
           <TextInput
             label="Username"
             placeholder="Enter username"
@@ -106,13 +100,13 @@ const LoginPage: React.FC = () => {
           />
 
           <FlexContainer>
-            <button
-              type="submit"
-              className="mt-2 inline-block btn-primary bg-primary"
+            <Button
+              className="mt-2 inline-block bg-primary"
+              onClick={onFormSubmit}
             >
               {mode === "login" ? "Login" : "Sign up"}
               {loading ? "..." : null}
-            </button>
+            </Button>
           </FlexContainer>
 
           <FlexContainer>
@@ -128,7 +122,7 @@ const LoginPage: React.FC = () => {
               </button>
             )}
           </FlexContainer>
-        </LoginForm>
+        </FlexContainer>
       </div>
     </div>
   );
