@@ -6,18 +6,21 @@ interface IProps
     HTMLButtonElement
   > {
   className?: string;
+  loading?: boolean;
 }
 
 const Button: React.FC<PropsWithChildren<IProps>> = (props) => {
-  const { className, disabled } = props;
+  const { loading, className, disabled } = props;
   return (
     <button
       {...props}
       className={`btn-primary ${
-        disabled ? "cursor-not-allowed bg-opacity-50" : ""
+        disabled ? "cursor-wait bg-opacity-50" : ""
       } ${className}`}
+      disabled={loading}
     >
       {props.children}
+      {loading ? "..." : null}
     </button>
   );
 };

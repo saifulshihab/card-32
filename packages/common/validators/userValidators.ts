@@ -36,3 +36,18 @@ export const userProfileUpdateValidator = yup.object().shape({
   ...userUsernameValidatorSchema,
   ...userEmailValidatorSchema,
 });
+
+export const changePasswordValidationSchema = {
+  oldPassword: yup
+    .string()
+    .min(4, "Password must be at least 4 characters")
+    .required("Password is required"),
+  newPassword: yup
+    .string()
+    .min(4, "Password must be at least 4 characters")
+    .required("Password is required"),
+};
+
+export const changePasswordValidator = yup.object().shape({
+  ...changePasswordValidationSchema,
+});

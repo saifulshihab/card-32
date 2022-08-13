@@ -19,10 +19,11 @@ export const RoomProvider: React.FC<PropsWithChildren> = (props) => {
   const [activeRooms] = useState<IActiveRoom[]>([]);
 
   useEffect(() => {
+    if (!socket) return;
     socket.on("roomData", (roomData: IRoom) => {
       setRoom(roomData);
     });
-  }, []);
+  }, [socket]);
 
   const playerFromLocalStorage = getPlayerFromLocalStorage();
 

@@ -1,6 +1,10 @@
 import { ISignInOrUpInput } from "@card-32/common/types/user";
 import React, { PropsWithChildren, useCallback, useState } from "react";
-import { handlePublicApiError, ICommonApiError } from "../api/apiRequest";
+import {
+  handlePublicApiError,
+  ICommonApiError,
+  setAuthToken,
+} from "../api/apiRequest";
 import { userLoginApi } from "../api/userApi";
 import { showToastMessage } from "../components/atoms/toast";
 import {
@@ -13,6 +17,7 @@ import {
 interface IAuthContext {
   isAuthenticated: boolean;
   user: IUserLocalStorage | null;
+  setUser: React.Dispatch<React.SetStateAction<IUserLocalStorage | null>>;
   accessToken: string | undefined;
   userLoginApiAction: (input: ISignInOrUpInput) => Promise<void>;
   logout: () => void;
@@ -34,6 +39,7 @@ const localStorageUserAndToken = getUserAndTokenFromLocalStorage();
 
 if (localStorageUserAndToken) {
   const { user, accessToken } = localStorageUserAndToken;
+  setAuthToken(accessToken);
   authInitialState = {
     user,
     isAuthenticated: true,
@@ -60,6 +66,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = (props) => {
       setUser(data.user);
       setUserAndTokenOnLocalStorage(data);
       setAccessToken(data.accessToken);
+      setAuthToken(data.accessToken);
       setIsAuthenticated(true);
     } catch (err) {
       const { error, data } = handlePublicApiError(err as ICommonApiError);
@@ -82,6 +89,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = (props) => {
     <AuthContext.Provider
       value={{
         user,
+        setUser,
         accessToken,
         isAuthenticated,
         userLoginApiAction,

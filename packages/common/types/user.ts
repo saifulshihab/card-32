@@ -1,4 +1,5 @@
 export interface IUser {
+  _id: string;
   username: string;
   password: string;
   email?: string;
@@ -14,4 +15,9 @@ export interface ISignInOrUpInput {
 export interface IProfileUpdateInput {
   username: string;
   email?: string;
+}
+
+export interface IPasswordChangeInput {
+  newPassword: string;
+  oldPassword: string;
 }

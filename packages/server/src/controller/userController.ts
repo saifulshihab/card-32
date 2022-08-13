@@ -61,7 +61,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
 // check username
 export const checkUsername = async (req: Request, res: Response) => {
-  const { username } = req.body;
+  const { username } = req.query;
   const userWithUsername = await User.findOne({ username });
   if (userWithUsername) {
     return res.status(403).json({ message: "Username taken" });
@@ -71,7 +71,7 @@ export const checkUsername = async (req: Request, res: Response) => {
 
 // check email
 export const checkEmail = async (req: Request, res: Response) => {
-  const { email } = req.body;
+  const { email } = req.query;
   const userWithEmail = await User.findOne({ email });
   if (userWithEmail) {
     return res.status(403).json({ message: "This email is not available" });
@@ -121,4 +121,30 @@ export const updateUserProfile = async (req: Request, res: Response) => {
   await user.save();
 
   return res.status(200).json(user);
+};
+
+// change password
+export const changePassword = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const { oldPassword, newPassword } = req.body;
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
+
+  if (oldPassword !== newPassword) {
+    return res.status(400).json({
+      message: "Password doesn't match",
+    });
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+  user.password = hashedPassword;
+  await user.save();
+
+  return res.status(200).json({ message: "Success " });
 };

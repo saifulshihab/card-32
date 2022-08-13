@@ -13,10 +13,10 @@ export const CardsProvider: React.FC<PropsWithChildren> = (props) => {
   const [cards, setCards] = useState<ICard[]>([]);
 
   useEffect(() => {
-    socket.on("receiveCards", ({ cards }: { cards: ICard[] }) => {
+    socket?.on("receiveCards", ({ cards }: { cards: ICard[] }) => {
       setCards(cards);
     });
-  }, []);
+  }, [socket]);
 
   return (
     <CardsContext.Provider

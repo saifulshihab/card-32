@@ -87,16 +87,17 @@ const LoginPage: React.FC = () => {
             value={loginInput.username}
             className="border-b border-primary"
             onChange={(e) => onLoginInputChange("username", e.target.value)}
-            error={formErrors?.username}
+            errorMessage={formErrors?.username}
           />
 
           <TextInput
+            type="password"
             label="Password"
             placeholder="Enter password"
             value={loginInput.password}
             className="border-b border-primary"
             onChange={(e) => onLoginInputChange("password", e.target.value)}
-            error={formErrors?.password}
+            errorMessage={formErrors?.password}
           />
 
           <FlexContainer>

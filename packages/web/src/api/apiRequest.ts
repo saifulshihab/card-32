@@ -1,11 +1,19 @@
 import axios, { AxiosError } from "axios";
+import { BASE_URL } from "../constants/config";
 
 const publicInstance = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: BASE_URL,
 });
 
-export const publicApiRequest = publicInstance;
+const privateInstance = axios.create({
+  baseURL: BASE_URL,
+});
 
+export function setAuthToken(token: string) {
+  if (token) {
+    privateInstance.defaults.headers.common["Authorization"] = token;
+  }
+}
 export type ICommonApiError = AxiosError<{ message: string }>;
 
 interface IErrorData<E> {
@@ -16,7 +24,7 @@ interface IErrorData<E> {
 
 export function handlePrivateApiError<E>(
   err: AxiosError<E>,
-  logoutAction: () => void
+  logoutAction?: () => void
 ): IErrorData<E> {
   if (err.response && err.response.status) {
     switch (err.response.status) {
@@ -24,7 +32,7 @@ export function handlePrivateApiError<E>(
         return { status: 400, error: "", data: err.response.data };
       }
       case 401: {
-        logoutAction();
+        logoutAction && logoutAction();
         return {
           status: 401,
           error: "Your session has expired",
@@ -69,3 +77,6 @@ export function handlePublicApiError<E>(err: AxiosError<E>): IErrorData<E> {
     return { status: 520, error: "Something went wrong!" };
   }
 }
+
+export const publicApiRequest = publicInstance;
+export const privateApiRequest = privateInstance;

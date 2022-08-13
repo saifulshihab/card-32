@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useRoomContext } from "../../../contexts/RoomProvider";
-import { useSocketContext } from "../../../contexts/SocketProvider";
 import { useThemeContext } from "../../../contexts/ThemeProvider";
 import { HOME } from "../../../routes/routes";
 import FlexContainer from "../../atoms/box/FlexContainer";
@@ -38,7 +37,6 @@ const StyledSelect = styled.select`
 
 const PlaygroundSidebar: React.FC = () => {
   const navigate = useNavigate();
-  const { socket } = useSocketContext();
   const { room, player } = useRoomContext();
   const { sidebarOrder, setSidebarOrder } = useThemeContext();
   const [bidModalVisible, setBidModalVisible] = useState(false);
@@ -55,7 +53,7 @@ const PlaygroundSidebar: React.FC = () => {
       return;
     }
     // game start: send request for cards
-    socket.emit("startGame");
+    // socket.emit("startGame");
   };
 
   const onLeave = () => {

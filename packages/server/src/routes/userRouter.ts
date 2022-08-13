@@ -1,4 +1,5 @@
 import {
+  changePasswordValidator,
   userEmailValidator,
   userProfileUpdateValidator,
   userSignupValidator,
@@ -6,6 +7,7 @@ import {
 } from "@card-32/common/validators/userValidators";
 import { Router } from "express";
 import {
+  changePassword,
   checkEmail,
   checkUsername,
   getUserProfile,
@@ -25,11 +27,19 @@ router.post("/login", inputValidator(userSignupValidator), loginUser);
 // check username
 router
   .route("/profile/check/username")
-  .get(authenticator(), inputValidator(userUsernameValidator), checkUsername);
+  .get(
+    authenticator(),
+    inputValidator(null, null, userUsernameValidator),
+    checkUsername
+  );
 // check email
 router
   .route("/profile/check/email")
-  .get(authenticator(), inputValidator(userEmailValidator), checkEmail);
+  .get(
+    authenticator(),
+    inputValidator(null, null, userEmailValidator),
+    checkEmail
+  );
 // change username & email
 router
   .route("/:userId")
@@ -38,6 +48,14 @@ router
     authenticator(),
     inputValidator(userProfileUpdateValidator),
     updateUserProfile
+  );
+// change password
+router
+  .route("/:userId/change/password")
+  .put(
+    authenticator(),
+    inputValidator(changePasswordValidator),
+    changePassword
   );
 
 export default router;

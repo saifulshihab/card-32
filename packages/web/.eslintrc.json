@@ -16,9 +16,11 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["react", "@typescript-eslint"],
+  "plugins": ["react", "@typescript-eslint", "react-hooks"],
   "rules": {
     "no-console": [1],
-    "@typescript-eslint/no-explicit-any": [0]
+    "@typescript-eslint/no-explicit-any": [0],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
   }
 }
