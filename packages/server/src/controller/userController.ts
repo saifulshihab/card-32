@@ -45,8 +45,11 @@ export const loginUser = async (req: Request, res: Response) => {
   }
 
   const tokenPayload: ISignInTokenPayload = {
-    userId: user._id.toString(),
+    _id: user._id.toString(),
     username: user.username,
+    email: user.email,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
   };
 
   const accessToken = jwt.sign(tokenPayload, JWT_USER_SECRET, {

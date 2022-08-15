@@ -21,7 +21,11 @@ export const userSignupValidator = yup.object().shape({
 });
 
 export const userEmailValidatorSchema = {
-  email: yup.string().matches(EMAIL_FORMAT_REGEX, "Invalid email"),
+  email: yup
+    .string()
+    .nullable(true)
+    .matches(EMAIL_FORMAT_REGEX, "Invalid email")
+    .notRequired(),
 };
 
 export const userUsernameValidator = yup.object().shape({
@@ -29,7 +33,7 @@ export const userUsernameValidator = yup.object().shape({
 });
 
 export const userEmailValidator = yup.object().shape({
-  email: yup.string().required().matches(EMAIL_FORMAT_REGEX, "Invalid email"),
+  ...userEmailValidatorSchema,
 });
 
 export const userProfileUpdateValidator = yup.object().shape({

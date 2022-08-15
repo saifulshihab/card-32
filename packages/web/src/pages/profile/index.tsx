@@ -1,14 +1,13 @@
 import {
   IPasswordChangeInput,
   IProfileUpdateInput,
-  IUser,
 } from "@card-32/common/types/user";
-import React, { useCallback, useEffect, useState } from "react";
+
+import React, { useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { handlePublicApiError, ICommonApiError } from "../../api/apiRequest";
 import {
   emailCheckApi,
-  getUserProfileApi,
   usernameCheckApi,
   userPasswordChangeApi,
   userProfileUpdateApi,
@@ -21,9 +20,11 @@ import { ContentHeading } from "../../components/atoms/texts/ContentHeading";
 import { showToastMessage } from "../../components/atoms/toast";
 import { useAuthContext } from "../../contexts/AuthProvider";
 import { setUserAndTokenOnLocalStorage } from "../../utils/localStorage";
+import { getValueOrUndefined } from "../../utils/string";
 import {
   userChangePasswordValidator,
   userEmailUpdateValidator,
+  userProfileUpdateValidator,
   userUsernameUpdateValidator,
 } from "../../validators/userValidator";
 
@@ -41,7 +42,6 @@ const initialFormErrors: {
 
 const Profile: React.FC = () => {
   const { user, accessToken, setUser } = useAuthContext();
-  const [userData, setUserData] = useState<IUser | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [profileUpdateModal, setProfileUpdateModal] = useState(false);
   const [changePasswordModal, setChangePasswordModal] = useState(false);
@@ -55,8 +55,8 @@ const Profile: React.FC = () => {
 
   const [profileUpdateInput, setProfileUpdateInput] =
     useState<IProfileUpdateInput>({
-      username: "",
-      email: undefined,
+      username: user?.username || "",
+      email: user?.email,
     });
   const [changePasswordInput, setChangePasswordInput] =
     useState<IPasswordChangeInput>({
@@ -78,31 +78,9 @@ const Profile: React.FC = () => {
     }));
   };
 
-  const getUserProfileApiAction = useCallback(async () => {
-    if (!user) return;
-    try {
-      const { data } = await getUserProfileApi(user.userId);
-      setUserData(data);
-      setProfileUpdateInput({
-        username: data.username,
-        email: data.email,
-      });
-    } catch (err) {
-      const { error, data } = handlePublicApiError(err as ICommonApiError);
-      showToastMessage({
-        message: error || data?.message || "Something went wrong",
-        type: "error",
-      });
-    }
-  }, [user]);
-
-  useEffect(() => {
-    getUserProfileApiAction();
-  }, [getUserProfileApiAction]);
-
   const checkUsername = useDebouncedCallback(async (username: string) => {
     setFormErrors(null);
-    if (username === userData?.username) {
+    if (username === user?.username) {
       return setAvailability({ username: undefined, email: undefined });
     }
     const { isValid, errors } = await userUsernameUpdateValidator(
@@ -125,12 +103,16 @@ const Profile: React.FC = () => {
 
   const checkEmail = useDebouncedCallback(async (email: string) => {
     setFormErrors(null);
-    if (email === userData?.email) {
+    if (!email) {
+      return setAvailability({ email: undefined });
+    }
+    if (email === user?.email) {
       return setAvailability({ username: undefined, email: undefined });
     }
-    const { isValid, errors } = await userEmailUpdateValidator(
-      profileUpdateInput
-    );
+    const { isValid, errors } = await userEmailUpdateValidator({
+      ...profileUpdateInput,
+      email: getValueOrUndefined(profileUpdateInput.email),
+    });
     if (isValid) {
       try {
         setLoading(true);
@@ -168,38 +150,35 @@ const Profile: React.FC = () => {
 
   const onProfileUpdateSubmit = async () => {
     if (!user) return;
-    try {
-      const { data } = await userProfileUpdateApi(
-        user.userId,
-        profileUpdateInput
-      );
-      setUserData(data);
-      const userLocal = {
-        userId: user.userId,
-        username: data.username,
-      };
-      setUser(userLocal);
-      if (accessToken)
-        setUserAndTokenOnLocalStorage({
-          user: userLocal,
-          accessToken,
+    const { isValid } = await userProfileUpdateValidator({
+      ...profileUpdateInput,
+      email: getValueOrUndefined(profileUpdateInput.email),
+    });
+    if (isValid)
+      try {
+        const { data } = await userProfileUpdateApi(user._id, {
+          ...profileUpdateInput,
+          email: profileUpdateInput.email || undefined,
         });
-      setAvailability({
-        username: false,
-        email: false,
-      });
-      setProfileUpdateInput({
-        username: "",
-        email: undefined,
-      });
-      setProfileUpdateModal(false);
-    } catch (err) {
-      const { error, data } = handlePublicApiError(err as ICommonApiError);
-      showToastMessage({
-        message: error || data?.message || "Something went wrong",
-        type: "error",
-      });
-    }
+        setUser(data);
+        if (accessToken) {
+          setUserAndTokenOnLocalStorage({
+            user: data,
+            accessToken,
+          });
+        }
+        setAvailability({
+          username: false,
+          email: false,
+        });
+        setProfileUpdateModal(false);
+      } catch (err) {
+        const { error, data } = handlePublicApiError(err as ICommonApiError);
+        showToastMessage({
+          message: error || data?.message || "Something went wrong",
+          type: "error",
+        });
+      }
   };
 
   const onPasswordChangeSubmit = async () => {
@@ -211,7 +190,7 @@ const Profile: React.FC = () => {
     if (isValid) {
       try {
         setLoading(true);
-        await userPasswordChangeApi(user.userId, changePasswordInput);
+        await userPasswordChangeApi(user._id, changePasswordInput);
         setChangePasswordInput({
           newPassword: "",
           oldPassword: "",
@@ -246,7 +225,7 @@ const Profile: React.FC = () => {
 
         <FlexContainer className="flex-col gap-1 items-start">
           <label className="text-sm font-semibold">Email</label>
-          <p className="text-xs">{userData?.email || "No email"}</p>
+          <p className="text-xs">{user?.email || "No email"}</p>
         </FlexContainer>
       </FlexContainer>
 

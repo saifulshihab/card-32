@@ -25,7 +25,7 @@ export function authenticator() {
       const tokenData: any = jwt.decode(authToken);
 
       const user = await User.findOne({
-        _id: tokenData.userId,
+        _id: tokenData._id,
       });
 
       if (!user) return sendUnauthorized(res);

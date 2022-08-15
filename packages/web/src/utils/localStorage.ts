@@ -9,8 +9,11 @@ interface ILocalStorageKeys {
 }
 
 export interface IUserLocalStorage {
-  userId: string;
+  _id: string;
   username: string;
+  email?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export const LOCAL_STORAGE_KEYS: ILocalStorageKeys = {
