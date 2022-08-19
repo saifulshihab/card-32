@@ -30,6 +30,7 @@ export function authenticator() {
 
       if (!user) return sendUnauthorized(res);
 
+      req.user = user;
       return next();
     } catch (err) {
       return res.status(401).send("Unauthorized");

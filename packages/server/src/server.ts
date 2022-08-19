@@ -17,7 +17,7 @@ export const httpServer = createServer(app);
 connectDatabase();
 
 process.on("unhandledRejection", (error) => {
-  throw error;
+  console.error(error);
 });
 
 // middleware
