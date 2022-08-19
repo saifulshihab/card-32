@@ -10,6 +10,7 @@ import {
   changePassword,
   checkEmail,
   checkUsername,
+  deleteAccount,
   getUserProfile,
   loginUser,
   signupUser,
@@ -48,7 +49,8 @@ router
     authenticator(),
     inputValidator(userProfileUpdateValidator),
     updateUserProfile
-  );
+  )
+  .delete(authenticator(), deleteAccount);
 // change password
 router
   .route("/:userId/change/password")

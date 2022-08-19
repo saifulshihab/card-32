@@ -81,3 +81,12 @@ export function userPasswordChangeApi(
       .catch((err) => reject(err));
   });
 }
+
+export function deleteUserAccountApi(userId: string) {
+  return new Promise((resolve, reject) => {
+    privateApiRequest
+      .delete(`/api/v1/user/${userId}`)
+      .then((res) => resolve(res))
+      .catch((err) => reject(err));
+  });
+}

@@ -151,3 +151,23 @@ export const changePassword = async (req: Request, res: Response) => {
 
   return res.status(200).json({ message: "Success " });
 };
+
+// delete account permanantly
+export const deleteAccount = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({
+      message: "User not found",
+    });
+  }
+
+  if (user._id.toString() !== userId) {
+    return res
+      .status(403)
+      .json({ message: "You are not authorized to delete this account" });
+  }
+  await user.delete();
+
+  return res.status(200).json({ message: "Account deleted permanatly" });
+};
