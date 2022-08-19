@@ -17,6 +17,10 @@ const RoomSchema = new Schema<IRoom>(
       ],
       required: true,
     },
+    creator: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,

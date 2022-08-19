@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { JWT_USER_SECRET } from "../config/env";
 import { User } from "../models/user";
 
-function sendUnauthorized(res: Response) {
+export function sendUnauthorized(res: Response) {
   return res.status(401).send("Unauthorized");
 }
 

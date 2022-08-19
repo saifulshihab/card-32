@@ -6,6 +6,7 @@ import { connectDatabase } from "./config/dbConnection";
 import { PORT } from "./config/env";
 import errorHandler, { routeNotFound } from "./middlewares/errorHandler";
 import userRouter from "./routes/userRouter";
+import roomRouter from "./routes/roomRouter";
 
 dotenv.config();
 require("express-async-errors");
@@ -28,6 +29,7 @@ app.use(cors());
 
 // APIs
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/room", roomRouter);
 
 // error handler
 app.use(routeNotFound);
