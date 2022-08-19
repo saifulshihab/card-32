@@ -1,12 +1,25 @@
-import mongoose, { Schema } from "mongoose";
-import { IRoom } from "@card-32/common/types/room";
+import { IPlayer } from "@card-32/common/types/player";
+import mongoose, { ObjectId, Schema } from "mongoose";
+import { User } from "./user";
 
-const RoomSchema = new Schema<IRoom>(
+interface IRoomDocument {
+  roomId: string;
+  password: string;
+  players: IPlayer[];
+  creator: ObjectId;
+}
+
+const RoomSchema = new Schema<IRoomDocument>(
   {
     roomId: {
       type: String,
       required: true,
       unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      select: false,
     },
     players: {
       type: [
@@ -18,7 +31,8 @@ const RoomSchema = new Schema<IRoom>(
       required: true,
     },
     creator: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: User,
       required: true,
     },
   },
@@ -27,4 +41,4 @@ const RoomSchema = new Schema<IRoom>(
   }
 );
 
-export const Room = mongoose.model<IRoom>("room", RoomSchema);
+export const Room = mongoose.model<IRoomDocument>("room", RoomSchema);
