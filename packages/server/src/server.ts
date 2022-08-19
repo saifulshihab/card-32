@@ -4,7 +4,7 @@ import express from "express";
 import { createServer } from "http";
 import { connectDatabase } from "./config/dbConnection";
 import { PORT } from "./config/env";
-import errorHandler from "./middlewares/errorHandler";
+import errorHandler, { routeNotFound } from "./middlewares/errorHandler";
 import userRouter from "./routes/userRouter";
 
 dotenv.config();
@@ -30,6 +30,7 @@ app.use(cors());
 app.use("/api/v1/user", userRouter);
 
 // error handler
+app.use(routeNotFound);
 app.use(errorHandler);
 
 // invoke socket events
