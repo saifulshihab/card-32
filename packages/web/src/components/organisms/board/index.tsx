@@ -1,15 +1,15 @@
 import { DNDType } from "@card-32/common/types/dnd";
 import React from "react";
 import { useDrop } from "react-dnd";
+import { useAuthContext } from "../../../contexts/AuthProvider";
 import { useCardsContext } from "../../../contexts/CardsProvider";
-import { useRoomContext } from "../../../contexts/RoomProvider";
 
 import FlexContainer from "../../atoms/box/FlexContainer";
 import { Card } from "../card";
 import Chat from "../chat";
 
 const Board: React.FC = () => {
-  const { player } = useRoomContext();
+  const { user } = useAuthContext();
   const { cards } = useCardsContext();
   const [{ isOver }, drop] = useDrop(
     {
@@ -47,9 +47,7 @@ const Board: React.FC = () => {
           <FlexContainer className="h-full justify-center p-2 sm:p-0">
             <div className="inline-grid grid-cols-4 lg:grid-cols-8 grid-rows-1 sm:grid-rows-1 lg:grid-rows-1 gap-2 sm:gap-3">
               {cards
-                .filter(
-                  (card) => !card.used && card.playerId === player?.playerId
-                )
+                .filter((card) => !card.used && card.playerId === user?._id)
                 .map((card, idx) => (
                   <Card key={idx} card={card} />
                 ))}

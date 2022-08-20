@@ -2,6 +2,7 @@ import { IPlayer } from "@card-32/common/types/player";
 import { Request, Response } from "express";
 import { sendUnauthorized } from "../middlewares/authenticator";
 import { Room } from "../models/room";
+import { emitNewRoomCreate } from "../socket/mainSocket";
 
 // create room
 export const createRoom = async (req: Request, res: Response) => {
@@ -37,7 +38,9 @@ export const createRoom = async (req: Request, res: Response) => {
     creator: req.user._id,
   });
 
-  return res.status(200).json(newRoom);
+  res.status(200).json(newRoom);
+
+  return emitNewRoomCreate(newRoom);
 };
 
 // create room

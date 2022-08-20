@@ -3,40 +3,45 @@ import { io, Socket } from "socket.io-client";
 import { BASE_URL } from "../constants/config";
 import { useAuthContext } from "./AuthProvider";
 
+// Namespaces
+const mainNamespace = BASE_URL;
+
 interface ISocketContext {
-  socket: Socket | undefined;
+  mainSocket: Socket | undefined;
 }
 
 const SocketContext = React.createContext<ISocketContext | null>(null);
 
 export const SocketProvider: React.FC<PropsWithChildren> = (props) => {
-  const { isAuthenticated, accessToken } = useAuthContext();
-
-  const [socket, setSocket] = useState<Socket | undefined>(undefined);
+  const { isAuthenticated, accessToken, user } = useAuthContext();
+  const [mainSocket, setMainSocket] = useState<Socket | undefined>(undefined);
 
   useEffect(() => {
     if (!isAuthenticated) return;
-    const socket = io(BASE_URL, {
+    const mainSocket = io(mainNamespace, {
+      query: {
+        playerId: user?._id,
+      },
       auth: {
         token: accessToken,
       },
     });
-    setSocket(socket);
 
-    socket.on("connect_error", (err) => {
-      // eslint-disable-next-line no-console
-      console.error(err);
-    });
+    setMainSocket(mainSocket);
+
+    // mainSocket.on("connect_error", () => {
+    //   setMainSocket(undefined);
+    // });
 
     return () => {
-      socket.close();
+      mainSocket.close();
     };
-  }, [isAuthenticated, accessToken]);
+  }, [isAuthenticated, accessToken, user]);
 
   return (
     <SocketContext.Provider
       value={{
-        socket,
+        mainSocket,
       }}
     >
       {props.children}

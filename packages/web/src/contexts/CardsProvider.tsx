@@ -9,7 +9,7 @@ interface ICardsContext {
 const CardsContext = React.createContext<ICardsContext | null>(null);
 
 export const CardsProvider: React.FC<PropsWithChildren> = (props) => {
-  const { socket } = useSocketContext();
+  const { mainSocket: socket } = useSocketContext();
   const [cards, setCards] = useState<ICard[]>([]);
 
   useEffect(() => {

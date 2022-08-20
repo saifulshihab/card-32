@@ -4,9 +4,11 @@ export interface IRoom {
   roomId: string;
   players: IPlayer[];
   creator: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface IActiveRoom {
-  roomId: string;
-  numOfUsers: number;
+export interface IRoomCreateInput {
+  roomId?: string;
+  password?: string;
 }

@@ -2,7 +2,7 @@ import { IPlayer } from "@card-32/common/types/player";
 import mongoose, { ObjectId, Schema } from "mongoose";
 import { User } from "./user";
 
-interface IRoomDocument {
+export interface IRoomDocument {
   roomId: string;
   password: string;
   players: IPlayer[];

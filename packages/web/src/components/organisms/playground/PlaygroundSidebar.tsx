@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useAuthContext } from "../../../contexts/AuthProvider";
 import { useRoomContext } from "../../../contexts/RoomProvider";
 import { useThemeContext } from "../../../contexts/ThemeProvider";
 import { HOME } from "../../../routes/routes";
@@ -37,7 +38,8 @@ const StyledSelect = styled.select`
 
 const PlaygroundSidebar: React.FC = () => {
   const navigate = useNavigate();
-  const { room, player } = useRoomContext();
+  const { user } = useAuthContext();
+  const { room } = useRoomContext();
   const { sidebarOrder, setSidebarOrder } = useThemeContext();
   const [bidModalVisible, setBidModalVisible] = useState(false);
 
@@ -73,7 +75,7 @@ const PlaygroundSidebar: React.FC = () => {
           </div>
           <div>
             <p className="text-sm sm:text-lg sm:leading-6 font-bold">
-              {player?.username}
+              {user?.username}
             </p>
             <p className="text-xs">don&apos;t freeze</p>
           </div>

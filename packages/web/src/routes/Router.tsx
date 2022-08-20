@@ -55,7 +55,7 @@ const Router: React.FC = () => {
           />
 
           <Route
-            path={PLAYGROUND}
+            path={PLAYGROUND(":roomId")}
             element={
               <PrivateRoute layout={BlankLayout}>
                 <Playground />

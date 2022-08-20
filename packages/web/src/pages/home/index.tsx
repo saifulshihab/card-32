@@ -1,4 +1,8 @@
-import React, { useState } from "react";
+import { IRoomCreateInput } from "@card-32/common/types/room";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { handlePublicApiError, ICommonApiError } from "../../api/apiRequest";
+import { roomCreateApi } from "../../api/roomApi";
 import FlexContainer from "../../components/atoms/box/FlexContainer";
 import Button from "../../components/atoms/button/Button";
 import TextInput from "../../components/atoms/inputs/TextInput";
@@ -7,21 +11,74 @@ import { ContentSubHeading } from "../../components/atoms/texts/ContentSubHeadin
 import { showToastMessage } from "../../components/atoms/toast";
 import RoomCard from "../../components/organisms/home/RoomCard";
 import { useRoomContext } from "../../contexts/RoomProvider";
+import { useSocketContext } from "../../contexts/SocketProvider";
+import { PLAYGROUND } from "../../routes/routes";
+import { roomCreateValidator } from "../../validators/roomValidators";
+
+const initialFormErrors: IRoomCreateInput = {
+  roomId: undefined,
+  password: undefined,
+};
+
+const initialInput: IRoomCreateInput = {
+  roomId: undefined,
+  password: undefined,
+};
 
 const HomePage: React.FC = () => {
-  const { activeRooms } = useRoomContext();
+  const navigate = useNavigate();
+  const { mainSocket } = useSocketContext();
+  const { activeRooms, setRoom, room } = useRoomContext();
   const [roomModal, setRoomModal] = useState<"create" | "join" | undefined>(
     undefined
   );
-  const [roomId, setRoomId] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
+  const [roomInput, setRoomInput] = useState<IRoomCreateInput>(initialInput);
+  const [formErrors, setFormErrors] = useState<typeof initialFormErrors | null>(
+    null
+  );
 
-  const onRoomCreate = () => {
-    if (!roomId) {
-      return showToastMessage({
-        message: "Enter room name",
-      });
+  useEffect(() => {
+    if (room) {
+      navigate(PLAYGROUND(room.roomId));
+    }
+  }, [room, navigate]);
+
+  const onChangeRoomInput = (key: keyof IRoomCreateInput, value: string) => {
+    setRoomInput((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const onRoomCreate = async () => {
+    setFormErrors(null);
+    const { isValid, errors } = await roomCreateValidator(roomInput);
+
+    if (isValid) {
+      try {
+        setLoading(true);
+        const { data } = await roomCreateApi(roomInput);
+        setRoom(data);
+        setRoomInput(initialInput);
+        setRoomModal(undefined);
+      } catch (err) {
+        const { error, data } = handlePublicApiError(err as ICommonApiError);
+        showToastMessage({
+          message: error || data?.message || "Something went wrong",
+          type: "error",
+        });
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setFormErrors(errors);
     }
   };
+
+  if (!mainSocket?.active) {
+    return <p className="">Connecting...</p>;
+  }
 
   return (
     <>
@@ -41,7 +98,7 @@ const HomePage: React.FC = () => {
       </FlexContainer>
 
       <hr className="border-zinc-700 my-3" />
-      <div className="grid grid-cols-6 gap-3">
+      <div className="grid grid-cols-4 gap-4">
         {activeRooms.length ? (
           activeRooms.map((room, key) => <RoomCard key={key} room={room} />)
         ) : (
@@ -57,16 +114,32 @@ const HomePage: React.FC = () => {
         <div className="bg-zinc-800 p-4 py-5 text-white">
           <ContentSubHeading>Create room</ContentSubHeading>
           <p className="text-xs">Create room and invite other&apos;s</p>
-          <FlexContainer className="mt-3">
+          <FlexContainer className="flex-col gap-4 mt-3">
             <TextInput
-              placeholder="Enter room name"
+              placeholder="Room ID (e.g discord99)"
               className="border-b border-primary focus:border-b-2 shadow-md"
-              value={roomId}
-              onChange={(e) => setRoomId(e.target.value)}
+              value={roomInput.roomId}
+              onChange={(e) => onChangeRoomInput("roomId", e.target.value)}
+              errorMessage={formErrors?.roomId}
             />
-            <Button className="bg-primary" onClick={onRoomCreate}>
-              Create
-            </Button>
+            <TextInput
+              type="password"
+              placeholder="Room password"
+              className="border-b border-primary focus:border-b-2 shadow-md"
+              value={roomInput.password}
+              onChange={(e) => onChangeRoomInput("password", e.target.value)}
+              errorMessage={formErrors?.password}
+            />
+
+            <FlexContainer className="w-full justify-end">
+              <Button
+                className="bg-primary"
+                onClick={onRoomCreate}
+                loading={loading}
+              >
+                Create
+              </Button>
+            </FlexContainer>
           </FlexContainer>
         </div>
       </Modal>
@@ -83,8 +156,8 @@ const HomePage: React.FC = () => {
             <TextInput
               placeholder="Enter room name"
               className="border-b border-primary focus:border-b-2 shadow-md"
-              value={roomId}
-              onChange={(e) => setRoomId(e.target.value)}
+              value={roomInput.roomId}
+              onChange={(e) => onChangeRoomInput("roomId", e.target.value)}
             />
             <Button className="bg-primary" onClick={onRoomCreate}>
               Join
