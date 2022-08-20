@@ -25,7 +25,7 @@ const Playground: React.FC = () => {
     }
   }, [room, accessToken]);
 
-  if (!roomSocket) return <p>Connecting....</p>;
+  if (!roomSocket) return <p>Connecting...</p>;
 
   return (
     <div className="w-full h-full flex flex-col sm:flex-row gap-1">
