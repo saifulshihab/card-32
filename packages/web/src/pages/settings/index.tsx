@@ -51,7 +51,7 @@ const Settings: React.FC = () => {
         <FlexContainer className="flex-col gap-4 items-start bg-zinc-800 p-5 text-white">
           <ContentSubHeading>Delete account?</ContentSubHeading>
           <p className="text-gray-300">
-            Are you sure you want to delete your account permanatly?
+            Are you sure you want to delete your account permanently?
           </p>
 
           <FlexContainer className="w-full justify-end gap-2">

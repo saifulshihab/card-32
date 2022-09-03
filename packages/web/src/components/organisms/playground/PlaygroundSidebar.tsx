@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { handlePublicApiError, ICommonApiError } from "../../../api/apiRequest";
+import { roomDeleteApi } from "../../../api/roomApi";
 import { useAuthContext } from "../../../contexts/AuthProvider";
 import { useRoomContext } from "../../../contexts/RoomProvider";
 import { useThemeContext } from "../../../contexts/ThemeProvider";
 import { HOME } from "../../../routes/routes";
 import FlexContainer from "../../atoms/box/FlexContainer";
+import Button from "../../atoms/button/Button";
 import Modal from "../../atoms/modal/Modal";
+import { ContentSubHeading } from "../../atoms/texts/ContentSubHeading";
 import { showToastMessage } from "../../atoms/toast";
 import { PlayerCard } from "../playerCard";
 
@@ -39,7 +43,10 @@ const StyledSelect = styled.select`
 const PlaygroundSidebar: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuthContext();
-  const { room } = useRoomContext();
+  const { room, setRoom } = useRoomContext();
+
+  const [loading, setLoading] = useState(false);
+  const [leaveRoomModal, setLeaveRoomModal] = useState(false);
   const { sidebarOrder, setSidebarOrder } = useThemeContext();
   const [bidModalVisible, setBidModalVisible] = useState(false);
 
@@ -58,8 +65,29 @@ const PlaygroundSidebar: React.FC = () => {
     // socket.emit("startGame");
   };
 
-  const onLeave = () => {
-    navigate(HOME);
+  const onLeave = async () => {
+    if (!room) return;
+    if (room.creator === user?._id) {
+      // room creator delete the room
+      try {
+        setLoading(true);
+        await roomDeleteApi(room.roomId);
+        setRoom(undefined);
+        navigate(HOME);
+      } catch (err) {
+        const { error, data } = handlePublicApiError(err as ICommonApiError);
+        showToastMessage({
+          message: error || data?.message || "Something went wrong",
+          type: "error",
+        });
+      } finally {
+        setLoading(false);
+        setLeaveRoomModal(false);
+      }
+    } else {
+      // room player wants to leave
+      navigate(HOME);
+    }
   };
 
   return (
@@ -94,12 +122,14 @@ const PlaygroundSidebar: React.FC = () => {
           <button className="block sm:hidden btn-primary">
             <i className="fa-solid fa-message"></i>
           </button>
-          <button className="btn-primary" onClick={onLeave}>
+          <button
+            className="btn-primary text-red-600"
+            onClick={() => setLeaveRoomModal(true)}
+          >
             <i className="fa-solid fa-arrow-right-from-bracket"></i>
           </button>
         </FlexContainer>
       </FlexContainer>
-
       <div className="hidden sm:block mt-20">
         <FlexContainer className="flex-col justify-center gap-2">
           <FlexContainer>
@@ -129,7 +159,6 @@ const PlaygroundSidebar: React.FC = () => {
           ) : null}
         </FlexContainer>
       </div>
-
       {/* mobile view */}
       <div className="block sm:hidden p-2 py-3">
         <FlexContainer className="justify-between gap-2">
@@ -160,7 +189,6 @@ const PlaygroundSidebar: React.FC = () => {
           </div>
         ) : null}
       </div>
-
       {/* sidebar bottom content */}
       <div className="hidden sm:flex w-full absolute bottom-0 p-2 flex-col gap-2">
         <FlexContainer className="gap-2 justify-center">
@@ -175,7 +203,6 @@ const PlaygroundSidebar: React.FC = () => {
           </button>
         </FlexContainer>
       </div>
-
       {/* bid select modal */}
       <Modal visible={bidModalVisible} onClose={setBidModalVisible}>
         <FlexContainer className="p-5 bg-zinc-900 text-white  flex-col gap-2">
@@ -193,6 +220,27 @@ const PlaygroundSidebar: React.FC = () => {
           <button className="btn-primary  bg-blue-700 text-xs py-2 px-3">
             Bid
           </button>
+        </FlexContainer>
+      </Modal>
+      {/* room leave modal */}
+      <Modal visible={leaveRoomModal} onClose={() => setLeaveRoomModal(false)}>
+        <FlexContainer className="flex-col gap-4 items-start bg-zinc-800 p-5 text-white">
+          <ContentSubHeading>Leave room?</ContentSubHeading>
+          <p className="text-gray-300">
+            Are you sure you want to leave this room?
+          </p>
+
+          <FlexContainer className="w-full justify-end gap-2">
+            <Button
+              className="bg-zinc-700"
+              onClick={() => setLeaveRoomModal(false)}
+            >
+              No
+            </Button>
+            <Button className="bg-red-600" loading={loading} onClick={onLeave}>
+              Yes
+            </Button>
+          </FlexContainer>
         </FlexContainer>
       </Modal>
     </SidebarContainer>

@@ -31,6 +31,15 @@ export function userLoginApi(data: ISignInOrUpInput) {
   });
 }
 
+export function userAuthCheckApi() {
+  return new Promise((resolve, reject) => {
+    privateApiRequest
+      .get("/api/v1/user/auth")
+      .then((res) => resolve(res))
+      .catch((err) => reject(err));
+  });
+}
+
 export function getUserProfileApi(userId: string) {
   return new Promise<AxiosResponse<IUser>>((resolve, reject) => {
     privateApiRequest

@@ -1,9 +1,10 @@
 import {
   createRoomSchema,
   roomIdParamsSchema,
+  roomPasswordSchema,
 } from "@card-32/common/validators/roomValidator";
 import { Router } from "express";
-import { createRoom, deleteRoom } from "../controller/roomController";
+import { createRoom, deleteRoom, joinRoom } from "../controller/roomController";
 import { authenticator } from "../middlewares/authenticator";
 import { inputValidator } from "../middlewares/inputValidator";
 
@@ -16,6 +17,8 @@ router
 
 router
   .route("/:roomId")
+  // join room
+  .patch(authenticator(), inputValidator(roomPasswordSchema), joinRoom)
   // delete room by creator
   .delete(
     authenticator(),

@@ -17,6 +17,13 @@ export const createRoomSchema = yup.object().shape({
     .required("Password is required"),
 });
 
+export const roomPasswordSchema = yup.object().shape({
+  password: yup
+    .string()
+    .min(4, "Password must be at least 4 characters")
+    .required("Password is required"),
+});
+
 export const roomIdParamsSchema = yup.object().shape({
   roomId: yup
     .string()

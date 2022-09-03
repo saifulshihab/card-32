@@ -62,6 +62,10 @@ export const loginUser = async (req: Request, res: Response) => {
   });
 };
 
+// user authentication check
+export const checkAuth = async (req: Request, res: Response) =>
+  res.status(200).send("Authorized");
+
 // check username
 export const checkUsername = async (req: Request, res: Response) => {
   const { username } = req.query;

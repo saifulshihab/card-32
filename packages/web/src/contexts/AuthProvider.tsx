@@ -1,11 +1,17 @@
 import { ISignInOrUpInput } from "@card-32/common/types/user";
-import React, { PropsWithChildren, useCallback, useState } from "react";
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import {
+  handlePrivateApiError,
   handlePublicApiError,
   ICommonApiError,
   setAuthToken,
 } from "../api/apiRequest";
-import { userLoginApi } from "../api/userApi";
+import { userAuthCheckApi, userLoginApi } from "../api/userApi";
 import { showToastMessage } from "../components/atoms/toast";
 import {
   getUserAndTokenFromLocalStorage,
@@ -84,6 +90,19 @@ export const AuthProvider: React.FC<PropsWithChildren> = (props) => {
     setAccessToken(undefined);
     removeDataOnLocalStorage();
   }, []);
+
+  const userAuthCheckApiAction = useCallback(async () => {
+    try {
+      await userAuthCheckApi();
+    } catch (err) {
+      handlePrivateApiError(err as ICommonApiError, logout);
+    }
+  }, [logout]);
+
+  useEffect(() => {
+    // user auth check on page load
+    userAuthCheckApiAction();
+  }, [userAuthCheckApiAction]);
 
   return (
     <AuthContext.Provider

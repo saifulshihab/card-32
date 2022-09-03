@@ -8,6 +8,7 @@ import {
 import { Router } from "express";
 import {
   changePassword,
+  checkAuth,
   checkEmail,
   checkUsername,
   deleteAccount,
@@ -22,9 +23,11 @@ import { inputValidator } from "../middlewares/inputValidator";
 const router = Router();
 
 // sign up
-router.post("/signup", inputValidator(userSignupValidator), signupUser);
+router.route("/signup").post(inputValidator(userSignupValidator), signupUser);
 // login
-router.post("/login", inputValidator(userSignupValidator), loginUser);
+router.route("/login").post(inputValidator(userSignupValidator), loginUser);
+// auth check
+router.route("/auth").get(authenticator(), checkAuth);
 // check username
 router
   .route("/profile/check/username")
@@ -42,6 +45,7 @@ router
     checkEmail
   );
 // change username & email
+
 router
   .route("/:userId")
   .get(authenticator(), getUserProfile)
