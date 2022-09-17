@@ -6,34 +6,40 @@ import { connectDatabase } from "./config/dbConnection";
 import { PORT } from "./config/env";
 import errorHandler, { routeNotFound } from "./middlewares/errorHandler";
 import userRouter from "./routes/userRouter";
+import { logger } from "./utils/winston";
 
-dotenv.config();
 require("express-async-errors");
 
 const app = express();
 const httpServer = createServer(app);
 
-// database connection
-connectDatabase();
+(async () => {
+  dotenv.config();
+  // database connection
+  await connectDatabase();
 
-// middleware
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+  // middleware
+  app.use(cors());
+  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json());
 
-app.use(cors());
+  app.get("/PING", (_, res) => {
+    res.send("PONG");
+  });
 
-// APIs
-app.use("/api/v1/user", userRouter);
+  // APIs
+  app.use("/api/v1/user", userRouter);
 
-// error handler
-app.use(routeNotFound);
-app.use(errorHandler);
+  // error handler
+  app.use(routeNotFound);
+  app.use(errorHandler);
 
-// listening server
-httpServer.listen(PORT, () => {
-  console.log(`Server running and up on port ${PORT} 🚀`);
-});
+  // listening server
+  httpServer.listen(PORT, () => {
+    logger.info(`Server running and up on port ${PORT} 🚀`);
+  });
+})().catch((err) => logger.error(err));
 
 process.on("unhandledRejection", (error) => {
-  console.error(error);
+  logger.error(error);
 });
