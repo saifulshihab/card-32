@@ -2,10 +2,12 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import { createServer } from "http";
+import { Server } from "socket.io";
 import { connectDatabase } from "./config/dbConnection";
 import { PORT } from "./config/env";
 import errorHandler, { routeNotFound } from "./middlewares/errorHandler";
 import userRouter from "./routes/userRouter";
+import { mainSocketIO } from "./socket/mainSocket";
 import { logger } from "./utils/winston";
 
 require("express-async-errors");
@@ -17,6 +19,12 @@ const httpServer = createServer(app);
   dotenv.config();
   // database connection
   await connectDatabase();
+
+  const io = new Server(httpServer, {
+    cors: {
+      origin: ["http://localhost:3000"],
+    },
+  });
 
   // middleware
   app.use(cors());
@@ -33,6 +41,9 @@ const httpServer = createServer(app);
   // error handler
   app.use(routeNotFound);
   app.use(errorHandler);
+
+  // sockets
+  mainSocketIO(io);
 
   // listening server
   httpServer.listen(PORT, () => {
