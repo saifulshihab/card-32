@@ -173,5 +173,5 @@ export const deleteAccount = async (req: Request, res: Response) => {
   }
   await user.delete();
 
-  return res.status(200).json({ message: "Account deleted permanatly" });
+  return res.status(200).json({ message: "Account deleted permanently" });
 };
