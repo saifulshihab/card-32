@@ -156,7 +156,7 @@ export const changePassword = async (req: Request, res: Response) => {
   return res.status(200).json({ message: "Success " });
 };
 
-// delete account permanantly
+// delete account permanently
 export const deleteAccount = async (req: Request, res: Response) => {
   const { userId } = req.params;
   const user = await User.findById(userId);
