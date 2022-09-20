@@ -1,12 +1,12 @@
 import { Dialog, Transition } from "@headlessui/react";
 import React, { Fragment, PropsWithChildren, useRef } from "react";
 
-interface IProps {
+export interface IModalProps {
   visible: boolean;
   onClose: (value: boolean) => void;
 }
 
-const Modal: React.FC<PropsWithChildren<IProps>> = (props) => {
+const Modal: React.FC<PropsWithChildren<IModalProps>> = (props) => {
   const { visible, onClose, children } = props;
   const cancelButtonRef = useRef(null);
   return (

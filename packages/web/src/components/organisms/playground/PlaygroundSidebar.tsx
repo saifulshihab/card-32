@@ -1,17 +1,12 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { handlePublicApiError, ICommonApiError } from "../../../api/apiRequest";
-import { roomDeleteApi } from "../../../api/roomApi";
 import { useAuthContext } from "../../../contexts/AuthProvider";
 import { useRoomContext } from "../../../contexts/RoomProvider";
 import { useThemeContext } from "../../../contexts/ThemeProvider";
-import { HOME } from "../../../routes/routes";
 import FlexContainer from "../../atoms/box/FlexContainer";
 import Button from "../../atoms/button/Button";
 import Modal from "../../atoms/modal/Modal";
 import { ContentSubHeading } from "../../atoms/texts/ContentSubHeading";
-import { showToastMessage } from "../../atoms/toast";
 import { PlayerCard } from "../playerCard";
 
 const SidebarContainer = styled.div`
@@ -41,53 +36,19 @@ const StyledSelect = styled.select`
 `;
 
 const PlaygroundSidebar: React.FC = () => {
-  const navigate = useNavigate();
-  const { user } = useAuthContext();
-  const { room, setRoom } = useRoomContext();
+  const { player } = useAuthContext();
+  const { room } = useRoomContext();
 
-  const [loading, setLoading] = useState(false);
   const [leaveRoomModal, setLeaveRoomModal] = useState(false);
   const { sidebarOrder, setSidebarOrder } = useThemeContext();
   const [bidModalVisible, setBidModalVisible] = useState(false);
 
   const onStartGame = () => {
-    if (!room) return;
-    if (room.players.length < 4) {
-      showToastMessage({
-        message: `Invite ${
-          4 - room.players.length
-        } more players to start the game`,
-        type: "info",
-      });
-      return;
-    }
-    // game start: send request for cards
-    // socket.emit("startGame");
+    return;
   };
 
   const onLeave = async () => {
-    if (!room) return;
-    if (room.creator === user?._id) {
-      // room creator delete the room
-      try {
-        setLoading(true);
-        await roomDeleteApi(room.roomId);
-        setRoom(undefined);
-        navigate(HOME);
-      } catch (err) {
-        const { error, data } = handlePublicApiError(err as ICommonApiError);
-        showToastMessage({
-          message: error || data?.message || "Something went wrong",
-          type: "error",
-        });
-      } finally {
-        setLoading(false);
-        setLeaveRoomModal(false);
-      }
-    } else {
-      // room player wants to leave
-      navigate(HOME);
-    }
+    return;
   };
 
   return (
@@ -103,7 +64,7 @@ const PlaygroundSidebar: React.FC = () => {
           </div>
           <div>
             <p className="text-sm sm:text-lg sm:leading-6 font-bold">
-              {user?.username}
+              {player?.username}
             </p>
             <p className="text-xs">don&apos;t freeze</p>
           </div>
@@ -237,7 +198,7 @@ const PlaygroundSidebar: React.FC = () => {
             >
               No
             </Button>
-            <Button className="bg-red-600" loading={loading} onClick={onLeave}>
+            <Button className="bg-red-600" onClick={onLeave}>
               Yes
             </Button>
           </FlexContainer>

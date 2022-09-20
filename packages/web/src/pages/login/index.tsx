@@ -1,78 +1,43 @@
-import { ISignInOrUpInput } from "@card-32/common/types/user";
 import React, { useState } from "react";
-import { Navigate } from "react-router-dom";
-import { handlePublicApiError, ICommonApiError } from "../../api/apiRequest";
-import { userSignUpApi } from "../../api/userApi";
 import FlexContainer from "../../components/atoms/box/FlexContainer";
 import Button from "../../components/atoms/button/Button";
 import TextInput from "../../components/atoms/inputs/TextInput";
-import { showToastMessage } from "../../components/atoms/toast";
-import { useAuthContext } from "../../contexts/AuthProvider";
-import { HOME } from "../../routes/routes";
-import { userSignupValidator } from "../../validators/userValidator";
-
-const initialLoginInput: ISignInOrUpInput = {
-  username: "",
-  password: "",
-};
 
 const LoginPage: React.FC = () => {
-  const { isAuthenticated, userLoginApiAction } = useAuthContext();
-
-  const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<"login" | "signup">("login");
-
-  const [loginInput, setLoginInput] =
-    useState<ISignInOrUpInput>(initialLoginInput);
-  const [formErrors, setFormErrors] = useState<ISignInOrUpInput | null>(null);
-
   const onFormSubmit = async () => {
-    const { isValid, errors } = await userSignupValidator(loginInput);
-    if (isValid) {
-      try {
-        setLoading(true);
-        setFormErrors(null);
-        if (mode === "login") {
-          await userLoginApiAction(loginInput);
-        } else {
-          await userSignUpApi(loginInput);
-          showToastMessage({
-            type: "success",
-            message: "Successfully registered.",
-            position: "bottom-center",
-          });
-          setMode("login");
-          setLoginInput(initialLoginInput);
-        }
-      } catch (err) {
-        const { error, data } = handlePublicApiError(err as ICommonApiError);
-        showToastMessage({
-          message: error || data?.message || "Something went wrong",
-          position: "bottom-center",
-          type: "error",
-        });
-      }
-      setLoading(false);
-    } else {
-      setFormErrors(errors as any);
-    }
-  };
+    // const { isValid, errors } = await userSignupValidator(loginInput);
+    // if (isValid) {
+    //   try {
+    //     setLoading(true);
+    //     setFormErrors(null);
+    //     if (mode === "login") {
+    //       await userLoginApiAction(loginInput);
+    //     } else {
+    //       await userSignUpApi(loginInput);
+    //       showToastMessage({
+    //         type: "success",
+    //         message: "Successfully registered.",
+    //         position: "bottom-center",
+    //       });
+    //       setMode("login");
+    //       setLoginInput(initialLoginInput);
+    //     }
+    //   } catch (err) {
+    //     const { error, data } = handlePublicApiError(err as ICommonApiError);
+    //     showToastMessage({
+    //       message: error || data?.message || "Something went wrong",
+    //       position: "bottom-center",
+    //       type: "error",
+    //     });
+    //   }
+    //   setLoading(false);
+    // } else {
+    //   setFormErrors(errors as any);
+    // }
 
-  const onLoginInputChange = (name: keyof ISignInOrUpInput, value: string) => {
-    setLoginInput((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    return;
   };
-
-  if (isAuthenticated)
-    return (
-      <Navigate
-        to={{
-          pathname: HOME,
-        }}
-      />
-    );
 
   return (
     <div className="flex justify-center">
@@ -84,20 +49,20 @@ const LoginPage: React.FC = () => {
           <TextInput
             label="Username"
             placeholder="Enter username"
-            value={loginInput.username}
+            // value={loginInput.username}
             className="border-b border-primary"
-            onChange={(e) => onLoginInputChange("username", e.target.value)}
-            errorMessage={formErrors?.username}
+            // onChange={(e) => onLoginInputChange("username", e.target.value)}
+            // errorMessage={formErrors?.username}
           />
 
           <TextInput
             type="password"
             label="Password"
             placeholder="Enter password"
-            value={loginInput.password}
+            // value={loginInput.password}
             className="border-b border-primary"
-            onChange={(e) => onLoginInputChange("password", e.target.value)}
-            errorMessage={formErrors?.password}
+            // onChange={(e) => onLoginInputChange("password", e.target.value)}
+            // errorMessage={formErrors?.password}
           />
 
           <FlexContainer>
@@ -106,7 +71,7 @@ const LoginPage: React.FC = () => {
               onClick={onFormSubmit}
             >
               {mode === "login" ? "Login" : "Sign up"}
-              {loading ? "..." : null}
+              {/* {loading ? "..." : null} */}
             </Button>
           </FlexContainer>
 

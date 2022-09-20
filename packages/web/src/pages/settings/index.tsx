@@ -1,35 +1,31 @@
 import React, { useState } from "react";
-import { handlePublicApiError, ICommonApiError } from "../../api/apiRequest";
-import { deleteUserAccountApi } from "../../api/userApi";
 import FlexContainer from "../../components/atoms/box/FlexContainer";
 import Button from "../../components/atoms/button/Button";
 import Modal from "../../components/atoms/modal/Modal";
 import { ContentHeading } from "../../components/atoms/texts/ContentHeading";
 import { ContentSubHeading } from "../../components/atoms/texts/ContentSubHeading";
-import { showToastMessage } from "../../components/atoms/toast";
-import { useAuthContext } from "../../contexts/AuthProvider";
 
 const Settings: React.FC = () => {
-  const { user, logout } = useAuthContext();
-  const [loading, setLoading] = useState(false);
   const [deleteAccountModal, setDeleteAccountModal] = useState(false);
 
   const onAccountDelete = async () => {
-    if (!user) return;
-    try {
-      setLoading(true);
-      await deleteUserAccountApi(user._id);
-      logout();
-    } catch (err) {
-      const { error, data } = handlePublicApiError(err as ICommonApiError);
-      showToastMessage({
-        message: error || data?.message || "Something went wrong",
-        type: "error",
-      });
-    } finally {
-      setLoading(false);
-      setDeleteAccountModal(false);
-    }
+    // if (!user) return;
+    // try {
+    //   setLoading(true);
+    //   await deleteUserAccountApi(user._id);
+    //   logout();
+    // } catch (err) {
+    //   const { error, data } = handlePublicApiError(err as ICommonApiError);
+    //   showToastMessage({
+    //     message: error || data?.message || "Something went wrong",
+    //     type: "error",
+    //   });
+    // } finally {
+    //   setLoading(false);
+    //   setDeleteAccountModal(false);
+    // }
+
+    return;
   };
 
   return (
@@ -61,11 +57,7 @@ const Settings: React.FC = () => {
             >
               No
             </Button>
-            <Button
-              className="bg-red-600"
-              loading={loading}
-              onClick={onAccountDelete}
-            >
+            <Button className="bg-red-600" onClick={onAccountDelete}>
               Yes, delete
             </Button>
           </FlexContainer>

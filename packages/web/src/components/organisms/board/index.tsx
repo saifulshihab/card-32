@@ -9,7 +9,7 @@ import { Card } from "../card";
 import Chat from "../chat";
 
 const Board: React.FC = () => {
-  const { user } = useAuthContext();
+  const { player } = useAuthContext();
   const { cards } = useCardsContext();
   const [{ isOver }, drop] = useDrop(
     {
@@ -47,7 +47,9 @@ const Board: React.FC = () => {
           <FlexContainer className="h-full justify-center p-2 sm:p-0">
             <div className="inline-grid grid-cols-4 lg:grid-cols-8 grid-rows-1 sm:grid-rows-1 lg:grid-rows-1 gap-2 sm:gap-3">
               {cards
-                .filter((card) => !card.used && card.playerId === user?._id)
+                .filter(
+                  (card) => !card.used && card.playerId === player?.playerId
+                )
                 .map((card, idx) => (
                   <Card key={idx} card={card} />
                 ))}

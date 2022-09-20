@@ -1,47 +1,11 @@
-import {
-  IPasswordChangeInput,
-  IProfileUpdateInput,
-} from "@card-32/common/types/user";
-
 import React, { useState } from "react";
-import { useDebouncedCallback } from "use-debounce";
-import { handlePublicApiError, ICommonApiError } from "../../api/apiRequest";
-import {
-  emailCheckApi,
-  usernameCheckApi,
-  userPasswordChangeApi,
-  userProfileUpdateApi,
-} from "../../api/userApi";
 import FlexContainer from "../../components/atoms/box/FlexContainer";
 import Button from "../../components/atoms/button/Button";
 import TextInput from "../../components/atoms/inputs/TextInput";
 import Modal from "../../components/atoms/modal/Modal";
 import { ContentHeading } from "../../components/atoms/texts/ContentHeading";
-import { showToastMessage } from "../../components/atoms/toast";
-import { useAuthContext } from "../../contexts/AuthProvider";
-import { setUserAndTokenOnLocalStorage } from "../../utils/localStorage";
-import { getValueOrUndefined } from "../../utils/string";
-import {
-  userChangePasswordValidator,
-  userEmailUpdateValidator,
-  userProfileUpdateValidator,
-  userUsernameUpdateValidator,
-} from "../../validators/userValidator";
-
-const initialFormErrors: {
-  username?: string;
-  email?: string;
-  newPassword?: string;
-  oldPassword?: string;
-} = {
-  username: undefined,
-  email: undefined,
-  oldPassword: undefined,
-  newPassword: undefined,
-};
 
 const Profile: React.FC = () => {
-  const { user, accessToken, setUser } = useAuthContext();
   const [loading, setLoading] = useState(false);
   const [profileUpdateModal, setProfileUpdateModal] = useState(false);
   const [changePasswordModal, setChangePasswordModal] = useState(false);
@@ -53,162 +17,162 @@ const Profile: React.FC = () => {
     email: false,
   });
 
-  const [profileUpdateInput, setProfileUpdateInput] =
-    useState<IProfileUpdateInput>({
-      username: user?.username || "",
-      email: user?.email,
-    });
-  const [changePasswordInput, setChangePasswordInput] =
-    useState<IPasswordChangeInput>({
-      newPassword: "",
-      oldPassword: "",
-    });
+  // const [profileUpdateInput, setProfileUpdateInput] =
+  //   useState<IProfileUpdateInput>({
+  //     username: user?.username || "",
+  //     email: user?.email,
+  //   });
+  // const [changePasswordInput, setChangePasswordInput] =
+  //   useState<IPasswordChangeInput>({
+  //     newPassword: "",
+  //     oldPassword: "",
+  //   });
 
-  const [formErrors, setFormErrors] = useState<typeof initialFormErrors | null>(
-    null
-  );
+  // const [formErrors, setFormErrors] = useState<typeof initialFormErrors | null>(
+  //   null
+  // );
 
-  const onProfileUpdateInputChange = (
-    key: keyof IProfileUpdateInput,
-    value: string
-  ) => {
-    setProfileUpdateInput((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
-  };
+  // const onProfileUpdateInputChange = (
+  //   key: keyof IProfileUpdateInput,
+  //   value: string
+  // ) => {
+  //   setProfileUpdateInput((prev) => ({
+  //     ...prev,
+  //     [key]: value,
+  //   }));
+  // };
 
-  const checkUsername = useDebouncedCallback(async (username: string) => {
-    setFormErrors(null);
-    if (username === user?.username) {
-      return setAvailability({ username: undefined, email: undefined });
-    }
-    const { isValid, errors } = await userUsernameUpdateValidator(
-      profileUpdateInput
-    );
-    if (isValid) {
-      try {
-        setLoading(true);
-        await usernameCheckApi(username);
-        setAvailability({ username: true });
-      } catch {
-        setAvailability({ username: false });
-        setFormErrors({ username: "Username taken" });
-      }
-    } else {
-      setFormErrors(errors);
-    }
-    setLoading(false);
-  }, 500);
+  // const checkUsername = useDebouncedCallback(async (username: string) => {
+  //   setFormErrors(null);
+  //   if (username === user?.username) {
+  //     return setAvailability({ username: undefined, email: undefined });
+  //   }
+  //   const { isValid, errors } = await userUsernameUpdateValidator(
+  //     profileUpdateInput
+  //   );
+  //   if (isValid) {
+  //     try {
+  //       setLoading(true);
+  //       await usernameCheckApi(username);
+  //       setAvailability({ username: true });
+  //     } catch {
+  //       setAvailability({ username: false });
+  //       setFormErrors({ username: "Username taken" });
+  //     }
+  //   } else {
+  //     setFormErrors(errors);
+  //   }
+  //   setLoading(false);
+  // }, 500);
 
-  const checkEmail = useDebouncedCallback(async (email: string) => {
-    setFormErrors(null);
-    if (!email) {
-      return setAvailability({ email: undefined });
-    }
-    if (email === user?.email) {
-      return setAvailability({ username: undefined, email: undefined });
-    }
-    const { isValid, errors } = await userEmailUpdateValidator({
-      ...profileUpdateInput,
-      email: getValueOrUndefined(profileUpdateInput.email),
-    });
-    if (isValid) {
-      try {
-        setLoading(true);
-        await emailCheckApi(email);
-        setAvailability({ email: true });
-      } catch {
-        setAvailability({ email: false });
-        setFormErrors({ email: "Email is registered already" });
-      }
-    } else {
-      setFormErrors(errors);
-    }
-    setLoading(false);
-  }, 500);
+  // const checkEmail = useDebouncedCallback(async (email: string) => {
+  //   setFormErrors(null);
+  //   if (!email) {
+  //     return setAvailability({ email: undefined });
+  //   }
+  //   if (email === user?.email) {
+  //     return setAvailability({ username: undefined, email: undefined });
+  //   }
+  //   const { isValid, errors } = await userEmailUpdateValidator({
+  //     ...profileUpdateInput,
+  //     email: getValueOrUndefined(profileUpdateInput.email),
+  //   });
+  //   if (isValid) {
+  //     try {
+  //       setLoading(true);
+  //       await emailCheckApi(email);
+  //       setAvailability({ email: true });
+  //     } catch {
+  //       setAvailability({ email: false });
+  //       setFormErrors({ email: "Email is registered already" });
+  //     }
+  //   } else {
+  //     setFormErrors(errors);
+  //   }
+  //   setLoading(false);
+  // }, 500);
 
-  const handleUsernameChange = async (value: string) => {
-    onProfileUpdateInputChange("username", value);
-    await checkUsername(value);
-  };
+  // const handleUsernameChange = async (value: string) => {
+  //   onProfileUpdateInputChange("username", value);
+  //   await checkUsername(value);
+  // };
 
-  const handleEmailChange = async (value: string) => {
-    onProfileUpdateInputChange("email", value);
-    await checkEmail(value);
-  };
+  // const handleEmailChange = async (value: string) => {
+  //   onProfileUpdateInputChange("email", value);
+  //   await checkEmail(value);
+  // };
 
-  const handlePasswordInputChange = (
-    key: keyof IPasswordChangeInput,
-    value: string
-  ) => {
-    setChangePasswordInput((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
-  };
+  // const handlePasswordInputChange = (
+  //   key: keyof IPasswordChangeInput,
+  //   value: string
+  // ) => {
+  //   setChangePasswordInput((prev) => ({
+  //     ...prev,
+  //     [key]: value,
+  //   }));
+  // };
 
-  const onProfileUpdateSubmit = async () => {
-    if (!user) return;
-    const { isValid } = await userProfileUpdateValidator({
-      ...profileUpdateInput,
-      email: getValueOrUndefined(profileUpdateInput.email),
-    });
-    if (isValid)
-      try {
-        const { data } = await userProfileUpdateApi(user._id, {
-          ...profileUpdateInput,
-          email: profileUpdateInput.email || undefined,
-        });
-        setUser(data);
-        if (accessToken) {
-          setUserAndTokenOnLocalStorage({
-            user: data,
-            accessToken,
-          });
-        }
-        setAvailability({
-          username: false,
-          email: false,
-        });
-        setProfileUpdateModal(false);
-      } catch (err) {
-        const { error, data } = handlePublicApiError(err as ICommonApiError);
-        showToastMessage({
-          message: error || data?.message || "Something went wrong",
-          type: "error",
-        });
-      }
-  };
+  // const onProfileUpdateSubmit = async () => {
+  //   if (!user) return;
+  //   const { isValid } = await userProfileUpdateValidator({
+  //     ...profileUpdateInput,
+  //     email: getValueOrUndefined(profileUpdateInput.email),
+  //   });
+  //   if (isValid)
+  //     try {
+  //       const { data } = await userProfileUpdateApi(user._id, {
+  //         ...profileUpdateInput,
+  //         email: profileUpdateInput.email || undefined,
+  //       });
+  //       setUser(data);
+  //       if (accessToken) {
+  //         setUserAndTokenOnLocalStorage({
+  //           user: data,
+  //           accessToken,
+  //         });
+  //       }
+  //       setAvailability({
+  //         username: false,
+  //         email: false,
+  //       });
+  //       setProfileUpdateModal(false);
+  //     } catch (err) {
+  //       const { error, data } = handlePublicApiError(err as ICommonApiError);
+  //       showToastMessage({
+  //         message: error || data?.message || "Something went wrong",
+  //         type: "error",
+  //       });
+  //     }
+  // };
 
-  const onPasswordChangeSubmit = async () => {
-    if (!user) return;
-    setFormErrors(null);
-    const { isValid, errors } = await userChangePasswordValidator(
-      changePasswordInput
-    );
-    if (isValid) {
-      try {
-        setLoading(true);
-        await userPasswordChangeApi(user._id, changePasswordInput);
-        setChangePasswordInput({
-          newPassword: "",
-          oldPassword: "",
-        });
-        setChangePasswordModal(false);
-      } catch (err) {
-        const { error, data } = handlePublicApiError(err as ICommonApiError);
-        showToastMessage({
-          message: error || data?.message || "Something went wrong",
-          type: "error",
-        });
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      setFormErrors(errors);
-    }
-  };
+  // const onPasswordChangeSubmit = async () => {
+  //   if (!user) return;
+  //   setFormErrors(null);
+  //   const { isValid, errors } = await userChangePasswordValidator(
+  //     changePasswordInput
+  //   );
+  //   if (isValid) {
+  //     try {
+  //       setLoading(true);
+  //       await userPasswordChangeApi(user._id, changePasswordInput);
+  //       setChangePasswordInput({
+  //         newPassword: "",
+  //         oldPassword: "",
+  //       });
+  //       setChangePasswordModal(false);
+  //     } catch (err) {
+  //       const { error, data } = handlePublicApiError(err as ICommonApiError);
+  //       showToastMessage({
+  //         message: error || data?.message || "Something went wrong",
+  //         type: "error",
+  //       });
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   } else {
+  //     setFormErrors(errors);
+  //   }
+  // };
 
   return (
     <div className="flex flex-col gap-6">
@@ -220,12 +184,12 @@ const Profile: React.FC = () => {
 
         <FlexContainer className="flex-col gap-1 items-start">
           <label className="text-sm font-semibold">Username </label>
-          <p className="text-xs">{user?.username}</p>
+          <p className="text-xs">{"user?.username"}</p>
         </FlexContainer>
 
         <FlexContainer className="flex-col gap-1 items-start">
           <label className="text-sm font-semibold">Email</label>
-          <p className="text-xs">{user?.email || "No email"}</p>
+          <p className="text-xs">{"user?.email" || "No email"}</p>
         </FlexContainer>
       </FlexContainer>
 
@@ -247,9 +211,9 @@ const Profile: React.FC = () => {
             label="Username"
             placeholder="Enter username"
             className="border-b border-primary"
-            value={profileUpdateInput.username}
-            onChange={(e) => handleUsernameChange(e.target.value)}
-            errorMessage={formErrors?.username}
+            // value={profileUpdateInput.username}
+            // onChange={(e) => handleUsernameChange(e.target.value)}
+            // errorMessage={formErrors?.username}
             infoMessage={
               usernameEmailAvailable.username ? "Username available" : undefined
             }
@@ -258,9 +222,9 @@ const Profile: React.FC = () => {
             label="Email"
             placeholder="Enter your email (optional)"
             className="border-b border-primary"
-            value={profileUpdateInput.email}
-            onChange={(e) => handleEmailChange(e.target.value)}
-            errorMessage={formErrors?.email}
+            // value={profileUpdateInput.email}
+            // onChange={(e) => handleEmailChange(e.target.value)}
+            // errorMessage={formErrors?.email}
             infoMessage={
               usernameEmailAvailable.email ? "Email available" : undefined
             }
@@ -268,7 +232,7 @@ const Profile: React.FC = () => {
 
           <Button
             className="mt-2 bg-primary"
-            onClick={onProfileUpdateSubmit}
+            // onClick={onProfileUpdateSubmit}
             loading={loading}
           >
             Update
@@ -287,27 +251,27 @@ const Profile: React.FC = () => {
             label="Old password"
             placeholder="Enter old password"
             className="border-b border-primary"
-            value={changePasswordInput.oldPassword}
-            onChange={(e) =>
-              handlePasswordInputChange("oldPassword", e.target.value)
-            }
-            errorMessage={formErrors?.oldPassword}
+            // value={changePasswordInput.oldPassword}
+            // onChange={(e) =>
+            // handlePasswordInputChange("oldPassword", e.target.value)
+            // }
+            // errorMessage={formErrors?.oldPassword}
           />
           <TextInput
             type="password"
             label="New password"
             placeholder="Enter new password"
             className="border-b border-primary"
-            value={changePasswordInput.newPassword}
-            onChange={(e) =>
-              handlePasswordInputChange("newPassword", e.target.value)
-            }
-            errorMessage={formErrors?.newPassword}
+            // value={changePasswordInput.newPassword}
+            // onChange={(e) =>
+            // handlePasswordInputChange("newPassword", e.target.value)
+            // }
+            // errorMessage={formErrors?.newPassword}
           />
 
           <Button
             className="mt-2 bg-primary"
-            onClick={onPasswordChangeSubmit}
+            // onClick={onPasswordChangeSubmit}
             loading={loading}
           >
             Change

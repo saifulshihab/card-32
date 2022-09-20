@@ -1,6 +1,5 @@
 import React, { PropsWithChildren } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useAuthContext } from "../../../contexts/AuthProvider";
 import { APPEARANCE, PROFILE, SETTINGS } from "../../../routes/routes";
 import Button from "../../atoms/button/Button";
 
@@ -22,7 +21,6 @@ const ListItem: React.FC<PropsWithChildren<IListItemProps>> = ({
 );
 
 const ProfileSidebar: React.FC = () => {
-  const { logout } = useAuthContext();
   const { pathname } = useLocation();
   return (
     <div className="w-full">
@@ -39,7 +37,7 @@ const ProfileSidebar: React.FC = () => {
           </Link>
         </ul>
       </div>
-      <Button onClick={logout} className="w-full mt-3">
+      <Button className="w-full mt-3">
         <i className="fa-solid fa-arrow-right-from-bracket mr-2"></i>
         Logout
       </Button>

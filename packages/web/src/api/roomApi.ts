@@ -1,8 +1,8 @@
-import { IRoom, IRoomCreateInput } from "@card-32/common/types/room";
+import { IRoom } from "@card-32/common/types/room";
 import { AxiosResponse } from "axios";
 import { privateApiRequest } from "./apiRequest";
 
-export function roomCreateApi(data: IRoomCreateInput) {
+export function roomCreateApi(data: any) {
   return new Promise<AxiosResponse<IRoom>>((resolve, reject) => {
     privateApiRequest
       .post("/api/v1/room", data)
@@ -20,7 +20,7 @@ export function roomDeleteApi(roomId: string) {
   });
 }
 
-export function joinRoomApi(data: IRoomCreateInput) {
+export function joinRoomApi(data: any) {
   return new Promise<AxiosResponse<IRoom>>((resolve, reject) => {
     privateApiRequest
       .put(`/api/v1/room/${data.roomId}`, data)

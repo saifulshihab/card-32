@@ -1,11 +1,9 @@
 import React, { PropsWithChildren } from "react";
 import { Link } from "react-router-dom";
-import { useAuthContext } from "../../../contexts/AuthProvider";
 import { HOME, PROFILE } from "../../../routes/routes";
 import FlexContainer from "../../atoms/box/FlexContainer";
 
 const Header: React.FC<PropsWithChildren> = () => {
-  const { user } = useAuthContext();
   return (
     <div className="w-full h-14 bg-zinc-800 flex items-center shadow-md">
       <div className="container px-28 m-auto flex justify-between">
@@ -16,7 +14,7 @@ const Header: React.FC<PropsWithChildren> = () => {
           </FlexContainer>
         </Link>
         <FlexContainer className="items-center gap-2">
-          <p className="text-sm font-semibold">{user?.username}</p>
+          {/* <p className="text-sm font-semibold">{user?.username}</p> */}
           <Link to={PROFILE}>
             <div className="w-8 h-8 shadow-md rounded-full cursor-pointer border-2 border-zinc-600">
               <img

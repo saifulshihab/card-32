@@ -1,7 +1,5 @@
-import { MAIN_SOCKET_EVENTS } from "@card-32/common/constant/socket";
 import { IRoom } from "@card-32/common/types/room";
-import React, { PropsWithChildren, useEffect, useState } from "react";
-import { useAuthContext } from "./AuthProvider";
+import React, { PropsWithChildren, useState } from "react";
 import { useSocketContext } from "./SocketProvider";
 
 interface IRoomContext {
@@ -14,31 +12,9 @@ interface IRoomContext {
 const RoomContext = React.createContext<IRoomContext | null>(null);
 
 export const RoomProvider: React.FC<PropsWithChildren> = (props) => {
-  const { user } = useAuthContext();
-  const { mainSocket } = useSocketContext();
+  const { socket } = useSocketContext();
   const [room, setRoom] = useState<IRoom | undefined>(undefined);
   const [activeRooms, setActiveRooms] = useState<IRoom[]>([]);
-
-  useEffect(() => {
-    if (!mainSocket) return;
-
-    // active rooms
-    mainSocket.on(MAIN_SOCKET_EVENTS["ACTIVE::ROOMS"], ({ activeRooms }) => {
-      setActiveRooms(activeRooms);
-    });
-
-    // new room
-    mainSocket.on(MAIN_SOCKET_EVENTS["NEW::ROOM"], (newRoom: IRoom) => {
-      setActiveRooms((prev) => [...prev, newRoom]);
-    });
-
-    // room deleted
-    mainSocket.on(MAIN_SOCKET_EVENTS["ROOM::DELETED"], (room: IRoom) => {
-      setRoom(undefined);
-      const rooms = activeRooms.filter(({ roomId }) => roomId === room.roomId);
-      setActiveRooms(rooms);
-    });
-  }, [user?._id, mainSocket, activeRooms]);
 
   return (
     <RoomContext.Provider

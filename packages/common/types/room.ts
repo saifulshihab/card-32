@@ -3,12 +3,9 @@ import { IPlayer } from "./player";
 export interface IRoom {
   roomId: string;
   players: IPlayer[];
-  creator: string;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
-export interface IRoomCreateInput {
+export interface IRoomCreateIOrJoinInput {
   roomId?: string;
-  password?: string;
+  username?: string; // player username
 }

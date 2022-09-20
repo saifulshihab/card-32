@@ -1,11 +1,10 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { BlankLayout } from "../components/layouts/BlankLayout";
-import MainLayout from "../components/layouts/MainLayout";
 import ProfileLayout from "../components/layouts/ProfileLayout";
 import PageNotFound from "../pages/404/PageNotFound";
 import Appearance from "../pages/appearance";
-import HomePage from "../pages/home";
+import LandingPage from "../pages/landing";
 import LoginPage from "../pages/login";
 import Playground from "../pages/playground";
 import Profile from "../pages/profile";
@@ -13,7 +12,7 @@ import Settings from "../pages/settings";
 import { PrivateRoute } from "./PrivateRoute";
 import {
   APPEARANCE,
-  HOME,
+  LANDING,
   LOGIN,
   PLAYGROUND,
   PROFILE,
@@ -27,14 +26,7 @@ const Router: React.FC = () => {
         <Routes>
           <Route path={LOGIN} element={<LoginPage />} />
 
-          <Route
-            path={HOME}
-            element={
-              <PrivateRoute layout={MainLayout}>
-                <HomePage />
-              </PrivateRoute>
-            }
-          />
+          <Route path={LANDING} element={<LandingPage />} />
 
           <Route
             path={PROFILE}

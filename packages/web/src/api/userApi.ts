@@ -1,20 +1,13 @@
-import {
-  IPasswordChangeInput,
-  IProfileUpdateInput,
-  ISignInOrUpInput,
-  IUser,
-} from "@card-32/common/types/user";
 import { privateApiRequest, publicApiRequest } from "./apiRequest";
 import { AxiosResponse } from "axios";
-import { IUserLocalStorage } from "../utils/localStorage";
 
 export interface IUserLoginResponse {
-  user: IUserLocalStorage;
+  user: any;
   accessToken: string;
 }
 
-export function userSignUpApi(data: ISignInOrUpInput) {
-  return new Promise<AxiosResponse<IUser>>((resolve, reject) => {
+export function userSignUpApi(data: any) {
+  return new Promise<AxiosResponse<any>>((resolve, reject) => {
     publicApiRequest
       .post("/api/v1/user/signup", data)
       .then((res) => resolve(res))
@@ -22,7 +15,7 @@ export function userSignUpApi(data: ISignInOrUpInput) {
   });
 }
 
-export function userLoginApi(data: ISignInOrUpInput) {
+export function userLoginApi(data: any) {
   return new Promise<AxiosResponse<IUserLoginResponse>>((resolve, reject) => {
     publicApiRequest
       .post("/api/v1/user/login", data)
@@ -41,7 +34,7 @@ export function userAuthCheckApi() {
 }
 
 export function getUserProfileApi(userId: string) {
-  return new Promise<AxiosResponse<IUser>>((resolve, reject) => {
+  return new Promise<AxiosResponse<any>>((resolve, reject) => {
     privateApiRequest
       .get(`/api/v1/user/${userId}`)
       .then((res) => resolve(res))
@@ -67,11 +60,8 @@ export function emailCheckApi(email: string) {
   });
 }
 
-export function userProfileUpdateApi(
-  userId: string,
-  data: IProfileUpdateInput
-) {
-  return new Promise<AxiosResponse<IUser>>((resolve, reject) => {
+export function userProfileUpdateApi(userId: string, data: any) {
+  return new Promise<AxiosResponse<any>>((resolve, reject) => {
     privateApiRequest
       .put(`/api/v1/user/${userId}`, data)
       .then((res) => resolve(res))
@@ -79,10 +69,7 @@ export function userProfileUpdateApi(
   });
 }
 
-export function userPasswordChangeApi(
-  userId: string,
-  data: IPasswordChangeInput
-) {
+export function userPasswordChangeApi(userId: string, data: any) {
   return new Promise((resolve, reject) => {
     privateApiRequest
       .put(`/api/v1/user/${userId}/change/password`, data)
