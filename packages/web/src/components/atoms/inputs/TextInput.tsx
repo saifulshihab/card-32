@@ -7,10 +7,10 @@ interface IProps {
   type?: string;
   value?: string;
   className?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   errorMessage?: string;
   infoMessage?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const TextInput: React.FC<IProps> = (props) => {
@@ -21,7 +21,7 @@ const TextInput: React.FC<IProps> = (props) => {
       <input
         type={type || "text"}
         {...(props as any)}
-        className={`w-full outline-none bg-transparent p-1 px-3 text-sm ${
+        className={`w-full outline-none bg-transparent p-1 px-3 text-sm border-b border-primary ${
           className ? className : ""
         }`}
       />

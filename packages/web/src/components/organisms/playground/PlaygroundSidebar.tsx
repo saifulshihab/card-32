@@ -57,7 +57,7 @@ const PlaygroundSidebar: React.FC = () => {
         <FlexContainer className="my-1 sm:my-2 gap-2">
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full shadow">
             <img
-              src="https://picsum.photos/200"
+              src="https://random.imagecdn.app/100/100"
               alt="user"
               className="w-full h-full rounded-full border-2 border-blue-500"
             />
