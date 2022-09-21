@@ -1,6 +1,5 @@
 import { IRoom } from "@card-32/common/types/room";
 import React, { PropsWithChildren, useState } from "react";
-import { useSocketContext } from "./SocketProvider";
 
 interface IRoomContext {
   room: IRoom | undefined;
@@ -12,9 +11,8 @@ interface IRoomContext {
 const RoomContext = React.createContext<IRoomContext | null>(null);
 
 export const RoomProvider: React.FC<PropsWithChildren> = (props) => {
-  const { socket } = useSocketContext();
   const [room, setRoom] = useState<IRoom | undefined>(undefined);
-  const [activeRooms, setActiveRooms] = useState<IRoom[]>([]);
+  const [activeRooms] = useState<IRoom[]>([]);
 
   return (
     <RoomContext.Provider

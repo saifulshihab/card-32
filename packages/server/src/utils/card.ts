@@ -20,7 +20,7 @@ const generateCards = (roomId: string) => {
     );
     slicedNumbers.forEach((number) => {
       cards.push({
-        id: uuidV4(),
+        cardId: uuidV4(),
         value: number,
         used: false,
         playerId: player.playerId,

@@ -1,7 +1,9 @@
 import React, { PropsWithChildren } from "react";
 
 const BlankLayout: React.FC<PropsWithChildren> = ({ children }) => {
-  return <React.Fragment>{children}</React.Fragment>;
+  return (
+    <div className="w-full h-screen bg-zinc-900 text-zinc-100">{children}</div>
+  );
 };
 
 export { BlankLayout };

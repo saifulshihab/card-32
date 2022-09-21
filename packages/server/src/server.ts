@@ -3,10 +3,7 @@ import dotenv from "dotenv";
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { connectDatabase } from "./config/dbConnection";
 import { PORT } from "./config/env";
-import errorHandler, { routeNotFound } from "./middlewares/errorHandler";
-import userRouter from "./routes/userRouter";
 import { mainSocketIO } from "./socket/mainSocket";
 import { logger } from "./utils/winston";
 
@@ -17,8 +14,6 @@ const httpServer = createServer(app);
 
 (async () => {
   dotenv.config();
-  // database connection
-  await connectDatabase();
 
   const io = new Server(httpServer, {
     cors: {
@@ -34,13 +29,6 @@ const httpServer = createServer(app);
   app.get("/PING", (_, res) => {
     res.send("PONG");
   });
-
-  // APIs
-  app.use("/api/v1/user", userRouter);
-
-  // error handler
-  app.use(routeNotFound);
-  app.use(errorHandler);
 
   // sockets
   mainSocketIO(io);
