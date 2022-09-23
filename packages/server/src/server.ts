@@ -7,8 +7,6 @@ import { PORT } from "./config/env";
 import { mainSocketIO } from "./socket/mainSocket";
 import { logger } from "./utils/winston";
 
-require("express-async-errors");
-
 const app = express();
 const httpServer = createServer(app);
 
