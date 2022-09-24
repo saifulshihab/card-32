@@ -4,7 +4,7 @@
  */
 
 import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
-import { IPlayer } from "@card-32/common/types/player";
+import { IMessage, IPlayer } from "@card-32/common/types/player";
 import { IRoom, IRoomCreateIOrJoinInput } from "@card-32/common/types/room";
 import { Namespace, Server, Socket } from "socket.io";
 import {
@@ -17,6 +17,8 @@ const events = MAIN_NAMESPACE_EVENTS;
 
 const mainSocketIO = (server: Server) => {
   mainIO = server.of("/");
+
+  const getRoomId = (socket: Socket) => socket.data.room.roomId as string;
 
   mainIO.on(events.CONNECTION, (socket: Socket) => {
     /**
@@ -52,6 +54,14 @@ const mainSocketIO = (server: Server) => {
         }
       }
     );
+
+    /**
+     * chat - send message
+     */
+    socket.on(events.SEND_MESSAGE, (data: IMessage) => {
+      const roomId = getRoomId(socket);
+      mainIO.to(roomId).emit(events.NEW_MESSAGE, { data });
+    });
 
     /**
      * leave room

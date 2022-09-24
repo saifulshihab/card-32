@@ -47,7 +47,7 @@ export const rooms: IRoom[] = [];
             players: room.players.map((player) => player.username),
           }))
         );
-      }, 3000);
+      }, 5000);
     }
   });
 })().catch((err) => logger.error(err));

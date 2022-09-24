@@ -23,6 +23,7 @@ export const SocketProvider: React.FC<PropsWithChildren> = (props) => {
 
     socket.on("disconnect", () => {
       setSocketConnected(false);
+      window.location.reload();
     });
 
     // clean up
