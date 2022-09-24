@@ -1,14 +1,18 @@
+import { IRoom } from "@card-32/common/types/room";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { PORT } from "./config/env";
+import { NODE_ENV, PORT } from "./config/env";
 import { mainSocketIO } from "./socket/mainSocket";
 import { logger } from "./utils/winston";
 
 const app = express();
 const httpServer = createServer(app);
+
+// initial database
+export const rooms: IRoom[] = [];
 
 (async () => {
   dotenv.config();
@@ -34,6 +38,17 @@ const httpServer = createServer(app);
   // listening server
   httpServer.listen(PORT, () => {
     logger.info(`Server running and up on port ${PORT} 🚀`);
+
+    if (NODE_ENV === "development") {
+      setInterval(() => {
+        console.table(
+          rooms.map((room) => ({
+            ...room,
+            players: room.players.map((player) => player.username),
+          }))
+        );
+      }, 3000);
+    }
   });
 })().catch((err) => logger.error(err));
 

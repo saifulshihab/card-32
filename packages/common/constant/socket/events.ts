@@ -6,4 +6,6 @@ export const MAIN_NAMESPACE_EVENTS = {
   END_GAME: "end::game",
   JOIN_ROOM: "join::room",
   LEAVE_ROOM: "leave::room",
+  NEW_PLAYER_JOINED: "player::joined",
+  PLAYER_DISCONNECTED: "player::disconnected",
 };
