@@ -1,109 +1,48 @@
+import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
-import { handlePublicApiError, ICommonApiError } from "../../../api/apiRequest";
-import { roomDeleteApi } from "../../../api/roomApi";
 import { useAuthContext } from "../../../contexts/AuthProvider";
 import { useRoomContext } from "../../../contexts/RoomProvider";
+import { useSocketContext } from "../../../contexts/SocketProvider";
 import { useThemeContext } from "../../../contexts/ThemeProvider";
-import { HOME } from "../../../routes/routes";
 import FlexContainer from "../../atoms/box/FlexContainer";
 import Button from "../../atoms/button/Button";
 import Modal from "../../atoms/modal/Modal";
 import { ContentSubHeading } from "../../atoms/texts/ContentSubHeading";
-import { showToastMessage } from "../../atoms/toast";
 import { PlayerCard } from "../playerCard";
 
-const SidebarContainer = styled.div`
-  width: 320px;
-  @media (max-width: 1024px) {
-    width: 230px;
-  }
-  @media (max-width: 640px) {
-    width: 100%;
-  }
-`;
-
-const TinyText = styled.p`
-  font-size: 10px;
-  font-weight: 400;
-`;
-
-const StyledSelect = styled.select`
-  /* for Firefox */
-  -moz-appearance: none;
-  /* for Chrome */
-  -webkit-appearance: none;
-  /* For IE10 */
-  select::-ms-expand {
-    display: none;
-  }
-`;
-
 const PlaygroundSidebar: React.FC = () => {
-  const navigate = useNavigate();
-  const { user } = useAuthContext();
-  const { room, setRoom } = useRoomContext();
+  const { socket } = useSocketContext();
+  const { player, setPlayer } = useAuthContext();
+  const { room } = useRoomContext();
 
-  const [loading, setLoading] = useState(false);
   const [leaveRoomModal, setLeaveRoomModal] = useState(false);
   const { sidebarOrder, setSidebarOrder } = useThemeContext();
   const [bidModalVisible, setBidModalVisible] = useState(false);
 
   const onStartGame = () => {
-    if (!room) return;
-    if (room.players.length < 4) {
-      showToastMessage({
-        message: `Invite ${
-          4 - room.players.length
-        } more players to start the game`,
-        type: "info",
-      });
-      return;
-    }
-    // game start: send request for cards
-    // socket.emit("startGame");
+    return;
   };
 
   const onLeave = async () => {
-    if (!room) return;
-    if (room.creator === user?._id) {
-      // room creator delete the room
-      try {
-        setLoading(true);
-        await roomDeleteApi(room.roomId);
-        setRoom(undefined);
-        navigate(HOME);
-      } catch (err) {
-        const { error, data } = handlePublicApiError(err as ICommonApiError);
-        showToastMessage({
-          message: error || data?.message || "Something went wrong",
-          type: "error",
-        });
-      } finally {
-        setLoading(false);
-        setLeaveRoomModal(false);
-      }
-    } else {
-      // room player wants to leave
-      navigate(HOME);
-    }
+    if (!socket) return;
+    socket.emit(MAIN_NAMESPACE_EVENTS.LEAVE_ROOM);
+    setPlayer(null);
   };
 
   return (
-    <SidebarContainer className={`bg-zinc-800 relative order-${sidebarOrder}`}>
+    <div className="w-full sm:w-[320px] bg-zinc-800 relative">
       <FlexContainer className="justify-between bg-zinc-700 px-2 shadow">
-        <FlexContainer className="my-1 sm:my-2 gap-2">
+        <FlexContainer className="my-2 gap-2">
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full shadow">
             <img
-              src="https://picsum.photos/200"
+              src="https://random.imagecdn.app/100/100"
               alt="user"
               className="w-full h-full rounded-full border-2 border-blue-500"
             />
           </div>
           <div>
             <p className="text-sm sm:text-lg sm:leading-6 font-bold">
-              {user?.username}
+              {player?.username}
             </p>
             <p className="text-xs">don&apos;t freeze</p>
           </div>
@@ -119,9 +58,6 @@ const PlaygroundSidebar: React.FC = () => {
           >
             <i className="fa-solid fa-table-cells-large"></i>
           </button>
-          <button className="block sm:hidden btn-primary">
-            <i className="fa-solid fa-message"></i>
-          </button>
           <button
             className="btn-primary text-red-600"
             onClick={() => setLeaveRoomModal(true)}
@@ -134,7 +70,7 @@ const PlaygroundSidebar: React.FC = () => {
         <FlexContainer className="flex-col justify-center gap-2">
           <FlexContainer>
             <div className="flex flex-col">
-              <TinyText className="text-gray-400 -mb-1.5">Room ID</TinyText>
+              <p className="text-xs text-gray-400 -mb-1.5">Room ID</p>
               <p className="text-lg select-all font-semibold text-ellipsis text-center">
                 {room?.roomId}
               </p>
@@ -163,7 +99,7 @@ const PlaygroundSidebar: React.FC = () => {
       <div className="block sm:hidden p-2 py-3">
         <FlexContainer className="justify-between gap-2">
           <div className="flex flex-col">
-            <TinyText className="text-gray-400 -mb-1.5">Room ID</TinyText>
+            <p className="text-xs text-gray-400 -mb-1.5">Room ID</p>
             <p className="text-lg select-all font-semibold text-ellipsis text-center">
               {room?.roomId}
             </p>
@@ -207,7 +143,7 @@ const PlaygroundSidebar: React.FC = () => {
       <Modal visible={bidModalVisible} onClose={setBidModalVisible}>
         <FlexContainer className="p-5 bg-zinc-900 text-white  flex-col gap-2">
           <p className="text-xl font-bold">Select your bid point</p>
-          <StyledSelect className="my-3 w-20 h-20 bg-zinc-800 shadow-md border-2 border-blue-700 border-dotted rounded py-1.5 text-center outline-none cursor-pointer focus:ring-2 ring-blue-700 text-2xl">
+          <select className="my-3 w-20 h-20 bg-zinc-800 shadow-md border-2 border-blue-700 border-dotted rounded py-1.5 text-center outline-none cursor-pointer focus:ring-2 ring-blue-700 text-2xl">
             <option value={1}>1</option>
             <option value={2}>2</option>
             <option value={3}>3</option>
@@ -216,7 +152,7 @@ const PlaygroundSidebar: React.FC = () => {
             <option value={6}>6</option>
             <option value={7}>7</option>
             <option value={8}>8</option>
-          </StyledSelect>
+          </select>
           <button className="btn-primary  bg-blue-700 text-xs py-2 px-3">
             Bid
           </button>
@@ -224,7 +160,7 @@ const PlaygroundSidebar: React.FC = () => {
       </Modal>
       {/* room leave modal */}
       <Modal visible={leaveRoomModal} onClose={() => setLeaveRoomModal(false)}>
-        <FlexContainer className="flex-col gap-4 items-start bg-zinc-800 p-5 text-white">
+        <FlexContainer className="flex-col gap-4 items-start text-white">
           <ContentSubHeading>Leave room?</ContentSubHeading>
           <p className="text-gray-300">
             Are you sure you want to leave this room?
@@ -237,13 +173,13 @@ const PlaygroundSidebar: React.FC = () => {
             >
               No
             </Button>
-            <Button className="bg-red-600" loading={loading} onClick={onLeave}>
+            <Button className="bg-red-600" onClick={onLeave}>
               Yes
             </Button>
           </FlexContainer>
         </FlexContainer>
       </Modal>
-    </SidebarContainer>
+    </div>
   );
 };
 

@@ -1,45 +1,114 @@
-import { MAIN_SOCKET_EVENTS } from "@card-32/common/constant/socket";
-import jwt from "jsonwebtoken";
+/**
+ * namespace: "/"
+ * auth: no-auth
+ */
+
+import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
+import { IMessage, IPlayer } from "@card-32/common/types/player";
+import { IRoom, IRoomCreateIOrJoinInput } from "@card-32/common/types/room";
 import { Namespace, Server, Socket } from "socket.io";
-import { JWT_USER_SECRET } from "../config/env";
-import { Room } from "../models/room";
+import {
+  getPlayerIntoRoom,
+  getRoomOnLeaveOrDisconnect,
+} from "../controller/roomController";
 
-let mainNamespace: Namespace;
-const events = MAIN_SOCKET_EVENTS;
+let mainIO: Namespace;
+const events = MAIN_NAMESPACE_EVENTS;
 
-export const emitUpdatedRooms = async () => {
-  const activeRooms = await Room.find({});
-  mainNamespace.emit(events["ACTIVE::ROOMS"], { activeRooms });
+const mainSocketIO = (server: Server) => {
+  mainIO = server.of("/");
+
+  const getRoomId = (socket: Socket) => socket.data.room.roomId as string;
+
+  mainIO.on(events.CONNECTION, (socket: Socket) => {
+    /**
+     * join/create room
+     */
+    socket.on(
+      events.JOIN_ROOM,
+      (joinInput: IRoomCreateIOrJoinInput, callback) => {
+        const { roomId, username } = joinInput;
+        const { error, data, newRoom } = getPlayerIntoRoom(joinInput);
+
+        if (error && !data) {
+          callback({
+            error,
+          });
+          return;
+        }
+
+        socket.join(joinInput.roomId);
+        const player = { username, playerId: data?.playerId! };
+
+        socket.data.player = player;
+        socket.data.room = data?.room!;
+
+        callback({ data });
+
+        if (!newRoom) {
+          // notify others new player joined
+          socket.to(roomId).emit(events.NEW_PLAYER_JOINED, {
+            message: `${username} has joined.`,
+            room: data?.room,
+          });
+        }
+      }
+    );
+
+    /**
+     * chat - send message
+     */
+    socket.on(events.SEND_MESSAGE, (data: IMessage) => {
+      const roomId = getRoomId(socket);
+      mainIO.to(roomId).emit(events.NEW_MESSAGE, { data });
+    });
+
+    /**
+     * leave room
+     */
+    socket.on(events.LEAVE_ROOM, () => {
+      const { room: socketRoom, player } = socket.data as {
+        room: IRoom;
+        player: IPlayer;
+      };
+      socket.leave(socketRoom.roomId);
+
+      const { room } = getRoomOnLeaveOrDisconnect(
+        socketRoom.roomId,
+        player.playerId
+      );
+
+      if (room) {
+        mainIO.to(room.roomId).emit(events.LEAVE_ROOM, {
+          message: `${player.username} has left.`,
+          room,
+        });
+      }
+    });
+
+    /**
+     * socket disconnected
+     */
+    socket.on(events.DISCONNECT, () => {
+      const { room: socketRoom, player } = socket.data as {
+        room: IRoom;
+        player: IPlayer;
+      };
+      // notify to the room if a player has disconnect (for example: close the window)
+      if (socketRoom && player) {
+        const { room } = getRoomOnLeaveOrDisconnect(
+          socketRoom.roomId,
+          player.playerId
+        );
+        if (room) {
+          mainIO.to(room.roomId).emit(events.PLAYER_DISCONNECTED, {
+            message: `${player.username} has left.`,
+            room,
+          });
+        }
+      }
+    });
+  });
 };
 
-export const mainNamespaceIO = (socketIO: Server) => {
-  mainNamespace = socketIO.of("/");
-
-  mainNamespace.use((socket, next) => {
-    const { token } = socket.handshake.auth;
-
-    if (!token) {
-      return next(new Error("Not authorized! Token not found."));
-    }
-    const tokenVerified = jwt.verify(token, JWT_USER_SECRET);
-
-    if (!tokenVerified) {
-      return next(new Error("Not authorized! Token expired."));
-    }
-
-    return next();
-  });
-
-  mainNamespace.on("connection", async (socket: Socket) => {
-    // send active rooms list on login
-    await emitUpdatedRooms();
-
-    // check if logged in user is in room or created a room
-    const { playerId } = socket.handshake.query;
-
-    const room = await Room.findOne({ creator: playerId });
-    if (room) {
-      socket.emit(events["CHECK::PLAYER"], { room });
-    }
-  });
-};
+export { mainSocketIO };

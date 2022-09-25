@@ -1,5 +1,5 @@
 export interface ICard {
-  id: string;
+  cardId: string;
   value: number;
   playerId: string;
   used: boolean;

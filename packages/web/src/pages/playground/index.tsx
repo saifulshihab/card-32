@@ -1,79 +1,101 @@
-import { ROOM_SOCKET_EVENTS } from "@card-32/common/constant/socket";
-import { IRoom } from "@card-32/common/types/room";
+import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { io, Socket } from "socket.io-client";
+import { showToastMessage } from "../../components/atoms/toast";
 import Board from "../../components/organisms/board";
+import Chat from "../../components/organisms/chat";
 import PlaygroundSidebar from "../../components/organisms/playground/PlaygroundSidebar";
-import { BASE_URL } from "../../constants/config";
 import { useAuthContext } from "../../contexts/AuthProvider";
 import { useRoomContext } from "../../contexts/RoomProvider";
-import { useThemeContext } from "../../contexts/ThemeProvider";
-import { HOME } from "../../routes/routes";
+import { useSocketContext } from "../../contexts/SocketProvider";
+import { LANDING } from "../../routes/routes";
 
 const Playground: React.FC = () => {
   const navigate = useNavigate();
   const { room, setRoom } = useRoomContext();
-  const { user, accessToken } = useAuthContext();
-  const { sidebarOrder } = useThemeContext();
-  const [roomSocket, setRoomSocket] = useState<Socket | undefined>(undefined);
+  const { player } = useAuthContext();
+  const { socket } = useSocketContext();
+
+  const [chatBoxVisible, setChatBoxVisible] = useState(false);
 
   useEffect(() => {
-    if (!accessToken) return;
-    console.log(accessToken, user?._id, room?.roomId);
-    console.log(user?._id);
-    console.log(room?.roomId);
-    if (!room?.roomId) return;
-    if (!user?._id) return;
-
-    const roomSocket = io(`${BASE_URL}/room`, {
-      query: {
-        roomId: room.roomId,
-        playerId: user._id,
-      },
-      auth: {
-        token: accessToken,
-      },
-    });
-    console.log(
-      "🚀 ~ file: index.tsx ~ line 35 ~ useEffect ~ roomSocket",
-      roomSocket
-    );
-
-    if (!roomSocket.active) {
-      navigate(HOME);
-      return;
+    // if no room or player object redirect to landing page
+    if (!player || !room) {
+      navigate(LANDING);
     }
-    setRoomSocket(roomSocket);
+  }, [player, room, navigate]);
 
-    // new player join
-    roomSocket.on(
-      ROOM_SOCKET_EVENTS["PLAYER::JOINED"],
-      ({ room }: { room: IRoom }) => {
+  useEffect(() => {
+    if (!socket) return;
+
+    // new player joined
+    socket.on(MAIN_NAMESPACE_EVENTS.NEW_PLAYER_JOINED, ({ message, room }) => {
+      setRoom(room);
+      showToastMessage({
+        position: "bottom-left",
+        message,
+      });
+    });
+
+    // player leave
+    socket.on(MAIN_NAMESPACE_EVENTS.LEAVE_ROOM, ({ message, room }) => {
+      setRoom(room);
+      showToastMessage({
+        position: "bottom-left",
+        message,
+      });
+    });
+
+    // player disconnect
+    socket.on(
+      MAIN_NAMESPACE_EVENTS.PLAYER_DISCONNECTED,
+      ({ message, room }) => {
         setRoom(room);
+        showToastMessage({
+          position: "bottom-left",
+          message,
+        });
       }
     );
 
-    // update room
-    roomSocket.on(
-      ROOM_SOCKET_EVENTS["UPDATE::ROOM"],
-      ({ room }: { room: IRoom }) => {
-        setRoom(room);
-      }
-    );
-  }, [room?.roomId, user?._id, accessToken, navigate, setRoom]);
+    return () => {
+      socket.off(MAIN_NAMESPACE_EVENTS.NEW_PLAYER_JOINED);
+      socket.off(MAIN_NAMESPACE_EVENTS.LEAVE_ROOM);
+      socket.off(MAIN_NAMESPACE_EVENTS.PLAYER_DISCONNECTED);
+    };
+  }, [socket, setRoom]);
 
   return (
-    <div className="w-full h-full flex flex-col sm:flex-row gap-1">
+    <div className="w-full h-full flex flex-col sm:flex-row gap-1 relative">
       {/* left sidebar */}
       <PlaygroundSidebar />
       {/* board & chat */}
+      <Board />
+      <div className="hidden xl:block xl:w-[320px]">
+        <Chat />
+      </div>
+      <button
+        className="absolute xl:hidden z-20 bottom-[23%] right-5 shadow-md sm:top-2 w-12 h-12 rounded-full btn-primary flex items-center justify-center
+        bg-zinc-900 sm:bg-zinc-800 border-zinc-700
+        "
+        onClick={() => {
+          setChatBoxVisible(!chatBoxVisible);
+        }}
+      >
+        {chatBoxVisible ? (
+          <i className="fa-solid fa-xmark"></i>
+        ) : (
+          <i className="fa-solid fa-message"></i>
+        )}
+      </button>
+
+      {/* floating chat box */}
       <div
-        className={`flex-1 h-full flex flex-col gap-1 ${
-          sidebarOrder === 1 ? "order-2" : "order-1"
+        className={`w-full border-2 rounded border-zinc-700 z-10 h-full sm:h-[90%] absolute sm:w-[320px] sm:right-16 sm:mt-14 ${
+          chatBoxVisible ? "block" : "hidden"
         }`}
       >
-        <Board />
+        <Chat />
       </div>
     </div>
   );

@@ -16,21 +16,16 @@
   "license": "ISC",
   "dependencies": {
     "@card-32/common": "*",
-    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
-    "express-async-errors": "^3.1.1",
-    "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.4.4",
     "socket.io": "^4.5.1",
     "uuid": "^8.3.2",
+    "winston": "^3.8.2",
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.2",
     "@types/express": "^4.17.13",
-    "@types/jsonwebtoken": "^8.5.8",
     "@types/node": "^18.0.0",
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.28.0",

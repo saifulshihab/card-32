@@ -15,7 +15,7 @@ const PlayerCard: React.FC<IProps> = (props) => {
       <FlexContainer className="flex-col gap-1 justify-center p-1 sm:p-2 pt-1 sm:pt-4">
         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full shadow">
           <img
-            src="https://picsum.photos/200"
+            src="https://random.imagecdn.app/100/100"
             alt="player"
             className="w-full h-full rounded-full"
           />

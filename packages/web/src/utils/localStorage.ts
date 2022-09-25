@@ -1,66 +1,34 @@
-/* eslint-disable no-console */
 import { IPlayer } from "@card-32/common/types/player";
-import { IUserLoginResponse } from "../api/userApi";
 
 interface ILocalStorageKeys {
   player: string;
-  user: string;
-  accessToken: string;
+  roomId: string;
 }
 
-export interface IUserLocalStorage {
-  _id: string;
-  username: string;
-  email?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export const LOCAL_STORAGE_KEYS: ILocalStorageKeys = {
+const LOCAL_STORAGE_KEYS: ILocalStorageKeys = {
   player: "card-32.player",
-  user: "card-32.user",
-  accessToken: "card-32.accessToken",
+  roomId: "card-32.roomId",
 };
 
-export const setPlayerOnLocalStorage = (player: IPlayer) => {
-  try {
-    localStorage.setItem(LOCAL_STORAGE_KEYS.player, JSON.stringify(player));
-  } catch (err) {
-    console.error(err);
-  }
+export const setPlayerAndRoomIdOnLocalStorage = (data: {
+  player: IPlayer;
+  roomId: string;
+}) => {
+  const { player, roomId } = data;
+  localStorage.setItem(LOCAL_STORAGE_KEYS.player, JSON.stringify(player));
+  localStorage.setItem(LOCAL_STORAGE_KEYS.roomId, JSON.stringify(roomId));
 };
 
-export const getPlayerFromLocalStorage = () => {
-  const data = localStorage.getItem(LOCAL_STORAGE_KEYS.player);
-  if (data) {
-    const player = JSON.parse(data) as IPlayer;
-    return { player };
-  }
-};
+export const getPlayerAndRoomIdFromLocalStorage = () => {
+  const player = localStorage.getItem(LOCAL_STORAGE_KEYS.player);
+  const roomId = localStorage.getItem(LOCAL_STORAGE_KEYS.roomId);
 
-export const setUserAndTokenOnLocalStorage = (data: IUserLoginResponse) => {
-  try {
-    localStorage.setItem(LOCAL_STORAGE_KEYS.user, JSON.stringify(data.user));
-    localStorage.setItem(LOCAL_STORAGE_KEYS.accessToken, data.accessToken);
-  } catch (err) {
-    console.error(err);
-  }
-};
+  const playerParsed: IPlayer = player ? JSON.parse(player) : null;
+  const roomIdParsed: string = roomId ? JSON.parse(roomId) : null;
 
-export const getUserAndTokenFromLocalStorage = () => {
-  const user = localStorage.getItem(LOCAL_STORAGE_KEYS.user);
-  const accessToken = localStorage.getItem(LOCAL_STORAGE_KEYS.accessToken);
-  if (user && accessToken) {
-    const userParsed = JSON.parse(user);
-    return {
-      user: userParsed as IUserLocalStorage,
-      accessToken,
-    };
-  }
+  return { player: playerParsed, roomId: roomIdParsed };
 };
 
 export const removeDataOnLocalStorage = () => {
-  localStorage.removeItem(LOCAL_STORAGE_KEYS.player);
-  localStorage.removeItem(LOCAL_STORAGE_KEYS.user);
-  localStorage.removeItem(LOCAL_STORAGE_KEYS.accessToken);
+  localStorage.clear();
 };

@@ -1,127 +1,62 @@
-import { IPlayer } from "@card-32/common/types/player";
-import { Request, Response } from "express";
-import { sendUnauthorized } from "../middlewares/authenticator";
-import { Room } from "../models/room";
-import { emitUpdatedRooms } from "../socket/mainSocket";
-import { newPlayerJoin } from "../socket/roomSocket";
+import { IRoom, IRoomCreateIOrJoinInput } from "@card-32/common/types/room";
+import { v4 as uuidV4 } from "uuid";
+import Room from "../models/Room";
+import { rooms } from "../server";
 
-// create room
-export const createRoom = async (req: Request, res: Response) => {
-  const { roomId } = req.body;
+export const getPlayerIntoRoom = (joinInput: IRoomCreateIOrJoinInput) => {
+  const { username, roomId } = joinInput;
 
-  if (!req.user) return sendUnauthorized(res);
+  const room = rooms.find((room) => room.roomId === roomId);
 
-  // user already created a room
-  const room = await Room.findOne({ creator: req.user._id });
-  if (room) {
-    return res.status(400).json({
-      message: `You already created a room - ${room.roomId}`,
-    });
-  }
-
-  const roomWithRoomIdExist = await Room.findOne({ roomId });
-  if (roomWithRoomIdExist) {
-    return res.status(400).json({
-      message: "This room ID is used",
-    });
-  }
-
-  const players: IPlayer[] = [
-    {
-      playerId: req.user._id,
-      username: req.user.username,
-    },
-  ];
-
-  const newRoom = await Room.create({
-    ...req.body,
-    players,
-    creator: req.user._id,
-  });
-
-  res.status(200).json(newRoom);
-
-  return emitUpdatedRooms();
-};
-
-// create room
-export const deleteRoom = async (req: Request, res: Response) => {
-  const { roomId } = req.params;
-
-  if (!req.user) return sendUnauthorized(res);
-
-  const room = await Room.findOne({ roomId });
+  // player wants to create new room
   if (!room) {
-    return res.status(404).json({
-      message: `Room not found`,
-    });
+    const playerId = uuidV4();
+    const newRoom = new Room(roomId, [{ username, playerId }], {
+      username,
+      playerId,
+    }) as IRoom;
+    rooms.push(newRoom);
+    const data = { room: newRoom, playerId };
+    return { data, newRoom: true };
   }
 
-  if (room.creator.toString() !== req.user._id.toString()) {
-    return res
-      .status(403)
-      .json({ message: "You are not authorized to delete this room" });
-  }
-
-  await room.delete();
-
-  res.status(200).json(room);
-
-  return emitUpdatedRooms();
-};
-
-// join room by room ID & password
-export const joinRoom = async (req: Request, res: Response) => {
-  const { roomId } = req.params;
-  const { password } = req.body;
-
-  if (!req.user) return sendUnauthorized(res);
-
-  const room = await Room.findOne({ roomId }).select("+password");
-  if (!room) {
-    return res.status(404).json({
-      message: `Room not found`,
-    });
-  }
-
-  if (room.password !== password) {
-    return res.status(400).json({
-      message: `Incorrect password`,
-    });
-  }
-
-  const playerAlreadyInRoom = await Room.findOne({
-    roomId,
-    $or: [
-      {
-        creator: req.user._id,
-      },
-      {
-        players: {
-          $elemMatch: { playerId: req.user._id },
-        },
-      },
-    ],
-  });
-
-  if (playerAlreadyInRoom) {
-    return res.status(400).json({ message: "Player already in the room" });
-  }
-
-  const updatedRoom = await Room.findByIdAndUpdate(
-    { _id: room._id },
-    {
-      $push: {
-        players: { playerId: req.user._id, username: req.user.username },
-      },
-    },
-    {
-      new: true,
-    }
+  // room exist push add player to the room
+  // username check
+  const usernameTaken = room.players.find(
+    (player) => player.username === username
   );
 
-  res.status(200).json(updatedRoom);
+  if (usernameTaken) {
+    return { error: "Username taken" };
+  }
 
-  await emitUpdatedRooms();
-  return newPlayerJoin(roomId, updatedRoom as any);
+  // room full check
+  if (room.players.length === 4) {
+    return { error: "Room is full" };
+  }
+
+  const playerId = uuidV4();
+  const newPlayer = { username, playerId };
+  room.players = [...room.players, newPlayer];
+
+  const data = { room, playerId };
+  return { data };
+};
+
+export const getRoomOnLeaveOrDisconnect = (
+  roomId: string,
+  playerId: string
+) => {
+  const room = rooms.find((room) => room.roomId === roomId)!;
+  if (room.players.length === 1) {
+    // last player wants to leave, remove the rooms from server
+    rooms.splice(
+      rooms.findIndex((room) => room.roomId === roomId),
+      1
+    );
+    return { room: undefined };
+  }
+
+  room.players = room.players.filter((player) => player.playerId !== playerId);
+  return { room };
 };

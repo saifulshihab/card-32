@@ -13,18 +13,18 @@ import Router from "./routes/Router";
 
 const App: React.FC = () => (
   <ThemeProvider>
-    <AuthProvider>
-      <SocketProvider>
-        <DndProvider backend={HTML5Backend}>
-          <RoomProvider>
-            <CardsProvider>
+    <SocketProvider>
+      <AuthProvider>
+        <RoomProvider>
+          <CardsProvider>
+            <DndProvider backend={HTML5Backend}>
               <Router />
               <ToastContainer />
-            </CardsProvider>
-          </RoomProvider>
-        </DndProvider>
-      </SocketProvider>
-    </AuthProvider>
+            </DndProvider>
+          </CardsProvider>
+        </RoomProvider>
+      </AuthProvider>
+    </SocketProvider>
   </ThemeProvider>
 );
 
