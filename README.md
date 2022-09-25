@@ -13,7 +13,7 @@ yarn start:server (run server)
 ```
 
 ## Stack
-- Front-End: React.js, Tailwind CSS, TypeScript
+- Front-End: React.js, React DnD, Tailwind CSS, TypeScript
 - Back-End: Express, Socket.io, TypeScript
 
 
