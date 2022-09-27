@@ -4,39 +4,46 @@ import { BASE_URL } from "../constants/config";
 
 // Namespaces
 const mainNamespace = BASE_URL;
+const roomNamespace = `${BASE_URL}/room`;
 
 interface ISocketContext {
-  socket: Socket | undefined;
+  mainSocket: Socket | undefined;
+  roomSocket: Socket | undefined;
   isSocketConnected: boolean;
 }
 
 const SocketContext = React.createContext<ISocketContext | null>(null);
 
+const mainSocket = io(mainNamespace);
+const roomSocket = io(roomNamespace);
+
 export const SocketProvider: React.FC<PropsWithChildren> = (props) => {
-  const socket = io(mainNamespace);
-  const [isSocketConnected, setSocketConnected] = useState(socket.connected);
+  const [isSocketConnected, setSocketConnected] = useState(
+    mainSocket.connected
+  );
 
   useEffect(() => {
-    socket.on("connect", () => {
+    mainSocket.on("connect", () => {
       setSocketConnected(true);
     });
 
-    socket.on("disconnect", () => {
+    mainSocket.on("disconnect", () => {
       setSocketConnected(false);
       window.location.reload();
     });
 
     // clean up
     return () => {
-      socket.off("connect");
-      socket.off("disconnect");
+      mainSocket.off("connect");
+      mainSocket.off("disconnect");
     };
-  }, [socket]);
+  }, []);
 
   return (
     <SocketContext.Provider
       value={{
-        socket,
+        mainSocket,
+        roomSocket,
         isSocketConnected,
       }}
     >

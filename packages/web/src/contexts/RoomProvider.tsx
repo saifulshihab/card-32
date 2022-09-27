@@ -1,5 +1,7 @@
+import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
 import { IRoom } from "@card-32/common/types/room";
-import React, { PropsWithChildren, useState } from "react";
+import React, { PropsWithChildren, useEffect, useState } from "react";
+import { useSocketContext } from "./SocketProvider";
 
 interface IRoomContext {
   room: IRoom | undefined;
@@ -11,8 +13,22 @@ interface IRoomContext {
 const RoomContext = React.createContext<IRoomContext | null>(null);
 
 export const RoomProvider: React.FC<PropsWithChildren> = (props) => {
+  const { mainSocket } = useSocketContext();
+
+  const [activeRooms, setActiveRooms] = useState<IRoom[]>([]);
   const [room, setRoom] = useState<IRoom | undefined>(undefined);
-  const [activeRooms] = useState<IRoom[]>([]);
+
+  useEffect(() => {
+    if (!mainSocket) return;
+
+    // receive active rooms
+    mainSocket.on(
+      MAIN_NAMESPACE_EVENTS.ACTIVE_ROOMS,
+      (data: { rooms: IRoom[] }) => {
+        setActiveRooms(data.rooms);
+      }
+    );
+  }, [mainSocket]);
 
   return (
     <RoomContext.Provider

@@ -1,4 +1,4 @@
-import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
+import { ROOM_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
 import React, { useState } from "react";
 import { useAuthContext } from "../../../contexts/AuthProvider";
 import { useRoomContext } from "../../../contexts/RoomProvider";
@@ -11,7 +11,7 @@ import { ContentSubHeading } from "../../atoms/texts/ContentSubHeading";
 import { PlayerCard } from "../playerCard";
 
 const PlaygroundSidebar: React.FC = () => {
-  const { socket } = useSocketContext();
+  const { roomSocket } = useSocketContext();
   const { player, setPlayer } = useAuthContext();
   const { room } = useRoomContext();
 
@@ -24,8 +24,8 @@ const PlaygroundSidebar: React.FC = () => {
   };
 
   const onLeave = async () => {
-    if (!socket) return;
-    socket.emit(MAIN_NAMESPACE_EVENTS.LEAVE_ROOM);
+    if (!roomSocket) return;
+    roomSocket.emit(ROOM_NAMESPACE_EVENTS.LEAVE_ROOM);
     setPlayer(null);
   };
 

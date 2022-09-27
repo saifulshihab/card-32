@@ -6,6 +6,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { NODE_ENV, PORT } from "./config/env";
 import { mainSocketIO } from "./socket/mainSocket";
+import { roomSocketIO } from "./socket/roomSocket";
 import { logger } from "./utils/winston";
 
 const app = express();
@@ -34,6 +35,7 @@ export const rooms: IRoom[] = [];
 
   // sockets
   mainSocketIO(io);
+  roomSocketIO(io);
 
   // listening server
   httpServer.listen(PORT, () => {

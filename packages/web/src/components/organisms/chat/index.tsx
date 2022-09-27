@@ -1,17 +1,27 @@
 import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
-import { IMessage } from "@card-32/common/types/player";
+import { IGloabalMessage, IMessage } from "@card-32/common/types/player";
 import { Form, Formik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
+import { Socket } from "socket.io-client";
 import { useAuthContext } from "../../../contexts/AuthProvider";
-import { useSocketContext } from "../../../contexts/SocketProvider";
 import { generateRandomColor } from "../../../utils/color";
 
-const Chat: React.FC = React.memo(() => {
+type TGenericMessage =
+  | IMessage
+  | (IGloabalMessage & {
+      username?: string;
+    });
+
+interface IProps {
+  socket: Socket | undefined;
+}
+
+const Chat: React.FC<IProps> = (props) => {
+  const { socket } = props;
   const { player } = useAuthContext();
-  const { socket } = useSocketContext();
 
   const scrollDivRef = useRef<HTMLDivElement | null>(null);
-  const [messages, setMessages] = useState<IMessage[]>([]);
+  const [messages, setMessages] = useState<TGenericMessage[]>([]);
 
   const scrollIntoChatBottom = () => {
     if (scrollDivRef.current)
@@ -27,7 +37,7 @@ const Chat: React.FC = React.memo(() => {
     // new message
     socket.on(
       MAIN_NAMESPACE_EVENTS.NEW_MESSAGE,
-      ({ data }: { data: IMessage }) => {
+      ({ data }: { data: TGenericMessage }) => {
         setMessages((prev) => [...prev, data]);
       }
     );
@@ -57,17 +67,30 @@ const Chat: React.FC = React.memo(() => {
         <div className="flex h-full flex-col gap-1.5 p-2 pb-0 text-xs overflow-y-scroll scrollbar-hide">
           {messages.map(({ username, message }, idx) => (
             <div key={idx} className="flex gap-1">
-              <p>
+              {username ? (
+                <>
+                  <p>
+                    <span
+                      style={{
+                        color: generateRandomColor(),
+                      }}
+                      className="font-semibold"
+                    >
+                      {username}
+                    </span>
+                  </p>
+                  <span className="font-bold">:</span>
+                </>
+              ) : (
                 <span
+                  className="font-bold"
                   style={{
                     color: generateRandomColor(),
                   }}
-                  className="font-semibold"
                 >
-                  {username}
+                  :
                 </span>
-              </p>
-              <span className="font-bold">:</span>
+              )}
               <p>{message}</p>
             </div>
           ))}
@@ -104,7 +127,6 @@ const Chat: React.FC = React.memo(() => {
       </div>
     </div>
   );
-});
+};
 
-Chat.displayName = "Chat";
 export default Chat;

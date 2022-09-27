@@ -1,4 +1,4 @@
-import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
+import { ROOM_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { showToastMessage } from "../../components/atoms/toast";
@@ -14,8 +14,7 @@ const Playground: React.FC = () => {
   const navigate = useNavigate();
   const { room, setRoom } = useRoomContext();
   const { player } = useAuthContext();
-  const { socket } = useSocketContext();
-
+  const { roomSocket } = useSocketContext();
   const [chatBoxVisible, setChatBoxVisible] = useState(false);
 
   useEffect(() => {
@@ -26,19 +25,22 @@ const Playground: React.FC = () => {
   }, [player, room, navigate]);
 
   useEffect(() => {
-    if (!socket) return;
+    if (!roomSocket) return;
 
     // new player joined
-    socket.on(MAIN_NAMESPACE_EVENTS.NEW_PLAYER_JOINED, ({ message, room }) => {
-      setRoom(room);
-      showToastMessage({
-        position: "bottom-left",
-        message,
-      });
-    });
+    roomSocket.on(
+      ROOM_NAMESPACE_EVENTS.NEW_PLAYER_JOINED,
+      ({ message, room }) => {
+        setRoom(room);
+        showToastMessage({
+          position: "bottom-left",
+          message,
+        });
+      }
+    );
 
     // player leave
-    socket.on(MAIN_NAMESPACE_EVENTS.LEAVE_ROOM, ({ message, room }) => {
+    roomSocket.on(ROOM_NAMESPACE_EVENTS.LEAVE_ROOM, ({ message, room }) => {
       setRoom(room);
       showToastMessage({
         position: "bottom-left",
@@ -47,8 +49,8 @@ const Playground: React.FC = () => {
     });
 
     // player disconnect
-    socket.on(
-      MAIN_NAMESPACE_EVENTS.PLAYER_DISCONNECTED,
+    roomSocket.on(
+      ROOM_NAMESPACE_EVENTS.PLAYER_DISCONNECTED,
       ({ message, room }) => {
         setRoom(room);
         showToastMessage({
@@ -59,20 +61,20 @@ const Playground: React.FC = () => {
     );
 
     return () => {
-      socket.off(MAIN_NAMESPACE_EVENTS.NEW_PLAYER_JOINED);
-      socket.off(MAIN_NAMESPACE_EVENTS.LEAVE_ROOM);
-      socket.off(MAIN_NAMESPACE_EVENTS.PLAYER_DISCONNECTED);
+      roomSocket.off(ROOM_NAMESPACE_EVENTS.NEW_PLAYER_JOINED);
+      roomSocket.off(ROOM_NAMESPACE_EVENTS.LEAVE_ROOM);
+      roomSocket.off(ROOM_NAMESPACE_EVENTS.PLAYER_DISCONNECTED);
     };
-  }, [socket, setRoom]);
+  }, [roomSocket, setRoom]);
 
   return (
-    <div className="w-full h-full flex flex-col sm:flex-row gap-1 relative">
+    <div className="w-full h-screen flex flex-col sm:flex-row gap-1 relative">
       {/* left sidebar */}
       <PlaygroundSidebar />
       {/* board & chat */}
       <Board />
       <div className="hidden xl:block xl:w-[320px]">
-        <Chat />
+        <Chat socket={roomSocket} />
       </div>
       <button
         className="absolute xl:hidden z-20 bottom-[23%] right-5 shadow-md sm:top-2 w-12 h-12 rounded-full btn-primary flex items-center justify-center
@@ -95,7 +97,7 @@ const Playground: React.FC = () => {
           chatBoxVisible ? "block" : "hidden"
         }`}
       >
-        <Chat />
+        <Chat socket={roomSocket} />
       </div>
     </div>
   );

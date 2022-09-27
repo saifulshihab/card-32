@@ -1,6 +1,10 @@
 export const MAIN_NAMESPACE_EVENTS = {
-  CONNECTION: "connection",
-  DISCONNECT: "disconnect",
+  ACTIVE_ROOMS: "active::rooms",
+  SEND_MESSAGE: "send::message",
+  NEW_MESSAGE: "new::message",
+};
+
+export const ROOM_NAMESPACE_EVENTS = {
   START_GAME: "start::game",
   RESTART_GAME: "restart::game",
   END_GAME: "end::game",

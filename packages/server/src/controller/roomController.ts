@@ -47,7 +47,10 @@ export const getRoomOnLeaveOrDisconnect = (
   roomId: string,
   playerId: string
 ) => {
-  const room = rooms.find((room) => room.roomId === roomId)!;
+  const room = rooms.find((room) => room.roomId === roomId);
+  if (!room) {
+    return { room: undefined };
+  }
   if (room.players.length === 1) {
     // last player wants to leave, remove the rooms from server
     rooms.splice(
@@ -56,7 +59,6 @@ export const getRoomOnLeaveOrDisconnect = (
     );
     return { room: undefined };
   }
-
   room.players = room.players.filter((player) => player.playerId !== playerId);
   return { room };
 };

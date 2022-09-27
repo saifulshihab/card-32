@@ -1,4 +1,4 @@
-import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
+import { ROOM_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
 import { IRoom, IRoomCreateIOrJoinInput } from "@card-32/common/types/room";
 import { Form, Formik } from "formik";
 import React from "react";
@@ -15,14 +15,14 @@ import { showToastMessage } from "../../atoms/toast";
 
 const CreateOrJoinRoomModal: React.FC<IModalProps> = (props) => {
   const navigate = useNavigate();
-  const { socket } = useSocketContext();
+  const { roomSocket } = useSocketContext();
   const { setPlayer } = useAuthContext();
   const { setRoom } = useRoomContext();
 
   const onJoinRoom = (joinInput: IRoomCreateIOrJoinInput, cb: () => void) => {
-    if (!socket) return;
-    socket.emit(
-      MAIN_NAMESPACE_EVENTS.JOIN_ROOM,
+    if (!roomSocket) return;
+    roomSocket.emit(
+      ROOM_NAMESPACE_EVENTS.JOIN_ROOM,
       joinInput,
       (response: {
         error?: string;
