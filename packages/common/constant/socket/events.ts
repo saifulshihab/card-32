@@ -10,4 +10,8 @@ export const MAIN_NAMESPACE_EVENTS = {
   PLAYER_DISCONNECTED: "player::disconnected",
   SEND_MESSAGE: "send::message",
   NEW_MESSAGE: "new::message",
+  ROOM_FULL: "room::full",
+  CARDS_GENERATED: "cards::generated",
+  BID_POINT: "bid::point",
+  NEW_BID: "new::bid",
 };

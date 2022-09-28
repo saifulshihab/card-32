@@ -10,8 +10,8 @@ export const roomJoinValidationSchema = yup.object().shape({
     .required("Username is required"),
   roomId: yup
     .string()
-    .min(5, "Username must be at least 5 characters")
-    .max(8, "Username can not be greater than 8 characters")
+    .min(5, "Room ID must be at least 5 characters")
+    .max(8, "Room ID can not be greater than 8 characters")
     .matches(USERNAME_REGEX, "Room Id can't contain special characters")
     .required("Room Id is required"),
 });

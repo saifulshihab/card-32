@@ -5,22 +5,27 @@
 
 import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
 import { IMessage, IPlayer } from "@card-32/common/types/player";
-import { IRoom, IRoomCreateIOrJoinInput } from "@card-32/common/types/room";
+import {
+  IBidPoint,
+  IRoom,
+  IRoomCreateIOrJoinInput,
+} from "@card-32/common/types/room";
 import { Namespace, Server, Socket } from "socket.io";
 import {
   getPlayerIntoRoom,
   getRoomOnLeaveOrDisconnect,
 } from "../controller/roomController";
+import { generateCards } from "../utils/card";
 
-let mainIO: Namespace;
+let io: Namespace;
 const events = MAIN_NAMESPACE_EVENTS;
 
 const mainSocketIO = (server: Server) => {
-  mainIO = server.of("/");
+  io = server.of("/");
 
   const getRoomId = (socket: Socket) => socket.data.room.roomId as string;
 
-  mainIO.on(events.CONNECTION, (socket: Socket) => {
+  io.on(events.CONNECTION, (socket: Socket) => {
     /**
      * join/create room
      */
@@ -46,11 +51,16 @@ const mainSocketIO = (server: Server) => {
         callback({ data });
 
         if (!newRoom) {
-          // notify others new player joined
+          // notify others that new player joined
           socket.to(roomId).emit(events.NEW_PLAYER_JOINED, {
             message: `${username} has joined.`,
             room: data?.room,
           });
+          if (data?.room.players.length === 4) {
+            socket.to(roomId).emit(events.ROOM_FULL, {
+              message: `Room is full. You can start the game.`,
+            });
+          }
         }
       }
     );
@@ -60,7 +70,27 @@ const mainSocketIO = (server: Server) => {
      */
     socket.on(events.SEND_MESSAGE, (data: IMessage) => {
       const roomId = getRoomId(socket);
-      mainIO.to(roomId).emit(events.NEW_MESSAGE, { data });
+      io.to(roomId).emit(events.NEW_MESSAGE, { data });
+    });
+
+    /**
+     * start game
+     */
+    socket.on(events.START_GAME, () => {
+      const roomId = getRoomId(socket);
+      const { cards } = generateCards(roomId);
+      io.to(roomId).emit(events.CARDS_GENERATED, { cards });
+    });
+
+    /**
+     * on bid point
+     */
+    socket.on(events.BID_POINT, (data: IBidPoint, callback) => {
+      const roomId = getRoomId(socket);
+      io.to(roomId).emit(events.NEW_BID, data);
+      callback({
+        bidDone: true,
+      });
     });
 
     /**
@@ -79,7 +109,7 @@ const mainSocketIO = (server: Server) => {
       );
 
       if (room) {
-        mainIO.to(room.roomId).emit(events.LEAVE_ROOM, {
+        io.to(room.roomId).emit(events.LEAVE_ROOM, {
           message: `${player.username} has left.`,
           room,
         });
@@ -101,7 +131,7 @@ const mainSocketIO = (server: Server) => {
           player.playerId
         );
         if (room) {
-          mainIO.to(room.roomId).emit(events.PLAYER_DISCONNECTED, {
+          io.to(room.roomId).emit(events.PLAYER_DISCONNECTED, {
             message: `${player.username} has left.`,
             room,
           });

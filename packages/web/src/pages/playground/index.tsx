@@ -37,6 +37,12 @@ const Playground: React.FC = () => {
       });
     });
 
+    socket.on(MAIN_NAMESPACE_EVENTS.ROOM_FULL, ({ message }) => {
+      showToastMessage({
+        message,
+      });
+    });
+
     // player leave
     socket.on(MAIN_NAMESPACE_EVENTS.LEAVE_ROOM, ({ message, room }) => {
       setRoom(room);
@@ -62,6 +68,7 @@ const Playground: React.FC = () => {
       socket.off(MAIN_NAMESPACE_EVENTS.NEW_PLAYER_JOINED);
       socket.off(MAIN_NAMESPACE_EVENTS.LEAVE_ROOM);
       socket.off(MAIN_NAMESPACE_EVENTS.PLAYER_DISCONNECTED);
+      socket.off(MAIN_NAMESPACE_EVENTS.ROOM_FULL);
     };
   }, [socket, setRoom]);
 

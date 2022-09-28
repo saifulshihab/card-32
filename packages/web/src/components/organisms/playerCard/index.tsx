@@ -1,12 +1,20 @@
+import { IPlayer } from "@card-32/common/types/player";
 import React from "react";
+import { useRoomContext } from "../../../contexts/RoomProvider";
 import FlexContainer from "../../atoms/box/FlexContainer";
 
 interface IProps {
-  username: string;
+  player: IPlayer;
 }
 
 const PlayerCard: React.FC<IProps> = (props) => {
-  const { username } = props;
+  const { player } = props;
+  const { bidPoints } = useRoomContext();
+
+  const bidPoint = bidPoints.find(
+    (data) => data.playerId === player.playerId
+  )?.bid;
+
   return (
     <div
       draggable
@@ -20,7 +28,7 @@ const PlayerCard: React.FC<IProps> = (props) => {
             className="w-full h-full rounded-full"
           />
         </div>
-        <p className="text-sm">{username}</p>
+        <p className="text-sm">{player.username}</p>
       </FlexContainer>
       <div className="absolute bottom-0 w-full bg-zinc-900 rounded-md rounded-tl-none rounded-tr-none text-xs">
         <FlexContainer>
@@ -31,7 +39,7 @@ const PlayerCard: React.FC<IProps> = (props) => {
           <p className="bg-primary-700 flex-1 text-center rounded-bl-md">
             Point
           </p>
-          <p className="text-center flex-1 font-semibold">0</p>
+          <p className="text-center flex-1 font-semibold">{bidPoint}</p>
         </FlexContainer>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
+import { Form, Formik } from "formik";
 import React, { useState } from "react";
 import { useAuthContext } from "../../../contexts/AuthProvider";
 import { useRoomContext } from "../../../contexts/RoomProvider";
@@ -8,19 +9,47 @@ import FlexContainer from "../../atoms/box/FlexContainer";
 import Button from "../../atoms/button/Button";
 import Modal from "../../atoms/modal/Modal";
 import { ContentSubHeading } from "../../atoms/texts/ContentSubHeading";
+import { showToastMessage } from "../../atoms/toast";
 import { PlayerCard } from "../playerCard";
 
 const PlaygroundSidebar: React.FC = () => {
   const { socket } = useSocketContext();
   const { player, setPlayer } = useAuthContext();
-  const { room } = useRoomContext();
+  const { room, isRoomFull, isGameStarted, bidPoints } = useRoomContext();
 
   const [leaveRoomModal, setLeaveRoomModal] = useState(false);
   const { sidebarOrder, setSidebarOrder } = useThemeContext();
   const [bidModalVisible, setBidModalVisible] = useState(false);
 
   const onStartGame = () => {
-    return;
+    if (!socket) return;
+    if (!room) return;
+    if (!isRoomFull) {
+      return showToastMessage({
+        type: "warning",
+        message: `Invite ${
+          4 - room.players.length
+        } more players to start the game`,
+      });
+    }
+    socket.emit(MAIN_NAMESPACE_EVENTS.START_GAME);
+  };
+
+  const onBidSubmit = (bid: number) => {
+    if (!socket) return;
+    if (!player) return;
+    socket.emit(
+      MAIN_NAMESPACE_EVENTS.BID_POINT,
+      {
+        playerId: player.playerId,
+        bid,
+      },
+      ({ bidDone }: { bidDone: boolean }) => {
+        if (bidDone) {
+          setBidModalVisible(false);
+        }
+      }
+    );
   };
 
   const onLeave = async () => {
@@ -28,6 +57,14 @@ const PlaygroundSidebar: React.FC = () => {
     socket.emit(MAIN_NAMESPACE_EVENTS.LEAVE_ROOM);
     setPlayer(null);
   };
+
+  const isBiddingDone = bidPoints.length
+    ? bidPoints.some((bid) => bid.playerId === player?.playerId)
+    : false;
+  console.log(
+    "🚀 ~ file: PlaygroundSidebar.tsx ~ line 62 ~ isBiddingDone",
+    isBiddingDone
+  );
 
   return (
     <div className="w-full sm:w-[320px] bg-zinc-800 relative">
@@ -89,7 +126,7 @@ const PlaygroundSidebar: React.FC = () => {
           {room?.players.length ? (
             <div className="inline-grid grid-cols-2 grid-rows-2 gap-4">
               {room.players.map((player) => (
-                <PlayerCard key={player.playerId} username={player.username} />
+                <PlayerCard key={player.playerId} player={player} />
               ))}
             </div>
           ) : null}
@@ -105,58 +142,99 @@ const PlaygroundSidebar: React.FC = () => {
             </p>
           </div>
           <FlexContainer className="gap-2">
-            <button
-              className="btn-primary p-1 text-xs border-2 border-blue-600 shadow-blue-600"
-              onClick={onStartGame}
-            >
-              Start Game
-            </button>
-            <button className="btn-primary p-1 text-xs border-2 border-primary shadow-primary">
+            {!isGameStarted ? (
+              <button
+                className="btn-primary p-1 text-xs border-2 border-blue-600 shadow-blue-600"
+                onClick={onStartGame}
+                disabled={isGameStarted}
+              >
+                Start Game
+              </button>
+            ) : !isBiddingDone ? (
+              <button
+                className="btn-primary p-1 text-xs border-2 border-blue-600 shadow-blue-600"
+                onClick={() => setBidModalVisible(true)}
+              >
+                Bid
+              </button>
+            ) : null}
+
+            {/* <button className="btn-primary p-1 text-xs border-2 border-primary shadow-primary">
               Restart
-            </button>
+            </button> */}
           </FlexContainer>
         </FlexContainer>
 
         {room?.players.length ? (
           <div className="mt-3 inline-grid grid-cols-4 grid-rows-1 gap-2">
             {room.players.map((player) => (
-              <PlayerCard key={player.playerId} username={player.username} />
+              <PlayerCard key={player.playerId} player={player} />
             ))}
           </div>
         ) : null}
       </div>
       {/* sidebar bottom content */}
-      <div className="hidden sm:flex w-full absolute bottom-0 p-2 flex-col gap-2">
+      <div className="hidden sm:flex w-full absolute bottom-5 p-2 flex-col gap-2">
         <FlexContainer className="gap-2 justify-center">
-          <button
-            className="btn-primary border-2 border-blue-600 shadow-blue-600"
-            onClick={onStartGame}
-          >
-            Start Game
-          </button>
-          <button className="btn-primary border-2 border-primary shadow-primary">
+          {!isGameStarted ? (
+            <button
+              className="btn-primary border-2 border-blue-600 shadow-blue-600"
+              onClick={onStartGame}
+              disabled={isGameStarted}
+            >
+              Start Game
+            </button>
+          ) : !isBiddingDone ? (
+            <button
+              className="btn-primary border-2 border-blue-600 shadow-blue-600"
+              onClick={() => setBidModalVisible(true)}
+            >
+              Bid
+            </button>
+          ) : null}
+
+          {/* <button className="btn-primary border-2 border-primary shadow-primary">
             Restart
-          </button>
+          </button> */}
         </FlexContainer>
       </div>
       {/* bid select modal */}
       <Modal visible={bidModalVisible} onClose={setBidModalVisible}>
-        <FlexContainer className="p-5 bg-zinc-900 text-white  flex-col gap-2">
-          <p className="text-xl font-bold">Select your bid point</p>
-          <select className="my-3 w-20 h-20 bg-zinc-800 shadow-md border-2 border-blue-700 border-dotted rounded py-1.5 text-center outline-none cursor-pointer focus:ring-2 ring-blue-700 text-2xl">
-            <option value={1}>1</option>
-            <option value={2}>2</option>
-            <option value={3}>3</option>
-            <option value={4}>4</option>
-            <option value={5}>5</option>
-            <option value={6}>6</option>
-            <option value={7}>7</option>
-            <option value={8}>8</option>
-          </select>
-          <button className="btn-primary  bg-blue-700 text-xs py-2 px-3">
-            Bid
-          </button>
-        </FlexContainer>
+        <Formik
+          initialValues={{
+            bid: 1,
+          }}
+          onSubmit={(values) => {
+            onBidSubmit(values.bid);
+          }}
+        >
+          {({ values, handleChange }) => (
+            <Form className="flex text-white  flex-col gap-2 items-center">
+              <p className="text-xl font-bold">Select your bid point</p>
+              <select
+                name="bid"
+                value={values.bid}
+                onChange={handleChange}
+                className="my-3 w-20 h-20 bg-zinc-800 shadow-md border-2 border-blue-700 border-dotted rounded py-1.5 text-center outline-none cursor-pointer focus:ring-2 ring-blue-700 text-2xl"
+              >
+                <option value={1}>1</option>
+                <option value={2}>2</option>
+                <option value={3}>3</option>
+                <option value={4}>4</option>
+                <option value={5}>5</option>
+                <option value={6}>6</option>
+                <option value={7}>7</option>
+                <option value={8}>8</option>
+              </select>
+              <button
+                className="btn-primary  bg-blue-700 text-xs py-2 px-3"
+                type="submit"
+              >
+                Bid
+              </button>
+            </Form>
+          )}
+        </Formik>
       </Modal>
       {/* room leave modal */}
       <Modal visible={leaveRoomModal} onClose={() => setLeaveRoomModal(false)}>
@@ -165,7 +243,6 @@ const PlaygroundSidebar: React.FC = () => {
           <p className="text-gray-300">
             Are you sure you want to leave this room?
           </p>
-
           <FlexContainer className="w-full justify-end gap-2">
             <Button
               className="bg-zinc-700"

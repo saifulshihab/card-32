@@ -1,4 +1,5 @@
 import { IRoom } from "@card-32/common/types/room";
+import { ICard } from "@card-32/common/types/card";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
@@ -13,6 +14,7 @@ const httpServer = createServer(app);
 
 // initial database
 export const rooms: IRoom[] = [];
+export const cards: ICard[] = [];
 
 (async () => {
   dotenv.config();

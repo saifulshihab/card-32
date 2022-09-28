@@ -10,3 +10,8 @@ export interface IRoomCreateIOrJoinInput {
   username: string; // player username
   roomId: string;
 }
+
+export interface IBidPoint {
+  playerId: string;
+  bid: number;
+}
