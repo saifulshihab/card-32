@@ -8,6 +8,6 @@ export interface IMessage {
   message: string;
 }
 
-export interface IGloabalMessage {
+export interface IGlobalMessage {
   message: string;
 }

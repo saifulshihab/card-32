@@ -1,5 +1,6 @@
 import React, { PropsWithChildren, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
+import { showToastMessage } from "../components/atoms/toast";
 import { BASE_URL } from "../constants/config";
 
 // Namespaces
@@ -12,10 +13,10 @@ interface ISocketContext {
   isSocketConnected: boolean;
 }
 
-const SocketContext = React.createContext<ISocketContext | null>(null);
-
 const mainSocket = io(mainNamespace);
 const roomSocket = io(roomNamespace);
+
+const SocketContext = React.createContext<ISocketContext | null>(null);
 
 export const SocketProvider: React.FC<PropsWithChildren> = (props) => {
   const [isSocketConnected, setSocketConnected] = useState(
@@ -32,10 +33,15 @@ export const SocketProvider: React.FC<PropsWithChildren> = (props) => {
       window.location.reload();
     });
 
+    mainSocket.on("connect_error", () => {
+      showToastMessage({ type: "error", message: "Socket connection error." });
+    });
+
     // clean up
     return () => {
       mainSocket.off("connect");
       mainSocket.off("disconnect");
+      mainSocket.off("connect_error");
     };
   }, []);
 

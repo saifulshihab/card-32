@@ -52,8 +52,12 @@ export const rooms: IRoom[] = [];
       }, 5000);
     }
   });
-})().catch((err) => logger.error(err));
+})().catch((err) => {
+  logger.error(err);
+  logger.info(err);
+});
 
 process.on("unhandledRejection", (error) => {
+  logger.info(error);
   logger.error(error);
 });

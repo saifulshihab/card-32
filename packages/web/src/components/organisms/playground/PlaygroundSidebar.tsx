@@ -4,6 +4,7 @@ import { useAuthContext } from "../../../contexts/AuthProvider";
 import { useRoomContext } from "../../../contexts/RoomProvider";
 import { useSocketContext } from "../../../contexts/SocketProvider";
 import { useThemeContext } from "../../../contexts/ThemeProvider";
+import { removeDataOnLocalStorage } from "../../../utils/localStorage";
 import FlexContainer from "../../atoms/box/FlexContainer";
 import Button from "../../atoms/button/Button";
 import Modal from "../../atoms/modal/Modal";
@@ -26,7 +27,8 @@ const PlaygroundSidebar: React.FC = () => {
   const onLeave = async () => {
     if (!roomSocket) return;
     roomSocket.emit(ROOM_NAMESPACE_EVENTS.LEAVE_ROOM);
-    setPlayer(null);
+    removeDataOnLocalStorage();
+    setPlayer(undefined);
   };
 
   return (

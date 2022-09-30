@@ -14,8 +14,8 @@ const RoomContext = React.createContext<IRoomContext | null>(null);
 
 export const RoomProvider: React.FC<PropsWithChildren> = (props) => {
   const { mainSocket } = useSocketContext();
-
   const [activeRooms, setActiveRooms] = useState<IRoom[]>([]);
+
   const [room, setRoom] = useState<IRoom | undefined>(undefined);
 
   useEffect(() => {
@@ -28,6 +28,10 @@ export const RoomProvider: React.FC<PropsWithChildren> = (props) => {
         setActiveRooms(data.rooms);
       }
     );
+
+    return () => {
+      mainSocket.off(MAIN_NAMESPACE_EVENTS.ACTIVE_ROOMS);
+    };
   }, [mainSocket]);
 
   return (
