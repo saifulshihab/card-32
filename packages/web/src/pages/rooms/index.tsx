@@ -181,7 +181,7 @@ const Rooms: React.FC = () => {
             </div>
             {/* chat */}
             <div className="hidden lg:block lg:w-[250px] xl:w-[320px]  h-[calc(100vh-180px)]">
-              <Chat socket={mainSocket} />
+              <Chat socket={mainSocket} heading="🌐 Global Chat" />
             </div>
           </div>
         </div>
