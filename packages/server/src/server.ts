@@ -43,6 +43,7 @@ export const rooms: IRoom[] = [];
 
     if (NODE_ENV === "development") {
       setInterval(() => {
+        // eslint-disable-next-line no-console
         console.table(
           rooms.map((room) => ({
             ...room,
