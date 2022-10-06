@@ -15,7 +15,7 @@ export const getPlayerIntoRoom = (joinInput: IRoomCreateIOrJoinInput) => {
       const newRoom = new Room(roomId, [newPlayer], newPlayer) as IRoom;
       rooms.push(newRoom);
       const data = { room: newRoom, player: newPlayer };
-      return { data, newRoom: true };
+      return { data };
     }
 
     // room exist push add player to the room

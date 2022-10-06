@@ -1,4 +1,4 @@
-import { ROOM_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
+import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
 import {
   IRoomCreateIOrJoinInput,
   IRoomCreateOrJoinResponse,
@@ -24,20 +24,20 @@ const localStoragePlayerAndRoom = getPlayerAndRoomIdFromLocalStorage();
 
 const CreateOrJoinRoomModal: React.FC<IModalProps> = (props) => {
   const navigate = useNavigate();
-  const { roomSocket } = useSocketContext();
-  const { player, setPlayer } = useAuthContext();
+  const { socket: socket } = useSocketContext();
+  const { player, setRoomId, setPlayer } = useAuthContext();
   const { setRoom } = useRoomContext();
 
   const onJoinRoom = (joinInput: IRoomCreateIOrJoinInput, cb: () => void) => {
-    if (!roomSocket) return;
+    if (!socket) return;
     if (player && localStoragePlayerAndRoom.roomId) {
       return showToastMessage({
         type: "warning",
         message: "You already created a room.",
       });
     }
-    roomSocket.emit(
-      ROOM_NAMESPACE_EVENTS.JOIN_ROOM,
+    socket.emit(
+      MAIN_NAMESPACE_EVENTS.JOIN_ROOM,
       joinInput,
       (response: { error?: string; data?: IRoomCreateOrJoinResponse }) => {
         const { error, data } = response;
@@ -59,10 +59,10 @@ const CreateOrJoinRoomModal: React.FC<IModalProps> = (props) => {
           player,
           roomId: data.room.roomId,
         });
-
         setPlayer(player);
+        setRoomId(data.room.roomId);
         setRoom(data.room);
-        navigate(PLAYGROUND(joinInput.roomId));
+        navigate(PLAYGROUND);
         cb();
       }
     );

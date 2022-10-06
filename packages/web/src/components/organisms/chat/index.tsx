@@ -13,12 +13,12 @@ type TGenericMessage =
     });
 
 interface IProps {
-  heading?: string;
+  isGlobal?: boolean;
   socket: Socket | undefined;
 }
 
 const Chat: React.FC<IProps> = (props) => {
-  const { socket, heading } = props;
+  const { socket, isGlobal } = props;
   const { player } = useAuthContext();
 
   const scrollDivRef = useRef<HTMLDivElement | null>(null);
@@ -43,25 +43,40 @@ const Chat: React.FC<IProps> = (props) => {
       }
     );
 
+    socket.on(
+      MAIN_NAMESPACE_EVENTS.GLOBAL_NEW_MESSAGE,
+      ({ data }: { data: TGenericMessage }) => {
+        setMessages((prev) => [...prev, data]);
+      }
+    );
+
     return () => {
       socket.off(MAIN_NAMESPACE_EVENTS.NEW_MESSAGE);
+      socket.off(MAIN_NAMESPACE_EVENTS.GLOBAL_NEW_MESSAGE);
     };
   }, [socket]);
 
   const sendMessage = (message: string, cb: () => void) => {
     if (!socket) return;
     if (!message) return;
-    socket.emit(MAIN_NAMESPACE_EVENTS.SEND_MESSAGE, {
-      message,
-      username: player?.username,
-    });
+    socket.emit(
+      isGlobal
+        ? MAIN_NAMESPACE_EVENTS.GLOBAL_SEND_MESSAGE
+        : MAIN_NAMESPACE_EVENTS.SEND_MESSAGE,
+      {
+        message,
+        username: player?.username,
+      }
+    );
     cb();
   };
 
   return (
     <div className="w-full h-full flex flex-col bg-zinc-800">
       <div className="relative py-2 px-3 border-b-4 border-zinc-900">
-        <p className="text-2xl font-bold">{heading || "Chat"}</p>
+        <p className="text-2xl font-bold">
+          {isGlobal ? "🌐 Global Chat" : "Chat"}
+        </p>
       </div>
       {/* messages */}
       <div className="flex flex-grow overflow-hidden">

@@ -1,4 +1,4 @@
-import { ROOM_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
+import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
 import {
   IRoomCreateOrJoinResponse,
   TRoomJoinRequestStatus,
@@ -6,6 +6,7 @@ import {
 import { Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AnimatedCircle from "../../components/atoms/box/AnimatedCircle";
 import FlexContainer from "../../components/atoms/box/FlexContainer";
 import TextInput from "../../components/atoms/inputs/TextInput";
 import Modal from "../../components/atoms/modal/Modal";
@@ -23,7 +24,7 @@ const Rooms: React.FC = () => {
   const navigate = useNavigate();
   const { setPlayer } = useAuthContext();
   const { activeRooms, setRoom } = useRoomContext();
-  const { isSocketConnected, mainSocket, roomSocket } = useSocketContext();
+  const { isSocketConnected, socket } = useSocketContext();
   const [createOrJoinRoomModalVisible, setCreateOrJoinRoomModalVisible] =
     useState(false);
   const [joinRequestSent, setJoinRequestSent] = useState(false);
@@ -37,10 +38,11 @@ const Rooms: React.FC = () => {
   >(undefined);
 
   useEffect(() => {
-    if (!roomSocket) return;
+    if (!socket) return;
+
     // join request response
-    roomSocket.on(
-      ROOM_NAMESPACE_EVENTS.JOIN_REQUEST_RESPONSE,
+    socket.on(
+      MAIN_NAMESPACE_EVENTS.JOIN_REQUEST_RESPONSE,
       (result: {
         status: TRoomJoinRequestStatus;
         data: IRoomCreateOrJoinResponse;
@@ -49,8 +51,8 @@ const Rooms: React.FC = () => {
         if (status === "rejected") {
           showToastMessage({ type: "error", message: "Request rejected." });
         } else if (status === "accepted") {
-          roomSocket.emit(
-            ROOM_NAMESPACE_EVENTS.JOIN_REQUEST_ACCEPTED,
+          socket.emit(
+            MAIN_NAMESPACE_EVENTS.JOIN_REQUEST_ACCEPTED,
             { data: joinRequestResponse },
             (result: { error?: string; data?: { message: string } }) => {
               const { error, data } = result;
@@ -61,7 +63,7 @@ const Rooms: React.FC = () => {
               if (data) {
                 setPlayer(joinRequestResponse.player);
                 setRoom(joinRequestResponse.room);
-                navigate(PLAYGROUND(joinRequestResponse.room.roomId));
+                navigate(PLAYGROUND);
                 showToastMessage({ type: "success", message: data.message });
               }
             }
@@ -71,9 +73,9 @@ const Rooms: React.FC = () => {
     );
 
     return () => {
-      roomSocket.off(ROOM_NAMESPACE_EVENTS.JOIN_REQUEST_RESPONSE);
+      socket.off(MAIN_NAMESPACE_EVENTS.JOIN_REQUEST_RESPONSE);
     };
-  }, [roomSocket, navigate, setPlayer, setRoom]);
+  }, [socket, navigate, setPlayer, setRoom]);
 
   useEffect(() => {
     if (joinRequestSent) {
@@ -98,12 +100,13 @@ const Rooms: React.FC = () => {
   };
 
   const sendJoinRequest = (username: string, cb?: () => void) => {
-    if (!roomSocket) return;
+    if (!socket) return;
     if (!joinRequestInput) return;
-    roomSocket.emit(
-      ROOM_NAMESPACE_EVENTS.JOIN_REQUEST,
+
+    socket.emit(
+      MAIN_NAMESPACE_EVENTS.JOIN_REQUEST,
       {
-        socketId: roomSocket.id,
+        socketId: socket.id,
         username,
         ...joinRequestInput,
       },
@@ -127,17 +130,7 @@ const Rooms: React.FC = () => {
         <div className="container m-auto flex items-center justify-end gap-2 text-xs font-bold px-5 select-none">
           <p>Server status</p>
           <div className="flex items-center gap-1.5">
-            <div
-              className={`inline-block relative h-2 w-2 rounded-full shadow ${
-                isSocketConnected ? "bg-green-600" : "bg-red-600"
-              }`}
-            >
-              <span
-                className={`${
-                  !isSocketConnected ? "hidden" : ""
-                }absolute h-2 w-2 rounded-full animate-ping bg-green-600 opacity-75`}
-              />
-            </div>
+            <AnimatedCircle socketConnected={isSocketConnected} />
             <p
               className={`${
                 isSocketConnected ? "text-green-600" : "text-red-600"
@@ -181,7 +174,7 @@ const Rooms: React.FC = () => {
             </div>
             {/* chat */}
             <div className="hidden lg:block lg:w-[250px] xl:w-[320px]  h-[calc(100vh-180px)]">
-              <Chat socket={mainSocket} heading="🌐 Global Chat" />
+              <Chat socket={socket} isGlobal />
             </div>
           </div>
         </div>

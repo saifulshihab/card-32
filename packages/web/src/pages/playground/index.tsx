@@ -1,63 +1,48 @@
-import { ROOM_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
+import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
 import {
   IRoomJoinRequestInput,
   TRoomJoinRequestStatus,
 } from "@card-32/common/types/room";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Modal from "../../components/atoms/modal/Modal";
 import { showToastMessage } from "../../components/atoms/toast";
 import Board from "../../components/organisms/board";
 import Chat from "../../components/organisms/chat";
 import PlaygroundSidebar from "../../components/organisms/playground/PlaygroundSidebar";
-import { useAuthContext } from "../../contexts/AuthProvider";
 import { useRoomContext } from "../../contexts/RoomProvider";
 import { useSocketContext } from "../../contexts/SocketProvider";
-import { LANDING } from "../../routes/routes";
 import { removeDataOnLocalStorage } from "../../utils/localStorage";
 
 const Playground: React.FC = () => {
-  const navigate = useNavigate();
-  const { room, setRoom } = useRoomContext();
-  const { player, setPlayer } = useAuthContext();
-  const { roomSocket } = useSocketContext();
+  const { setRoom } = useRoomContext();
+  const { socket } = useSocketContext();
   const [chatBoxVisible, setChatBoxVisible] = useState(false);
   const [newJoinRequest, setNewJoinRequest] = useState<
     IRoomJoinRequestInput | undefined
   >(undefined);
 
   useEffect(() => {
-    // if no room or player object redirect to landing page
-    if (!player || !room) {
-      navigate(LANDING);
-    }
-  }, [player, room, navigate]);
-
-  useEffect(() => {
-    if (!roomSocket) return;
+    if (!socket) return;
 
     // new player joined
-    roomSocket.on(
-      ROOM_NAMESPACE_EVENTS.NEW_PLAYER_JOINED,
-      ({ message, room }) => {
-        setRoom(room);
-        showToastMessage({
-          position: "bottom-left",
-          message,
-        });
-      }
-    );
+    socket.on(MAIN_NAMESPACE_EVENTS.NEW_PLAYER_JOINED, ({ message, room }) => {
+      setRoom(room);
+      showToastMessage({
+        position: "bottom-left",
+        message,
+      });
+    });
 
     // new room join request
-    roomSocket.on(
-      ROOM_NAMESPACE_EVENTS.JOIN_REQUEST,
+    socket.on(
+      MAIN_NAMESPACE_EVENTS.JOIN_REQUEST,
       (data: IRoomJoinRequestInput) => {
         setNewJoinRequest(data);
       }
     );
 
     // player leave
-    roomSocket.on(ROOM_NAMESPACE_EVENTS.LEAVE_ROOM, ({ message, room }) => {
+    socket.on(MAIN_NAMESPACE_EVENTS.LEAVE_ROOM, ({ message, room }) => {
       setRoom(room);
       showToastMessage({
         position: "bottom-left",
@@ -66,8 +51,8 @@ const Playground: React.FC = () => {
     });
 
     // player disconnect
-    roomSocket.on(
-      ROOM_NAMESPACE_EVENTS.PLAYER_DISCONNECTED,
+    socket.on(
+      MAIN_NAMESPACE_EVENTS.PLAYER_DISCONNECTED,
       ({ message, room }) => {
         setRoom(room);
         showToastMessage({
@@ -78,12 +63,12 @@ const Playground: React.FC = () => {
     );
 
     return () => {
-      roomSocket.off(ROOM_NAMESPACE_EVENTS.NEW_PLAYER_JOINED);
-      roomSocket.off(ROOM_NAMESPACE_EVENTS.LEAVE_ROOM);
-      roomSocket.off(ROOM_NAMESPACE_EVENTS.PLAYER_DISCONNECTED);
-      roomSocket.off(ROOM_NAMESPACE_EVENTS.JOIN_REQUEST);
+      socket.off(MAIN_NAMESPACE_EVENTS.NEW_PLAYER_JOINED);
+      socket.off(MAIN_NAMESPACE_EVENTS.LEAVE_ROOM);
+      socket.off(MAIN_NAMESPACE_EVENTS.PLAYER_DISCONNECTED);
+      socket.off(MAIN_NAMESPACE_EVENTS.JOIN_REQUEST);
     };
-  }, [roomSocket, setRoom]);
+  }, [socket, setRoom]);
 
   useEffect(() => {
     // close request modal after 10 second
@@ -98,13 +83,12 @@ const Playground: React.FC = () => {
     // remove localstorage data on window close
     window.onbeforeunload = () => {
       removeDataOnLocalStorage();
-      setPlayer(undefined);
     };
-  }, [setPlayer]);
+  }, []);
 
   const sendJoinRequestResponse = (status: TRoomJoinRequestStatus) => {
-    if (!roomSocket) return;
-    roomSocket.emit(ROOM_NAMESPACE_EVENTS.JOIN_REQUEST_RESPONSE, {
+    if (!socket) return;
+    socket.emit(MAIN_NAMESPACE_EVENTS.JOIN_REQUEST_RESPONSE, {
       status,
       joinRequest: newJoinRequest,
     });
@@ -118,7 +102,7 @@ const Playground: React.FC = () => {
       {/* board & chat */}
       <Board />
       <div className="hidden xl:block xl:w-[320px]">
-        <Chat socket={roomSocket} />
+        <Chat socket={socket} />
       </div>
       <button
         className="absolute xl:hidden z-20 bottom-[23%] right-5 shadow-md sm:top-2 w-12 h-12 rounded-full btn-primary flex items-center justify-center
@@ -141,7 +125,7 @@ const Playground: React.FC = () => {
           chatBoxVisible ? "block" : "hidden"
         }`}
       >
-        <Chat socket={roomSocket} />
+        <Chat socket={socket} />
       </div>
 
       {/* join request accept/reject modal */}
