@@ -1,4 +1,5 @@
 import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
+import { TGenericMessage } from "@card-32/common/types/player";
 import {
   IRoomJoinRequestInput,
   TRoomJoinRequestStatus,
@@ -9,14 +10,17 @@ import { showToastMessage } from "../../components/atoms/toast";
 import Board from "../../components/organisms/board";
 import Chat from "../../components/organisms/chat";
 import PlaygroundSidebar from "../../components/organisms/playground/PlaygroundSidebar";
+import { useAuthContext } from "../../contexts/AuthProvider";
 import { useRoomContext } from "../../contexts/RoomProvider";
 import { useSocketContext } from "../../contexts/SocketProvider";
 import { removeDataOnLocalStorage } from "../../utils/localStorage";
 
 const Playground: React.FC = () => {
+  const { player } = useAuthContext();
   const { setRoom } = useRoomContext();
   const { socket } = useSocketContext();
   const [chatBoxVisible, setChatBoxVisible] = useState(false);
+  const [messages, setMessages] = useState<TGenericMessage[]>([]);
   const [newJoinRequest, setNewJoinRequest] = useState<
     IRoomJoinRequestInput | undefined
   >(undefined);
@@ -86,6 +90,31 @@ const Playground: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on(
+      MAIN_NAMESPACE_EVENTS.NEW_MESSAGE,
+      ({ data }: { data: TGenericMessage }) => {
+        setMessages((prev) => [...prev, data]);
+      }
+    );
+
+    return () => {
+      socket.off(MAIN_NAMESPACE_EVENTS.NEW_MESSAGE);
+    };
+  }, [socket]);
+
+  const handleSendMessage = (message: string, callback?: () => void) => {
+    if (!socket) return;
+    if (!message) return;
+    socket.emit(MAIN_NAMESPACE_EVENTS.SEND_MESSAGE, {
+      message,
+      username: player?.username,
+    });
+    callback && callback();
+  };
+
   const sendJoinRequestResponse = (status: TRoomJoinRequestStatus) => {
     if (!socket) return;
     socket.emit(MAIN_NAMESPACE_EVENTS.JOIN_REQUEST_RESPONSE, {
@@ -102,7 +131,7 @@ const Playground: React.FC = () => {
       {/* board & chat */}
       <Board />
       <div className="hidden xl:block xl:w-[320px]">
-        <Chat socket={socket} />
+        <Chat messages={messages} handleSendMessage={handleSendMessage} />
       </div>
       <button
         className="absolute xl:hidden z-20 bottom-[23%] right-5 shadow-md sm:top-2 w-12 h-12 rounded-full btn-primary flex items-center justify-center
@@ -125,7 +154,7 @@ const Playground: React.FC = () => {
           chatBoxVisible ? "block" : "hidden"
         }`}
       >
-        <Chat socket={socket} />
+        <Chat messages={messages} handleSendMessage={handleSendMessage} />
       </div>
 
       {/* join request accept/reject modal */}

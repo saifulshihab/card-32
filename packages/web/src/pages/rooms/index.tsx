@@ -1,4 +1,5 @@
 import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
+import { TGenericMessage } from "@card-32/common/types/player";
 import {
   IRoomCreateIOrJoinInput,
   IRoomCreateOrJoinResponse,
@@ -37,6 +38,7 @@ const Rooms: React.FC = () => {
       }
     | undefined
   >(undefined);
+  const [messages, setMessages] = useState<TGenericMessage[]>([]);
 
   useEffect(() => {
     if (!socket) return;
@@ -79,12 +81,36 @@ const Rooms: React.FC = () => {
   }, [socket, navigate, setPlayer, setRoom]);
 
   useEffect(() => {
+    if (!socket) return;
+
+    socket.on(
+      MAIN_NAMESPACE_EVENTS.GLOBAL_NEW_MESSAGE,
+      ({ data }: { data: TGenericMessage }) => {
+        setMessages((prev) => [...prev, data]);
+      }
+    );
+
+    return () => {
+      socket.off(MAIN_NAMESPACE_EVENTS.GLOBAL_NEW_MESSAGE);
+    };
+  }, [socket]);
+
+  useEffect(() => {
     if (joinRequestSent) {
       setTimeout(() => {
         setJoinRequestSent(false);
       }, 3000);
     }
   }, [joinRequestSent]);
+
+  const handleSendMessage = (message: string, callback?: () => void) => {
+    if (!socket) return;
+    if (!message) return;
+    socket.emit(MAIN_NAMESPACE_EVENTS.GLOBAL_SEND_MESSAGE, {
+      message,
+    });
+    callback && callback();
+  };
 
   const handleCreateOrJoinRoom = (
     joinInput: IRoomCreateIOrJoinInput,
@@ -218,7 +244,11 @@ const Rooms: React.FC = () => {
             </div>
             {/* chat */}
             <div className="hidden lg:block lg:w-[250px] xl:w-[320px]  h-[calc(100vh-180px)]">
-              <Chat socket={socket} isGlobal />
+              <Chat
+                isGlobal
+                messages={messages}
+                handleSendMessage={handleSendMessage}
+              />
             </div>
           </div>
         </div>

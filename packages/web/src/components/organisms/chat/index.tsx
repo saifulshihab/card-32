@@ -1,28 +1,17 @@
-import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
-import { IGlobalMessage, IMessage } from "@card-32/common/types/player";
+import { TGenericMessage } from "@card-32/common/types/player";
 import { Form, Formik } from "formik";
-import React, { useEffect, useRef, useState } from "react";
-import { Socket } from "socket.io-client";
-import { useAuthContext } from "../../../contexts/AuthProvider";
+import React, { useEffect, useRef } from "react";
 import { generateRandomColor } from "../../../utils/color";
-
-type TGenericMessage =
-  | IMessage
-  | (IGlobalMessage & {
-      username?: string;
-    });
 
 interface IProps {
   isGlobal?: boolean;
-  socket: Socket | undefined;
+  messages: TGenericMessage[];
+  handleSendMessage: (message: string, callback?: () => void) => void;
 }
 
 const Chat: React.FC<IProps> = (props) => {
-  const { socket, isGlobal } = props;
-  const { player } = useAuthContext();
-
+  const { isGlobal, messages, handleSendMessage } = props;
   const scrollDivRef = useRef<HTMLDivElement | null>(null);
-  const [messages, setMessages] = useState<TGenericMessage[]>([]);
 
   const scrollIntoChatBottom = () => {
     if (scrollDivRef.current)
@@ -32,44 +21,6 @@ const Chat: React.FC<IProps> = (props) => {
   useEffect(() => {
     if (messages) scrollIntoChatBottom();
   }, [messages]);
-
-  useEffect(() => {
-    if (!socket) return;
-    // new message
-    socket.on(
-      MAIN_NAMESPACE_EVENTS.NEW_MESSAGE,
-      ({ data }: { data: TGenericMessage }) => {
-        setMessages((prev) => [...prev, data]);
-      }
-    );
-
-    socket.on(
-      MAIN_NAMESPACE_EVENTS.GLOBAL_NEW_MESSAGE,
-      ({ data }: { data: TGenericMessage }) => {
-        setMessages((prev) => [...prev, data]);
-      }
-    );
-
-    return () => {
-      socket.off(MAIN_NAMESPACE_EVENTS.NEW_MESSAGE);
-      socket.off(MAIN_NAMESPACE_EVENTS.GLOBAL_NEW_MESSAGE);
-    };
-  }, [socket]);
-
-  const sendMessage = (message: string, cb: () => void) => {
-    if (!socket) return;
-    if (!message) return;
-    socket.emit(
-      isGlobal
-        ? MAIN_NAMESPACE_EVENTS.GLOBAL_SEND_MESSAGE
-        : MAIN_NAMESPACE_EVENTS.SEND_MESSAGE,
-      {
-        message,
-        username: player?.username,
-      }
-    );
-    cb();
-  };
 
   return (
     <div className="w-full h-full flex flex-col bg-zinc-800">
@@ -120,7 +71,7 @@ const Chat: React.FC<IProps> = (props) => {
             message: "",
           }}
           onSubmit={(values, { resetForm }) => {
-            sendMessage(values.message, () => resetForm());
+            handleSendMessage(values.message, () => resetForm());
           }}
         >
           {({ values, handleChange }) => (
