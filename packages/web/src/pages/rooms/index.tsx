@@ -1,5 +1,6 @@
 import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
 import {
+  IRoomCreateIOrJoinInput,
   IRoomCreateOrJoinResponse,
   TRoomJoinRequestStatus,
 } from "@card-32/common/types/room";
@@ -12,23 +13,23 @@ import TextInput from "../../components/atoms/inputs/TextInput";
 import Modal from "../../components/atoms/modal/Modal";
 import { showToastMessage } from "../../components/atoms/toast";
 import Chat from "../../components/organisms/chat";
-import CreateOrJoinRoomModal from "../../components/organisms/landing/CreateOrJoinRoomModal";
+import CreateOrJoinRoomModal from "../../components/organisms/rooms/CreateOrJoinRoomModal";
 import RoomCard from "../../components/organisms/rooms/RoomCard";
 import { useAuthContext } from "../../contexts/AuthProvider";
 import { useRoomContext } from "../../contexts/RoomProvider";
 import { useSocketContext } from "../../contexts/SocketProvider";
 import { PLAYGROUND } from "../../routes/routes";
+import { setPlayerAndRoomIdOnLocalStorage } from "../../utils/localStorage";
 import { usernameValidatorSchema } from "../../validators/playerValidators";
 
 const Rooms: React.FC = () => {
   const navigate = useNavigate();
-  const { setPlayer } = useAuthContext();
+  const { player, setPlayer, roomId, setRoomId } = useAuthContext();
   const { activeRooms, setRoom } = useRoomContext();
   const { isSocketConnected, socket } = useSocketContext();
   const [createOrJoinRoomModalVisible, setCreateOrJoinRoomModalVisible] =
     useState(false);
   const [joinRequestSent, setJoinRequestSent] = useState(false);
-
   const [joinRequestInput, setJoinRequestInput] = useState<
     | {
         roomId?: string;
@@ -85,18 +86,47 @@ const Rooms: React.FC = () => {
     }
   }, [joinRequestSent]);
 
-  const handleJoinRequestInputChange = (name: any, value: any) => {
-    setJoinRequestInput((prev) => {
-      return {
-        ...prev,
-        [name]: value,
-      };
-    });
-  };
+  const handleCreateOrJoinRoom = (
+    joinInput: IRoomCreateIOrJoinInput,
+    callback?: () => void
+  ) => {
+    if (!socket) return;
+    if (player && roomId) {
+      return showToastMessage({
+        type: "warning",
+        message: "You already created a room.",
+      });
+    }
+    socket.emit(
+      MAIN_NAMESPACE_EVENTS.JOIN_ROOM,
+      joinInput,
+      (response: { error?: string; data?: IRoomCreateOrJoinResponse }) => {
+        const { error, data } = response;
+        if (error) {
+          showToastMessage({
+            type: "error",
+            message: error,
+          });
+          return;
+        }
 
-  const onRoomJoinClick = (roomId: string, roomCreatorId: string) => {
-    handleJoinRequestInputChange("roomId", roomId);
-    handleJoinRequestInputChange("roomCreatorId", roomCreatorId);
+        if (!data) return;
+        const player = {
+          username: joinInput.username,
+          playerId: data.player.playerId,
+        };
+
+        setPlayerAndRoomIdOnLocalStorage({
+          player,
+          roomId: data.room.roomId,
+        });
+        setPlayer(player);
+        setRoomId(data.room.roomId);
+        setRoom(data.room);
+        navigate(PLAYGROUND);
+        callback && callback();
+      }
+    );
   };
 
   const sendJoinRequest = (username: string, cb?: () => void) => {
@@ -122,6 +152,20 @@ const Rooms: React.FC = () => {
         cb && cb();
       }
     );
+  };
+
+  const handleJoinRequestInputChange = (name: any, value: any) => {
+    setJoinRequestInput((prev) => {
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
+  };
+
+  const onRoomJoinClick = (roomId: string, roomCreatorId: string) => {
+    handleJoinRequestInputChange("roomId", roomId);
+    handleJoinRequestInputChange("roomCreatorId", roomCreatorId);
   };
 
   return (
@@ -184,6 +228,7 @@ const Rooms: React.FC = () => {
       <CreateOrJoinRoomModal
         visible={createOrJoinRoomModalVisible}
         onClose={() => setCreateOrJoinRoomModalVisible(false)}
+        onSubmit={handleCreateOrJoinRoom}
       />
 
       {/* join request modal */}

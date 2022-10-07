@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../../contexts/AuthProvider";
 import { useRoomContext } from "../../../contexts/RoomProvider";
 import { useSocketContext } from "../../../contexts/SocketProvider";
-import { useThemeContext } from "../../../contexts/ThemeProvider";
 import { HOME } from "../../../routes/routes";
 import { removeDataOnLocalStorage } from "../../../utils/localStorage";
 import AnimatedCircle from "../../atoms/box/AnimatedCircle";
@@ -22,7 +21,6 @@ const PlaygroundSidebar: React.FC = () => {
   const { isSocketConnected, socket } = useSocketContext();
 
   const [leaveRoomModal, setLeaveRoomModal] = useState(false);
-  const { sidebarOrder, setSidebarOrder } = useThemeContext();
   const [bidModalVisible, setBidModalVisible] = useState(false);
 
   const onStartGame = () => {
@@ -48,6 +46,10 @@ const PlaygroundSidebar: React.FC = () => {
     navigate(HOME);
   };
 
+  const onHomeButtonClick = () => {
+    window.open(HOME);
+  };
+
   return (
     <div className="w-full sm:w-[320px] bg-zinc-800 relative">
       <FlexContainer className="justify-between bg-zinc-700 px-2 shadow">
@@ -67,7 +69,7 @@ const PlaygroundSidebar: React.FC = () => {
           </div>
         </FlexContainer>
         <FlexContainer className="gap-1">
-          <button
+          {/* <button
             className="hidden sm:block btn-primary"
             onClick={() =>
               setSidebarOrder(
@@ -76,6 +78,9 @@ const PlaygroundSidebar: React.FC = () => {
             }
           >
             <i className="fa-solid fa-table-cells-large"></i>
+          </button> */}
+          <button className="btn-primary" onClick={onHomeButtonClick}>
+            <i className="fa-sharp fa-solid fa-house-user"></i>
           </button>
           <button
             className="btn-primary text-red-600"
