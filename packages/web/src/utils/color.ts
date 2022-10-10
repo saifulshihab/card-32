@@ -6,3 +6,12 @@ export const generateRandomColor = (): string => {
   }
   return color;
 };
+
+export const colors = [
+  "#e74c3c",
+  "#5ac8fa",
+  "#4cd964",
+  "#f1c40f",
+  "#bb86fc",
+  "#ff2d55",
+];

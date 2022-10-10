@@ -1,7 +1,7 @@
 import { TGenericMessage } from "@card-32/common/types/player";
 import { Form, Formik } from "formik";
 import React, { useEffect, useRef } from "react";
-import { generateRandomColor } from "../../../utils/color";
+import ChatMessage from "./ChatMessage";
 
 interface IProps {
   isGlobal?: boolean;
@@ -31,35 +31,9 @@ const Chat: React.FC<IProps> = (props) => {
       </div>
       {/* messages */}
       <div className="flex flex-grow overflow-hidden">
-        <div className="flex h-full flex-col gap-1.5 p-2 pb-0 text-sm overflow-y-scroll scrollbar-hide">
-          {messages.map(({ username, message }, idx) => (
-            <div key={idx} className="flex gap-1">
-              {username ? (
-                <>
-                  <p>
-                    <span
-                      style={{
-                        color: generateRandomColor(),
-                      }}
-                      className="font-semibold"
-                    >
-                      {username}
-                    </span>
-                  </p>
-                  <span className="font-bold">:</span>
-                </>
-              ) : (
-                <span
-                  className="font-bold"
-                  style={{
-                    color: generateRandomColor(),
-                  }}
-                >
-                  :
-                </span>
-              )}
-              <p>{message}</p>
-            </div>
+        <div className="flex h-full flex-col gap-0.5 p-2 pb-0 text-sm overflow-y-scroll scrollbar-hide">
+          {messages.map((message, idx) => (
+            <ChatMessage key={idx} message={message} />
           ))}
           <div ref={scrollDivRef} />
         </div>

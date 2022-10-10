@@ -21,6 +21,7 @@
     "no-console": [1],
     "@typescript-eslint/no-explicit-any": [0],
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn"
+    "react-hooks/exhaustive-deps": "warn",
+    "react/prop-types": [0]
   }
 }
