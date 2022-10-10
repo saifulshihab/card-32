@@ -83,6 +83,7 @@ const socketIO = (server: Server) => {
             callback({
               error: "Something went wrong.",
             });
+            logger.error("join room: data not found");
             return;
           }
 
@@ -108,8 +109,8 @@ const socketIO = (server: Server) => {
           }
         } catch (err) {
           callback({ error: "Something went wrong" });
+          logger.error("error in join room");
           logger.error(err);
-          logger.info(err);
         }
       }
     );
@@ -159,8 +160,8 @@ const socketIO = (server: Server) => {
           });
         } catch (err) {
           callback({ error: "Something went wrong" });
+          logger.error("error in join request");
           logger.error(err);
-          logger.info(err);
         }
       }
     );
@@ -203,8 +204,8 @@ const socketIO = (server: Server) => {
               });
           }
         } catch (err) {
+          logger.error("error in join request response");
           logger.error(err);
-          logger.info(err);
         }
       }
     );
@@ -230,8 +231,8 @@ const socketIO = (server: Server) => {
           }
         } catch (err) {
           callback({ error: "Something went wrong" });
+          logger.error("error in join request accepted");
           logger.error(err);
-          logger.info(err);
         }
       }
     );
@@ -246,8 +247,8 @@ const socketIO = (server: Server) => {
           .to(roomId)
           .emit(MAIN_NAMESPACE_EVENTS.NEW_MESSAGE, { data });
       } catch (err) {
+        logger.error("error in send message");
         logger.error(err);
-        logger.info(err);
       }
     });
 
@@ -262,8 +263,8 @@ const socketIO = (server: Server) => {
             data,
           });
         } catch (err) {
+          logger.error("error in send message - global");
           logger.error(err);
-          logger.info(err);
         }
       }
     );
@@ -273,6 +274,11 @@ const socketIO = (server: Server) => {
      */
     socket.on(MAIN_NAMESPACE_EVENTS.LEAVE_ROOM, () => {
       try {
+        if (!socket.data) {
+          logger.error("leave room: socket data not found");
+          return;
+        }
+
         const { room: socketRoom, player } = socket.data as {
           room: IRoom;
           player: IPlayer;
@@ -294,8 +300,8 @@ const socketIO = (server: Server) => {
           });
         }
       } catch (err) {
+        logger.error("error in leave room");
         logger.error(err);
-        logger.info(err);
       }
     });
 
@@ -325,8 +331,8 @@ const socketIO = (server: Server) => {
           }
         }
       } catch (err) {
+        logger.error("error in socket disconnect");
         logger.error(err);
-        logger.info(err);
       }
     });
   });
