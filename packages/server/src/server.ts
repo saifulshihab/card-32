@@ -1,10 +1,10 @@
-import { IRoom } from "@card-32/common/types/room";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { NODE_ENV, PORT } from "./config/env";
+import { IRoom } from "./models/Room";
 import { socketIO } from "./socket";
 import { logger } from "./utils/winston";
 
@@ -52,11 +52,9 @@ export const rooms: IRoom[] = [];
     }
   });
 })().catch((err) => {
-  logger.error("server error");
-  logger.error(err);
+  logger.error("server error", err);
 });
 
 process.on("unhandledRejection", (error) => {
-  logger.error("unhandledRejection error");
-  logger.error(error);
+  logger.error("unhandledRejection error", error);
 });

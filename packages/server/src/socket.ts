@@ -1,21 +1,18 @@
-import {
-  IGlobalMessage,
-  IMessage,
-  IPlayer,
-} from "@card-32/common/types/player";
-import {
-  IRoom,
-  IRoomCreateIOrJoinInput,
-  IRoomCreateOrJoinResponse,
-  IRoomJoinRequestInput,
-  TRoomJoinRequestStatus,
-} from "@card-32/common/types/room";
 import { Server, Socket } from "socket.io";
 import {
   getPlayerIntoRoom,
   getRoomOnLeaveOrDisconnect,
 } from "./controller/roomController";
+import { IPlayer } from "./models/Player";
+import { IRoom } from "./models/Room";
 import { rooms } from "./server";
+import { IGlobalMessage, IMessage } from "./types/player";
+import {
+  IRoomCreateIOrJoinInput,
+  IRoomCreateOrJoinResponse,
+  IRoomJoinRequestInput,
+  TRoomJoinRequestStatus,
+} from "./types/room";
 import { isRoomExist } from "./utils/roomUtils";
 import { logger } from "./utils/winston";
 
@@ -109,8 +106,7 @@ const socketIO = (server: Server) => {
           }
         } catch (err) {
           callback({ error: "Something went wrong" });
-          logger.error("error in join room");
-          logger.error(err);
+          logger.error("error in join room", err);
         }
       }
     );
@@ -160,8 +156,7 @@ const socketIO = (server: Server) => {
           });
         } catch (err) {
           callback({ error: "Something went wrong" });
-          logger.error("error in join request");
-          logger.error(err);
+          logger.error("error in join request", err);
         }
       }
     );
@@ -204,8 +199,7 @@ const socketIO = (server: Server) => {
               });
           }
         } catch (err) {
-          logger.error("error in join request response");
-          logger.error(err);
+          logger.error("error in join request response", err);
         }
       }
     );
@@ -231,8 +225,7 @@ const socketIO = (server: Server) => {
           }
         } catch (err) {
           callback({ error: "Something went wrong" });
-          logger.error("error in join request accepted");
-          logger.error(err);
+          logger.error("error in join request accepted", err);
         }
       }
     );
@@ -247,8 +240,7 @@ const socketIO = (server: Server) => {
           .to(roomId)
           .emit(MAIN_NAMESPACE_EVENTS.NEW_MESSAGE, { data });
       } catch (err) {
-        logger.error("error in send message");
-        logger.error(err);
+        logger.error("error in send message", err);
       }
     });
 
@@ -263,8 +255,7 @@ const socketIO = (server: Server) => {
             data,
           });
         } catch (err) {
-          logger.error("error in send message - global");
-          logger.error(err);
+          logger.error("error in send message - global", err);
         }
       }
     );
@@ -300,8 +291,7 @@ const socketIO = (server: Server) => {
           });
         }
       } catch (err) {
-        logger.error("error in leave room");
-        logger.error(err);
+        logger.error("error in leave room", err);
       }
     });
 
@@ -331,8 +321,7 @@ const socketIO = (server: Server) => {
           }
         }
       } catch (err) {
-        logger.error("error in socket disconnect");
-        logger.error(err);
+        logger.error("error in socket disconnect", err);
       }
     });
   });
