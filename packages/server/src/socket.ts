@@ -1,21 +1,18 @@
-import {
-  IGlobalMessage,
-  IMessage,
-  IPlayer,
-} from "@card-32/common/types/player";
-import {
-  IRoom,
-  IRoomCreateIOrJoinInput,
-  IRoomCreateOrJoinResponse,
-  IRoomJoinRequestInput,
-  TRoomJoinRequestStatus,
-} from "@card-32/common/types/room";
 import { Server, Socket } from "socket.io";
 import {
   getPlayerIntoRoom,
   getRoomOnLeaveOrDisconnect,
 } from "./controller/roomController";
+import { IPlayer } from "./models/Player";
+import { IRoom } from "./models/Room";
 import { rooms } from "./server";
+import { IGlobalMessage, IMessage } from "./types/player";
+import {
+  IRoomCreateIOrJoinInput,
+  IRoomCreateOrJoinResponse,
+  IRoomJoinRequestInput,
+  TRoomJoinRequestStatus,
+} from "./types/room";
 import { isRoomExist } from "./utils/roomUtils";
 import { logger } from "./utils/winston";
 

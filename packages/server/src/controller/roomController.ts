@@ -1,7 +1,8 @@
-import { IRoom, IRoomCreateIOrJoinInput } from "@card-32/common/types/room";
 import { v4 as uuidV4 } from "uuid";
-import Room from "../models/Room";
+import Player from "../models/Player";
+import Room, { IRoom } from "../models/Room";
 import { rooms } from "../server";
+import { IRoomCreateIOrJoinInput } from "../types/room";
 import { logger } from "../utils/winston";
 
 export const getPlayerIntoRoom = (joinInput: IRoomCreateIOrJoinInput) => {
@@ -12,10 +13,12 @@ export const getPlayerIntoRoom = (joinInput: IRoomCreateIOrJoinInput) => {
     // player wants to create new room
     if (!room) {
       const playerId = uuidV4();
-      const newPlayer = { username, playerId };
+      const newPlayer = new Player(playerId, username);
       const newRoom = new Room(roomId, [newPlayer], newPlayer) as IRoom;
+
       rooms.push(newRoom);
       const data = { room: newRoom, player: newPlayer };
+
       return { data };
     }
 
@@ -35,7 +38,7 @@ export const getPlayerIntoRoom = (joinInput: IRoomCreateIOrJoinInput) => {
     }
 
     const playerId = uuidV4();
-    const newPlayer = { username, playerId };
+    const newPlayer = new Player(playerId, username);
     room.players = [...room.players, newPlayer];
 
     const data = { room, player: newPlayer };
