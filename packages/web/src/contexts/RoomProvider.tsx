@@ -13,16 +13,16 @@ interface IRoomContext {
 const RoomContext = React.createContext<IRoomContext | null>(null);
 
 export const RoomProvider: React.FC<PropsWithChildren> = (props) => {
-  const { mainSocket } = useSocketContext();
+  const { socket } = useSocketContext();
   const [activeRooms, setActiveRooms] = useState<IRoom[]>([]);
 
   const [room, setRoom] = useState<IRoom | undefined>(undefined);
 
   useEffect(() => {
-    if (!mainSocket) return;
+    if (!socket) return;
 
     // receive active rooms
-    mainSocket.on(
+    socket.on(
       MAIN_NAMESPACE_EVENTS.ACTIVE_ROOMS,
       (data: { rooms: IRoom[] }) => {
         setActiveRooms(data.rooms);
@@ -30,9 +30,9 @@ export const RoomProvider: React.FC<PropsWithChildren> = (props) => {
     );
 
     return () => {
-      mainSocket.off(MAIN_NAMESPACE_EVENTS.ACTIVE_ROOMS);
+      socket.off(MAIN_NAMESPACE_EVENTS.ACTIVE_ROOMS);
     };
-  }, [mainSocket]);
+  }, [socket]);
 
   return (
     <RoomContext.Provider

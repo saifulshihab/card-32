@@ -19,7 +19,7 @@ const Router: React.FC = () => {
           }
         />
         <Route
-          path={PLAYGROUND(":roomId")}
+          path={PLAYGROUND}
           element={
             <BlankLayout>
               <Playground />

@@ -2,6 +2,7 @@ import { IRoom, IRoomCreateIOrJoinInput } from "@card-32/common/types/room";
 import { v4 as uuidV4 } from "uuid";
 import Room from "../models/Room";
 import { rooms } from "../server";
+import { logger } from "../utils/winston";
 
 export const getPlayerIntoRoom = (joinInput: IRoomCreateIOrJoinInput) => {
   try {
@@ -15,7 +16,7 @@ export const getPlayerIntoRoom = (joinInput: IRoomCreateIOrJoinInput) => {
       const newRoom = new Room(roomId, [newPlayer], newPlayer) as IRoom;
       rooms.push(newRoom);
       const data = { room: newRoom, player: newPlayer };
-      return { data, newRoom: true };
+      return { data };
     }
 
     // room exist push add player to the room
@@ -40,6 +41,7 @@ export const getPlayerIntoRoom = (joinInput: IRoomCreateIOrJoinInput) => {
     const data = { room, player: newPlayer };
     return { data };
   } catch {
+    logger.error("error in getPlayerIntoRoom");
     return { error: "Something went wrong" };
   }
 };
@@ -48,18 +50,25 @@ export const getRoomOnLeaveOrDisconnect = (
   roomId: string,
   playerId: string
 ) => {
-  const room = rooms.find((room) => room.roomId === roomId);
-  if (!room) {
-    return { room: undefined };
-  }
-  if (room.players.length === 1) {
-    // last player wants to leave, remove the rooms from server
-    rooms.splice(
-      rooms.findIndex((room) => room.roomId === roomId),
-      1
+  try {
+    const room = rooms.find((room) => room.roomId === roomId);
+    if (!room) {
+      return { room: undefined };
+    }
+    if (room.players.length === 1) {
+      // last player wants to leave, remove the rooms from server
+      rooms.splice(
+        rooms.findIndex((room) => room.roomId === roomId),
+        1
+      );
+      return { room: undefined };
+    }
+    room.players = room.players.filter(
+      (player) => player.playerId !== playerId
     );
+    return { room };
+  } catch (err) {
+    logger.error("error in getRoomOnLeaveOrDisconnect");
     return { room: undefined };
   }
-  room.players = room.players.filter((player) => player.playerId !== playerId);
-  return { room };
 };

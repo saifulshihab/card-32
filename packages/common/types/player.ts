@@ -11,3 +11,9 @@ export interface IMessage {
 export interface IGlobalMessage {
   message: string;
 }
+
+export type TGenericMessage =
+  | IMessage
+  | (IGlobalMessage & {
+      username?: string;
+    });

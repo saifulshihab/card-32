@@ -5,8 +5,7 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { NODE_ENV, PORT } from "./config/env";
-import { mainSocketIO } from "./socket/mainSocket";
-import { roomSocketIO } from "./socket/roomSocket";
+import { socketIO } from "./socket";
 import { logger } from "./utils/winston";
 
 const app = express();
@@ -34,8 +33,7 @@ export const rooms: IRoom[] = [];
   });
 
   // sockets
-  mainSocketIO(io);
-  roomSocketIO(io);
+  socketIO(io);
 
   // listening server
   httpServer.listen(PORT, () => {
@@ -54,11 +52,11 @@ export const rooms: IRoom[] = [];
     }
   });
 })().catch((err) => {
+  logger.error("server error");
   logger.error(err);
-  logger.info(err);
 });
 
 process.on("unhandledRejection", (error) => {
-  logger.info(error);
+  logger.error("unhandledRejection error");
   logger.error(error);
 });

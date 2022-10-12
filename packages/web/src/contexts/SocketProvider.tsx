@@ -1,55 +1,47 @@
 import React, { PropsWithChildren, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
-import { showToastMessage } from "../components/atoms/toast";
 import { BASE_URL } from "../constants/config";
 
 // Namespaces
 const mainNamespace = BASE_URL;
-const roomNamespace = `${BASE_URL}/room`;
 
 interface ISocketContext {
-  mainSocket: Socket | undefined;
-  roomSocket: Socket | undefined;
   isSocketConnected: boolean;
+  socket: Socket | undefined;
 }
 
-const mainSocket = io(mainNamespace);
-const roomSocket = io(roomNamespace);
+const socket = io(mainNamespace);
 
 const SocketContext = React.createContext<ISocketContext | null>(null);
 
 export const SocketProvider: React.FC<PropsWithChildren> = (props) => {
-  const [isSocketConnected, setSocketConnected] = useState(
-    mainSocket.connected
-  );
+  const [isSocketConnected, setSocketConnected] = useState(socket.connected);
 
   useEffect(() => {
-    mainSocket.on("connect", () => {
+    socket.on("connect", () => {
       setSocketConnected(true);
     });
 
-    mainSocket.on("disconnect", () => {
+    socket.on("disconnect", () => {
       setSocketConnected(false);
-      window.location.reload();
     });
 
-    mainSocket.on("connect_error", () => {
-      showToastMessage({ type: "error", message: "Socket connection error." });
+    socket.on("connect_error", () => {
+      setSocketConnected(false);
     });
 
     // clean up
     return () => {
-      mainSocket.off("connect");
-      mainSocket.off("disconnect");
-      mainSocket.off("connect_error");
+      socket.off("connect");
+      socket.off("disconnect");
+      socket.off("connect_error");
     };
   }, []);
 
   return (
     <SocketContext.Provider
       value={{
-        mainSocket,
-        roomSocket,
+        socket,
         isSocketConnected,
       }}
     >

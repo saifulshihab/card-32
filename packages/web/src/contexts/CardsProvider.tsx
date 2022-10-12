@@ -1,6 +1,5 @@
 import { ICard } from "@card-32/common/types/card";
-import React, { PropsWithChildren, useEffect, useState } from "react";
-import { useSocketContext } from "./SocketProvider";
+import React, { PropsWithChildren, useState } from "react";
 
 interface ICardsContext {
   cards: ICard[];
@@ -9,14 +8,7 @@ interface ICardsContext {
 const CardsContext = React.createContext<ICardsContext | null>(null);
 
 export const CardsProvider: React.FC<PropsWithChildren> = (props) => {
-  const { roomSocket } = useSocketContext();
-  const [cards, setCards] = useState<ICard[]>([]);
-
-  useEffect(() => {
-    roomSocket?.on("receiveCards", ({ cards }: { cards: ICard[] }) => {
-      setCards(cards);
-    });
-  }, [roomSocket]);
+  const [cards] = useState<ICard[]>([]);
 
   return (
     <CardsContext.Provider
