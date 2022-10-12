@@ -8,7 +8,8 @@
     "postinstall": "husky install",
     "start:web": "lerna exec --scope @card-32/web -- yarn start",
     "start:server": "lerna exec --scope @card-32/server -- yarn dev",
-    "lerna:bootstrap": "lerna bootstrap"
+    "lerna:bootstrap": "lerna bootstrap",
+    "build": "lerna exec --scope @card-32/web -- yarn build && lerna exec --scope @card-32/server -- yarn build"
   },
   "author": "Saiful Islam Shihab",
   "license": "ISC",
