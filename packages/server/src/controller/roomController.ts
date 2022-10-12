@@ -43,8 +43,8 @@ export const getPlayerIntoRoom = (joinInput: IRoomCreateIOrJoinInput) => {
 
     const data = { room, player: newPlayer };
     return { data };
-  } catch {
-    logger.error("error in getPlayerIntoRoom");
+  } catch (err) {
+    logger.error("error in getPlayerIntoRoom", err);
     return { error: "Something went wrong" };
   }
 };
@@ -71,7 +71,7 @@ export const getRoomOnLeaveOrDisconnect = (
     );
     return { room };
   } catch (err) {
-    logger.error("error in getRoomOnLeaveOrDisconnect");
+    logger.error("error in getRoomOnLeaveOrDisconnect", err);
     return { room: undefined };
   }
 };

@@ -106,8 +106,7 @@ const socketIO = (server: Server) => {
           }
         } catch (err) {
           callback({ error: "Something went wrong" });
-          logger.error("error in join room");
-          logger.error(err);
+          logger.error("error in join room", err);
         }
       }
     );
@@ -157,8 +156,7 @@ const socketIO = (server: Server) => {
           });
         } catch (err) {
           callback({ error: "Something went wrong" });
-          logger.error("error in join request");
-          logger.error(err);
+          logger.error("error in join request", err);
         }
       }
     );
@@ -201,8 +199,7 @@ const socketIO = (server: Server) => {
               });
           }
         } catch (err) {
-          logger.error("error in join request response");
-          logger.error(err);
+          logger.error("error in join request response", err);
         }
       }
     );
@@ -228,8 +225,7 @@ const socketIO = (server: Server) => {
           }
         } catch (err) {
           callback({ error: "Something went wrong" });
-          logger.error("error in join request accepted");
-          logger.error(err);
+          logger.error("error in join request accepted", err);
         }
       }
     );
@@ -244,8 +240,7 @@ const socketIO = (server: Server) => {
           .to(roomId)
           .emit(MAIN_NAMESPACE_EVENTS.NEW_MESSAGE, { data });
       } catch (err) {
-        logger.error("error in send message");
-        logger.error(err);
+        logger.error("error in send message", err);
       }
     });
 
@@ -260,8 +255,7 @@ const socketIO = (server: Server) => {
             data,
           });
         } catch (err) {
-          logger.error("error in send message - global");
-          logger.error(err);
+          logger.error("error in send message - global", err);
         }
       }
     );
@@ -297,8 +291,7 @@ const socketIO = (server: Server) => {
           });
         }
       } catch (err) {
-        logger.error("error in leave room");
-        logger.error(err);
+        logger.error("error in leave room", err);
       }
     });
 
@@ -328,8 +321,7 @@ const socketIO = (server: Server) => {
           }
         }
       } catch (err) {
-        logger.error("error in socket disconnect");
-        logger.error(err);
+        logger.error("error in socket disconnect", err);
       }
     });
   });
