@@ -1,4 +1,4 @@
-name: Node.js build action
+name: Build action
 
 on:
   push:
