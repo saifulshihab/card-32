@@ -1,6 +1,12 @@
-import { IPlayer } from "@card-32/common/types/player";
+import { IPlayer } from "./Player";
 
-class Room {
+export interface IRoom {
+  roomId: string;
+  players: IPlayer[];
+  creator: IPlayer;
+}
+
+class Room implements IRoom {
   public roomId: string;
 
   public players: IPlayer[];
