@@ -1,12 +1,11 @@
-import { IRoom } from "@card-32/common/types/room";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { NODE_ENV, PORT } from "./config/env";
-import { mainSocketIO } from "./socket/mainSocket";
-import { roomSocketIO } from "./socket/roomSocket";
+import { IRoom } from "./models/Room";
+import { socketIO } from "./socket";
 import { logger } from "./utils/winston";
 
 const app = express();
@@ -34,8 +33,7 @@ export const rooms: IRoom[] = [];
   });
 
   // sockets
-  mainSocketIO(io);
-  roomSocketIO(io);
+  socketIO(io);
 
   // listening server
   httpServer.listen(PORT, () => {
@@ -54,11 +52,9 @@ export const rooms: IRoom[] = [];
     }
   });
 })().catch((err) => {
-  logger.error(err);
-  logger.info(err);
+  logger.error("server error", err);
 });
 
 process.on("unhandledRejection", (error) => {
-  logger.info(error);
-  logger.error(error);
+  logger.error("unhandledRejection error", error);
 });

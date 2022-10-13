@@ -1,10 +1,13 @@
-import { ROOM_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
+import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../../contexts/AuthProvider";
 import { useRoomContext } from "../../../contexts/RoomProvider";
 import { useSocketContext } from "../../../contexts/SocketProvider";
-import { useThemeContext } from "../../../contexts/ThemeProvider";
+import { HOME } from "../../../routes/routes";
 import { removeDataOnLocalStorage } from "../../../utils/localStorage";
+import AnimatedCircle from "../../atoms/box/AnimatedCircle";
 import FlexContainer from "../../atoms/box/FlexContainer";
 import Button from "../../atoms/button/Button";
 import Modal from "../../atoms/modal/Modal";
@@ -12,23 +15,37 @@ import { ContentSubHeading } from "../../atoms/texts/ContentSubHeading";
 import { PlayerCard } from "../playerCard";
 
 const PlaygroundSidebar: React.FC = () => {
-  const { roomSocket } = useSocketContext();
+  const navigate = useNavigate();
   const { player, setPlayer } = useAuthContext();
-  const { room } = useRoomContext();
+  const { room, setRoom } = useRoomContext();
+  const { isSocketConnected, socket } = useSocketContext();
 
   const [leaveRoomModal, setLeaveRoomModal] = useState(false);
-  const { sidebarOrder, setSidebarOrder } = useThemeContext();
   const [bidModalVisible, setBidModalVisible] = useState(false);
 
   const onStartGame = () => {
-    return;
+    if (!room) return;
+    if (room.players.length < 4) {
+      toast.error(
+        `Invite ${4 - room.players.length} more players to start the game.`,
+        { icon: "⚠️" }
+      );
+      return;
+    }
   };
 
   const onLeave = async () => {
-    if (!roomSocket) return;
-    roomSocket.emit(ROOM_NAMESPACE_EVENTS.LEAVE_ROOM);
+    if (!socket) return;
+    socket.emit(MAIN_NAMESPACE_EVENTS.LEAVE_ROOM);
     removeDataOnLocalStorage();
     setPlayer(undefined);
+    setRoom(undefined);
+    setLeaveRoomModal(false);
+    navigate(HOME);
+  };
+
+  const onHomeButtonClick = () => {
+    window.open(HOME);
   };
 
   return (
@@ -50,7 +67,7 @@ const PlaygroundSidebar: React.FC = () => {
           </div>
         </FlexContainer>
         <FlexContainer className="gap-1">
-          <button
+          {/* <button
             className="hidden sm:block btn-primary"
             onClick={() =>
               setSidebarOrder(
@@ -59,6 +76,9 @@ const PlaygroundSidebar: React.FC = () => {
             }
           >
             <i className="fa-solid fa-table-cells-large"></i>
+          </button> */}
+          <button className="btn-primary" onClick={onHomeButtonClick}>
+            <i className="fa-sharp fa-solid fa-house-user"></i>
           </button>
           <button
             className="btn-primary text-red-600"
@@ -73,9 +93,12 @@ const PlaygroundSidebar: React.FC = () => {
           <FlexContainer>
             <div className="flex flex-col">
               <p className="text-xs text-gray-400 -mb-1.5">Room ID</p>
-              <p className="text-lg select-all font-semibold text-ellipsis text-center">
-                {room?.roomId}
-              </p>
+              <div className="flex gap-1 items-center">
+                <AnimatedCircle socketConnected={isSocketConnected} />
+                <p className="text-lg select-all font-semibold text-ellipsis text-center">
+                  {room?.roomId}
+                </p>
+              </div>
             </div>
           </FlexContainer>
           <FlexContainer className="text-xs justify-center font-thin gap-2">
@@ -102,9 +125,12 @@ const PlaygroundSidebar: React.FC = () => {
         <FlexContainer className="justify-between gap-2">
           <div className="flex flex-col">
             <p className="text-xs text-gray-400 -mb-1.5">Room ID</p>
-            <p className="text-lg select-all font-semibold text-ellipsis text-center">
-              {room?.roomId}
-            </p>
+            <div className="flex gap-1 items-center">
+              <AnimatedCircle socketConnected={isSocketConnected} />
+              <p className="text-lg select-all font-semibold text-ellipsis text-center">
+                {room?.roomId}
+              </p>
+            </div>
           </div>
           <FlexContainer className="gap-2">
             <button

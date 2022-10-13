@@ -4,5 +4,5 @@ export const LANDING = "/";
 export const APPEARANCE = "/appearance";
 export const PROFILE = "/profile";
 export const SETTINGS = "/settings";
-export const PLAYGROUND = (roomId: string) => `/playground/${roomId}`;
+export const PLAYGROUND = `/playground`;
 export const ROOMS = "/rooms";
