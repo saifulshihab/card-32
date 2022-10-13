@@ -5,8 +5,8 @@ import {
   TRoomJoinRequestStatus,
 } from "@card-32/common/types/room";
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import Modal from "../../components/atoms/modal/Modal";
-import { showToastMessage } from "../../components/atoms/toast";
 import Board from "../../components/organisms/board";
 import Chat from "../../components/organisms/chat";
 import PlaygroundSidebar from "../../components/organisms/playground/PlaygroundSidebar";
@@ -31,9 +31,8 @@ const Playground: React.FC = () => {
     // new player joined
     socket.on(MAIN_NAMESPACE_EVENTS.NEW_PLAYER_JOINED, ({ message, room }) => {
       setRoom(room);
-      showToastMessage({
+      toast.success(message, {
         position: "bottom-left",
-        message,
       });
     });
 
@@ -48,9 +47,9 @@ const Playground: React.FC = () => {
     // player leave
     socket.on(MAIN_NAMESPACE_EVENTS.LEAVE_ROOM, ({ message, room }) => {
       setRoom(room);
-      showToastMessage({
+      toast(message, {
         position: "bottom-left",
-        message,
+        icon: "⬅️",
       });
     });
 
@@ -59,9 +58,8 @@ const Playground: React.FC = () => {
       MAIN_NAMESPACE_EVENTS.PLAYER_DISCONNECTED,
       ({ message, room }) => {
         setRoom(room);
-        showToastMessage({
+        toast(message, {
           position: "bottom-left",
-          message,
         });
       }
     );

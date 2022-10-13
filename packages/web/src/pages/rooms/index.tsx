@@ -7,12 +7,12 @@ import {
 } from "@card-32/common/types/room";
 import { Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import AnimatedCircle from "../../components/atoms/box/AnimatedCircle";
 import FlexContainer from "../../components/atoms/box/FlexContainer";
 import TextInput from "../../components/atoms/inputs/TextInput";
 import Modal from "../../components/atoms/modal/Modal";
-import { showToastMessage } from "../../components/atoms/toast";
 import Chat from "../../components/organisms/chat";
 import CreateOrJoinRoomModal from "../../components/organisms/rooms/CreateOrJoinRoomModal";
 import RoomCard from "../../components/organisms/rooms/RoomCard";
@@ -52,7 +52,7 @@ const Rooms: React.FC = () => {
       }) => {
         const { status, data: joinRequestResponse } = result;
         if (status === "rejected") {
-          showToastMessage({ type: "error", message: "Request rejected." });
+          toast.error("Request rejected.");
         } else if (status === "accepted") {
           socket.emit(
             MAIN_NAMESPACE_EVENTS.JOIN_REQUEST_ACCEPTED,
@@ -60,14 +60,14 @@ const Rooms: React.FC = () => {
             (result: { error?: string; data?: { message: string } }) => {
               const { error, data } = result;
               if (error) {
-                showToastMessage({ type: "error", message: error });
+                toast.error(error);
                 return;
               }
               if (data) {
                 setPlayer(joinRequestResponse.player);
                 setRoom(joinRequestResponse.room);
                 navigate(PLAYGROUND);
-                showToastMessage({ type: "success", message: data.message });
+                toast.success(data.message);
               }
             }
           );
@@ -118,10 +118,7 @@ const Rooms: React.FC = () => {
   ) => {
     if (!socket) return;
     if (player && roomId) {
-      return showToastMessage({
-        type: "warning",
-        message: "You already created a room.",
-      });
+      return toast.error("You are already in a room.");
     }
     socket.emit(
       MAIN_NAMESPACE_EVENTS.JOIN_ROOM,
@@ -129,10 +126,7 @@ const Rooms: React.FC = () => {
       (response: { error?: string; data?: IRoomCreateOrJoinResponse }) => {
         const { error, data } = response;
         if (error) {
-          showToastMessage({
-            type: "error",
-            message: error,
-          });
+          toast.error(error);
           return;
         }
 
@@ -169,7 +163,7 @@ const Rooms: React.FC = () => {
       (response: { error?: string; data?: { message: string } }) => {
         const { error, data } = response;
         if (error) {
-          showToastMessage({ type: "error", message: error });
+          toast.error(error);
           return;
         }
         if (!data) return;
