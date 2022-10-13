@@ -1,5 +1,6 @@
 import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../../contexts/AuthProvider";
 import { useRoomContext } from "../../../contexts/RoomProvider";
@@ -11,7 +12,6 @@ import FlexContainer from "../../atoms/box/FlexContainer";
 import Button from "../../atoms/button/Button";
 import Modal from "../../atoms/modal/Modal";
 import { ContentSubHeading } from "../../atoms/texts/ContentSubHeading";
-import { showToastMessage } from "../../atoms/toast";
 import { PlayerCard } from "../playerCard";
 
 const PlaygroundSidebar: React.FC = () => {
@@ -26,12 +26,10 @@ const PlaygroundSidebar: React.FC = () => {
   const onStartGame = () => {
     if (!room) return;
     if (room.players.length < 4) {
-      showToastMessage({
-        type: "warning",
-        message: `Invite ${
-          4 - room.players.length
-        } more players to start the game.`,
-      });
+      toast.error(
+        `Invite ${4 - room.players.length} more players to start the game.`,
+        { icon: "⚠️" }
+      );
       return;
     }
   };

@@ -1,8 +1,7 @@
 import React from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { Toaster } from "react-hot-toast";
 import "./App.css";
 import { AuthProvider } from "./contexts/AuthProvider";
 import { CardsProvider } from "./contexts/CardsProvider";
@@ -19,7 +18,16 @@ const App: React.FC = () => (
           <CardsProvider>
             <DndProvider backend={HTML5Backend}>
               <Router />
-              <ToastContainer />
+              <Toaster
+                toastOptions={{
+                  duration: 3000,
+                  style: {
+                    borderRadius: "6px",
+                    background: "#333",
+                    color: "#fff",
+                  },
+                }}
+              />
             </DndProvider>
           </CardsProvider>
         </RoomProvider>
