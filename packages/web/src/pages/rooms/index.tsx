@@ -30,7 +30,6 @@ const Rooms: React.FC = () => {
   const { isSocketConnected, socket } = useSocketContext();
   const [createOrJoinRoomModalVisible, setCreateOrJoinRoomModalVisible] =
     useState(false);
-  const [joinRequestSent, setJoinRequestSent] = useState(false);
   const [joinRequestInput, setJoinRequestInput] = useState<
     | {
         roomId?: string;
@@ -94,14 +93,6 @@ const Rooms: React.FC = () => {
       socket.off(MAIN_NAMESPACE_EVENTS.GLOBAL_NEW_MESSAGE);
     };
   }, [socket]);
-
-  useEffect(() => {
-    if (joinRequestSent) {
-      setTimeout(() => {
-        setJoinRequestSent(false);
-      }, 3000);
-    }
-  }, [joinRequestSent]);
 
   const handleSendMessage = (message: string, callback?: () => void) => {
     if (!socket) return;
@@ -167,9 +158,9 @@ const Rooms: React.FC = () => {
           return;
         }
         if (!data) return;
-        setJoinRequestSent(true);
         setJoinRequestInput(undefined);
         cb && cb();
+        toast.success("Please wait, the room creator will let you in soon.");
       }
     );
   };
@@ -257,48 +248,42 @@ const Rooms: React.FC = () => {
 
       {/* join request modal */}
       <Modal
-        visible={!!joinRequestInput || joinRequestSent}
+        visible={!!joinRequestInput}
         onClose={() => {
-          setJoinRequestInput(undefined), setJoinRequestSent(false);
+          setJoinRequestInput(undefined);
         }}
       >
-        {joinRequestSent ? (
-          <p className="text-sm">
-            Please wait, the room creator will let you in soon.
-          </p>
-        ) : joinRequestInput ? (
-          <Formik
-            initialValues={{
-              username: "",
-            }}
-            validationSchema={usernameValidatorSchema}
-            onSubmit={(values, { resetForm }) =>
-              sendJoinRequest(values.username, () => resetForm())
-            }
-          >
-            {({ values, handleChange }) => (
-              <Form className="flex flex-col gap-4">
-                <div>
-                  <label className="text-sm font-semibold">Room ID</label>
-                  <p className="text-xs">{joinRequestInput?.roomId}</p>
-                </div>
+        <Formik
+          initialValues={{
+            username: "",
+          }}
+          validationSchema={usernameValidatorSchema}
+          onSubmit={(values, { resetForm }) =>
+            sendJoinRequest(values.username, () => resetForm())
+          }
+        >
+          {({ values, handleChange }) => (
+            <Form className="flex flex-col gap-4">
+              <div>
+                <label className="text-sm font-semibold">Room ID</label>
+                <p className="text-xs">{joinRequestInput?.roomId}</p>
+              </div>
 
-                <TextInput
-                  label="Username"
-                  name="username"
-                  value={values.username}
-                  onChange={handleChange}
-                  placeholder="Enter your username"
-                />
-                <div className="flex justify-end">
-                  <button type="submit" className="btn-primary">
-                    Send request
-                  </button>
-                </div>
-              </Form>
-            )}
-          </Formik>
-        ) : null}
+              <TextInput
+                label="Username"
+                name="username"
+                value={values.username}
+                onChange={handleChange}
+                placeholder="Enter your username"
+              />
+              <div className="flex justify-end">
+                <button type="submit" className="btn-primary">
+                  Send request
+                </button>
+              </div>
+            </Form>
+          )}
+        </Formik>
       </Modal>
     </div>
   );

@@ -74,11 +74,14 @@ const Playground: React.FC = () => {
 
   useEffect(() => {
     // close request modal after 10 second
-    if (newJoinRequest) {
-      setTimeout(() => {
-        setNewJoinRequest(undefined);
-      }, 10000);
-    }
+    if (!newJoinRequest) return;
+    const timeout = setTimeout(() => {
+      setNewJoinRequest(undefined);
+    }, 10000);
+
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [newJoinRequest]);
 
   useEffect(() => {
