@@ -64,6 +64,7 @@ const Rooms: React.FC = () => {
               }
               if (data) {
                 setPlayer(joinRequestResponse.player);
+                setRoomId(joinRequestResponse.room.roomId);
                 setRoom(joinRequestResponse.room);
                 navigate(PLAYGROUND);
                 toast.success(data.message);
@@ -77,7 +78,7 @@ const Rooms: React.FC = () => {
     return () => {
       socket.off(MAIN_NAMESPACE_EVENTS.JOIN_REQUEST_RESPONSE);
     };
-  }, [socket, navigate, setPlayer, setRoom]);
+  }, [socket, navigate, setPlayer, setRoomId, setRoom]);
 
   useEffect(() => {
     if (!socket) return;

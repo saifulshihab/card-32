@@ -6,6 +6,7 @@ import {
 } from "@card-32/common/types/room";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import Modal from "../../components/atoms/modal/Modal";
 import Board from "../../components/organisms/board";
 import Chat from "../../components/organisms/chat";
@@ -13,10 +14,12 @@ import PlaygroundSidebar from "../../components/organisms/playground/PlaygroundS
 import { useAuthContext } from "../../contexts/AuthProvider";
 import { useRoomContext } from "../../contexts/RoomProvider";
 import { useSocketContext } from "../../contexts/SocketProvider";
+import { HOME } from "../../routes/routes";
 import { removeDataOnLocalStorage } from "../../utils/localStorage";
 
 const Playground: React.FC = () => {
-  const { player } = useAuthContext();
+  const navigate = useNavigate();
+  const { player, roomId } = useAuthContext();
   const { setRoom } = useRoomContext();
   const { socket } = useSocketContext();
   const [chatBoxVisible, setChatBoxVisible] = useState(false);
@@ -24,6 +27,12 @@ const Playground: React.FC = () => {
   const [newJoinRequest, setNewJoinRequest] = useState<
     IRoomJoinRequestInput | undefined
   >(undefined);
+
+  useEffect(() => {
+    if (!player || !roomId) {
+      navigate(HOME);
+    }
+  }, [player, roomId, navigate]);
 
   useEffect(() => {
     if (!socket) return;
@@ -60,6 +69,7 @@ const Playground: React.FC = () => {
         setRoom(room);
         toast(message, {
           position: "bottom-left",
+          icon: "⬅️",
         });
       }
     );
@@ -85,7 +95,7 @@ const Playground: React.FC = () => {
   }, [newJoinRequest]);
 
   useEffect(() => {
-    // remove localstorage data on window close
+    // remove localstorage data on window close or page refresh
     window.onbeforeunload = () => {
       removeDataOnLocalStorage();
     };
@@ -164,10 +174,12 @@ const Playground: React.FC = () => {
         onClose={() => setNewJoinRequest(undefined)}
       >
         <div className="flex flex-col gap-8 items-center">
-          <p className="text-xl font-bold">
-            <span className="text-primary">{newJoinRequest?.username}</span>{" "}
-            wants to join.
-          </p>
+          {newJoinRequest?.username ? (
+            <p className="text-xl font-bold">
+              <span className="text-primary">{newJoinRequest?.username}</span>{" "}
+              wants to join.
+            </p>
+          ) : null}
           <div className="flex items-center gap-4">
             <div className="flex flex-col gap-2 items-center">
               <button
