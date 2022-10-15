@@ -11,7 +11,6 @@ interface IProps {
 
 const PlayerCard: React.FC<IProps> = (props) => {
   const { username, bidPoint } = props;
-
   return (
     <div
       draggable

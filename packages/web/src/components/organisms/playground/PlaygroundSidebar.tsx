@@ -13,7 +13,7 @@ import FlexContainer from "../../atoms/box/FlexContainer";
 import Button from "../../atoms/button/Button";
 import Modal from "../../atoms/modal/Modal";
 import { ContentSubHeading } from "../../atoms/texts/ContentSubHeading";
-import { PlayerCard } from "../playerCard";
+import { PlayerCard } from "./PlayerCard";
 
 const PlaygroundSidebar: React.FC = () => {
   const navigate = useNavigate();

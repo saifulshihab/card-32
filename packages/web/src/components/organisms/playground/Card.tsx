@@ -25,9 +25,6 @@ const Card: React.FC<PropsWithChildren<IProps>> = (props) => {
     <div
       ref={!card.used ? dragRef : null}
       draggable
-      // style={{
-      //   opacity: isDragging ? 0.2 : 1,
-      // }}
       className={`w-10 h-16 sm:w-14 sm:h-20 bg-white rounded-md shadow cursor-pointer relative
       ${isDragging ? "hidden" : "block"}
       `}

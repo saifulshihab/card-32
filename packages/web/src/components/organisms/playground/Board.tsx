@@ -4,7 +4,7 @@ import { useDrop } from "react-dnd";
 import { useAuthContext } from "../../../contexts/AuthProvider";
 import { useCardsContext } from "../../../contexts/CardsProvider";
 import FlexContainer from "../../atoms/box/FlexContainer";
-import { Card } from "../card";
+import { Card } from "./Card";
 
 const Board: React.FC = () => {
   const { player } = useAuthContext();

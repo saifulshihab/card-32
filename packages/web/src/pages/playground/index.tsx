@@ -9,9 +9,9 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import Modal from "../../components/atoms/modal/Modal";
-import Board from "../../components/organisms/board";
-import { Card } from "../../components/organisms/card";
 import Chat from "../../components/organisms/chat";
+import Board from "../../components/organisms/playground/Board";
+import { Card } from "../../components/organisms/playground/Card";
 import PlaygroundSidebar from "../../components/organisms/playground/PlaygroundSidebar";
 import { useAuthContext } from "../../contexts/AuthProvider";
 import { useCardsContext } from "../../contexts/CardsProvider";
@@ -143,8 +143,6 @@ const Playground: React.FC = () => {
   const handleBidModalClose = () => {
     return;
   };
-
-  console.log(bidPoints);
 
   return (
     <div className="w-full h-screen flex flex-col sm:flex-row gap-1 relative">
