@@ -3,10 +3,15 @@ import FlexContainer from "../../atoms/box/FlexContainer";
 
 interface IProps {
   username: string;
+  bidPoint: {
+    bid: number;
+    point: number;
+  };
 }
 
 const PlayerCard: React.FC<IProps> = (props) => {
-  const { username } = props;
+  const { username, bidPoint } = props;
+
   return (
     <div
       draggable
@@ -25,13 +30,13 @@ const PlayerCard: React.FC<IProps> = (props) => {
       <div className="absolute bottom-0 w-full bg-zinc-900 rounded-md rounded-tl-none rounded-tr-none text-xs">
         <FlexContainer>
           <p className="bg-yellow-700 flex-1 text-center">Bid</p>
-          <p className="text-center flex-1 font-semibold">0</p>
+          <p className="text-center flex-1 font-semibold">{bidPoint.bid}</p>
         </FlexContainer>
         <FlexContainer>
           <p className="bg-primary-700 flex-1 text-center rounded-bl-md">
             Point
           </p>
-          <p className="text-center flex-1 font-semibold">0</p>
+          <p className="text-center flex-1 font-semibold">{bidPoint.point}</p>
         </FlexContainer>
       </div>
     </div>

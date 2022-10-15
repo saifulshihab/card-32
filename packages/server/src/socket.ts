@@ -6,6 +6,7 @@ import {
 import { IPlayer } from "./models/Player";
 import { IRoom } from "./models/Room";
 import { rooms } from "./server";
+import { IBidPoint } from "./types/card";
 import { IGlobalMessage, IMessage } from "./types/player";
 import {
   IRoomCreateIOrJoinInput,
@@ -13,7 +14,7 @@ import {
   IRoomJoinRequestInput,
   TRoomJoinRequestStatus,
 } from "./types/room";
-import { isRoomExist } from "./utils/roomUtils";
+import { generateCards, isRoomExist } from "./utils/roomUtils";
 import { logger } from "./utils/winston";
 
 const MAIN_NAMESPACE_EVENTS = {
@@ -31,6 +32,9 @@ const MAIN_NAMESPACE_EVENTS = {
   LEAVE_ROOM: "leave::room",
   PLAYER_DISCONNECTED: "player::disconnected",
   START_GAME: "start::game",
+  GET_CARDS: "get::cards",
+  ON_BID: "on::bid",
+  NEW_BID: "new::bid",
   END_GAME: "end::game",
   RESTART_GAME: "restart::game",
 };
@@ -47,6 +51,7 @@ const socketIO = (server: Server) => {
     mainNameSpace.emit(MAIN_NAMESPACE_EVENTS.ACTIVE_ROOMS, { rooms });
 
   const getRoomId = (socket: Socket) => socket.data.room.roomId as string;
+  const getPlayerId = (socket: Socket) => socket.data.player.playerId as string;
 
   mainNameSpace.on("connection", (socket: Socket) => {
     /**
@@ -256,6 +261,53 @@ const socketIO = (server: Server) => {
           });
         } catch (err) {
           logger.error("error in send message - global", err);
+        }
+      }
+    );
+
+    /**
+     * start game
+     */
+    socket.on(MAIN_NAMESPACE_EVENTS.START_GAME, () => {
+      try {
+        const roomId = getRoomId(socket);
+        const { cards } = generateCards(roomId);
+        if (cards?.length) {
+          mainNameSpace
+            .to(roomId)
+            .emit(MAIN_NAMESPACE_EVENTS.GET_CARDS, { data: { cards } });
+        }
+      } catch (err) {
+        logger.error("error start game", err);
+      }
+    });
+
+    /**
+     * on receive new bid point
+     */
+    socket.on(
+      MAIN_NAMESPACE_EVENTS.ON_BID,
+      (data: { bid: number }, callback) => {
+        try {
+          const roomId = getRoomId(socket);
+          const playerId = getPlayerId(socket);
+
+          if (!roomId || !playerId) {
+            callback(undefined);
+            return;
+          }
+
+          const newBid: IBidPoint = {
+            bid: data.bid,
+            playerId,
+            point: 0,
+          };
+          mainNameSpace
+            .to(roomId)
+            .emit(MAIN_NAMESPACE_EVENTS.NEW_BID, { data: { bid: newBid } });
+          callback({ data: "BID DONE" });
+        } catch (err) {
+          logger.error("error in bid", err);
         }
       }
     );
