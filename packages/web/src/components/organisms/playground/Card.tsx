@@ -7,10 +7,11 @@ import FlexContainer from "../../atoms/box/FlexContainer";
 interface IProps {
   card: ICard;
   hidden?: boolean;
+  noRef?: boolean;
 }
 
 const Card: React.FC<PropsWithChildren<IProps>> = (props) => {
-  const { card } = props;
+  const { card, noRef } = props;
   const [{ isDragging }, dragRef] = useDrag(
     {
       type: DNDType.CARD,
@@ -21,11 +22,12 @@ const Card: React.FC<PropsWithChildren<IProps>> = (props) => {
     },
     []
   );
+
   return (
     <div
-      ref={!card.used ? dragRef : null}
+      ref={noRef ? null : dragRef}
       draggable
-      className={`w-10 h-16 sm:w-14 sm:h-20 bg-white rounded-md shadow cursor-pointer relative
+      className={`w-10 h-16 sm:w-14 sm:h-20 bg-white rounded-md shadow cursor-pointer relative select-none
       ${isDragging ? "hidden" : "block"}
       `}
     >

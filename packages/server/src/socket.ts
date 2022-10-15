@@ -6,7 +6,7 @@ import {
 import { IPlayer } from "./models/Player";
 import { IRoom } from "./models/Room";
 import { rooms } from "./server";
-import { IBidPoint } from "./types/card";
+import { IBidPoint, ICard } from "./types/card";
 import { IGlobalMessage, IMessage } from "./types/player";
 import {
   IRoomCreateIOrJoinInput,
@@ -35,6 +35,7 @@ const MAIN_NAMESPACE_EVENTS = {
   GET_CARDS: "get::cards",
   ON_BID: "on::bid",
   NEW_BID: "new::bid",
+  CARD_DROPPED: "card::dropped",
   END_GAME: "end::game",
   RESTART_GAME: "restart::game",
 };
@@ -294,6 +295,7 @@ const socketIO = (server: Server) => {
 
           if (!roomId || !playerId) {
             callback(undefined);
+            logger.error("error in bid");
             return;
           }
 
@@ -305,12 +307,33 @@ const socketIO = (server: Server) => {
           mainNameSpace
             .to(roomId)
             .emit(MAIN_NAMESPACE_EVENTS.NEW_BID, { data: { bid: newBid } });
-          callback({ data: "BID DONE" });
+          callback({ data: "Bid done" });
         } catch (err) {
           logger.error("error in bid", err);
         }
       }
     );
+
+    /**
+     * on card dropped
+     */
+    socket.on(MAIN_NAMESPACE_EVENTS.CARD_DROPPED, (data: { card: ICard }) => {
+      try {
+        const roomId = getRoomId(socket);
+        const playerId = getPlayerId(socket);
+
+        if (!roomId || !playerId) {
+          logger.error("error in card drop");
+          return;
+        }
+
+        mainNameSpace.to(roomId).emit(MAIN_NAMESPACE_EVENTS.CARD_DROPPED, {
+          data: { card: data.card },
+        });
+      } catch (err) {
+        logger.error("error in card drop", err);
+      }
+    });
 
     /**
      * leave room

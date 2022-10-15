@@ -35,7 +35,6 @@ const generateCards = (roomId: string) => {
           cardId: uuidv4(),
           value: number,
           playerId: player.playerId,
-          used: false,
         });
       });
     });

@@ -219,7 +219,7 @@ const Playground: React.FC = () => {
             {cards.length
               ? cards
                   .filter((data) => data.playerId === player?.playerId)
-                  ?.map((card) => <Card key={card.cardId} card={card} />)
+                  ?.map((card) => <Card key={card.cardId} card={card} noRef />)
               : null}
           </div>
           <p className="text-sm font-semibold">Select your bid point</p>
