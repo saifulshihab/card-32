@@ -2,3 +2,20 @@
 body {
   font-family: "Fira Sans", sans-serif;
 }
+
+/* card animation */
+.card_animated {
+  animation: scale-to-fit-animation 0.08s ease;
+}
+
+@keyframes scale-to-fit-animation {
+  from {
+    opacity: 0.5;
+    transform: scale(0.4);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

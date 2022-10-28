@@ -206,8 +206,9 @@ const Playground: React.FC = () => {
       <div className="hidden xl:block xl:w-[320px]">
         <Chat messages={messages} handleSendMessage={handleSendMessage} />
       </div>
+
       <button
-        className="absolute xl:hidden z-20 bottom-[23%] right-5 shadow-md sm:top-2 w-12 h-12 rounded-full btn-primary flex items-center justify-center
+        className="absolute xl:hidden z-20 bottom-3 right-3 shadow-md sm:top-3 sm:right-3 w-12 h-12 rounded-full btn-primary flex items-center justify-center
         bg-zinc-900 sm:bg-zinc-800 border-zinc-700
         "
         onClick={() => {
@@ -223,7 +224,7 @@ const Playground: React.FC = () => {
 
       {/* floating chat box */}
       <div
-        className={`w-full border-2 rounded border-zinc-700 z-10 h-full sm:h-[90%] absolute sm:w-[320px] sm:right-16 sm:mt-14 ${
+        className={`w-[90%] border-2 rounded border-zinc-700 z-10 h-[93%] sm:h-[90%] absolute right-3 sm:w-[320px] sm:right-16 sm:mt-14 ${
           chatBoxVisible ? "block" : "hidden"
         }`}
       >
