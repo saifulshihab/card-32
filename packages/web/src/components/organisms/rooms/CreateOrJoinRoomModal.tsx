@@ -44,7 +44,7 @@ const CreateOrJoinRoomModal: React.FC<IProps> = (props) => {
                 placeholder="Room ID (e.g discord012)"
               />
               <button type="submit" className="btn-primary mt-4 bg-primary">
-                Submit
+                Enter
               </button>
             </FlexContainer>
           </Form>

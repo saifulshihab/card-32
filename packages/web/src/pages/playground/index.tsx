@@ -11,10 +11,11 @@ import { useNavigate } from "react-router-dom";
 import Modal from "../../components/atoms/modal/Modal";
 import Chat from "../../components/organisms/chat";
 import Board from "../../components/organisms/playground/Board";
-import { Card } from "../../components/organisms/playground/Card";
+import { Card } from "../../components/organisms/playground/card/Card";
 import PlaygroundSidebar from "../../components/organisms/playground/PlaygroundSidebar";
 import { useAuthContext } from "../../contexts/AuthProvider";
 import { useCardsContext } from "../../contexts/CardsProvider";
+import { useRoomContext } from "../../contexts/RoomProvider";
 import { useSocketContext } from "../../contexts/SocketProvider";
 import { HOME } from "../../routes/routes";
 import { removeDataOnLocalStorage } from "../../utils/localStorage";
@@ -23,7 +24,8 @@ const Playground: React.FC = () => {
   const navigate = useNavigate();
   const { socket } = useSocketContext();
   const { player, roomId } = useAuthContext();
-  const { cards, bidPoints } = useCardsContext();
+  const { room } = useRoomContext();
+  const { cards, bidPoints, usedCards } = useCardsContext();
   const [chatBoxVisible, setChatBoxVisible] = useState(false);
   const [messages, setMessages] = useState<TGenericMessage[]>([]);
   const [newJoinRequest, setNewJoinRequest] = useState<
@@ -48,8 +50,17 @@ const Playground: React.FC = () => {
       }
     );
 
+    // room chat - send message
+    socket.on(
+      MAIN_NAMESPACE_EVENTS.NEW_MESSAGE,
+      ({ data }: { data: TGenericMessage }) => {
+        setMessages((prev) => [...prev, data]);
+      }
+    );
+
     return () => {
       socket.off(MAIN_NAMESPACE_EVENTS.JOIN_REQUEST);
+      socket.off(MAIN_NAMESPACE_EVENTS.NEW_MESSAGE);
     };
   }, [socket]);
 
@@ -72,21 +83,6 @@ const Playground: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.on(
-      MAIN_NAMESPACE_EVENTS.NEW_MESSAGE,
-      ({ data }: { data: TGenericMessage }) => {
-        setMessages((prev) => [...prev, data]);
-      }
-    );
-
-    return () => {
-      socket.off(MAIN_NAMESPACE_EVENTS.NEW_MESSAGE);
-    };
-  }, [socket]);
-
   // open bid modal when cards received and player don't bid yet
   useEffect(() => {
     if (bidPoints === null) {
@@ -102,6 +98,63 @@ const Playground: React.FC = () => {
       setBidModalVisible(true);
     }
   }, [bidPoints, player?.playerId]);
+
+  // get round winner when 4 cards dropped
+  useEffect(() => {
+    if (!socket) return;
+
+    // this func will be called in room creator profile only
+    if (usedCards.length !== 4) return;
+    if (player?.playerId !== room?.creator.playerId) return;
+    if (!bidPoints?.length) return;
+
+    try {
+      // get winner card
+      const winnerCard = usedCards.reduce((prev, curr) =>
+        prev.value > curr.value ? prev : curr
+      );
+
+      const winner = room?.players.find(
+        (player) => player.playerId === winnerCard.playerId
+      );
+      if (!winner) return;
+
+      // updated bid points
+      const updatedBidPoints = bidPoints.map((data) =>
+        data.playerId === winner?.playerId
+          ? {
+              ...data,
+              point: data.point + 1,
+            }
+          : data
+      );
+
+      // remove used cards
+      const usedCardsIds = usedCards.map((card) => card.cardId);
+      const updatedCards = cards.filter(
+        (card) => !usedCardsIds.includes(card.cardId)
+      );
+
+      socket.emit(MAIN_NAMESPACE_EVENTS.ROUND_WINNER, {
+        data: {
+          winnerUsername: winner.username,
+          bidPoints: updatedBidPoints,
+          cards: updatedCards,
+        },
+      });
+    } catch {
+      toast.error("Something went wrong");
+    }
+  }, [
+    socket,
+    cards,
+    usedCards,
+    bidPoints,
+    room?.players,
+    player?.playerId,
+    usedCards.length,
+    room?.creator.playerId,
+  ]);
 
   // send message
   const handleSendMessage = (message: string, callback?: () => void) => {

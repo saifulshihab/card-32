@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { rooms } from "../server";
 import { ICard } from "../types/card";
 
@@ -32,7 +31,7 @@ const generateCards = (roomId: string) => {
       const slicedNumbers = numbers.slice((idx + 1 - 1) * 8, (idx + 1) * 8);
       slicedNumbers.forEach((number) => {
         cards.push({
-          cardId: uuidv4(),
+          cardId: number.toString(),
           value: number,
           playerId: player.playerId,
         });

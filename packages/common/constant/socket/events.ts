@@ -17,6 +17,6 @@ export const MAIN_NAMESPACE_EVENTS = {
   ON_BID: "on::bid",
   NEW_BID: "new::bid",
   CARD_DROPPED: "card::dropped",
-  END_GAME: "end::game",
-  RESTART_GAME: "restart::game",
+  RECEIVE_DROPPED_CARD: "receive::dropped::card",
+  ROUND_WINNER: "round::winner",
 };

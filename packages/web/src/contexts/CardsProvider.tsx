@@ -1,6 +1,7 @@
 import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
 import { IBidPoint, ICard } from "@card-32/common/types/card";
 import React, { PropsWithChildren, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { useRoomContext } from "./RoomProvider";
 import { useSocketContext } from "./SocketProvider";
 
@@ -46,23 +47,46 @@ export const CardsProvider: React.FC<PropsWithChildren> = (props) => {
 
     // on card dropped
     socket.on(
-      MAIN_NAMESPACE_EVENTS.CARD_DROPPED,
+      MAIN_NAMESPACE_EVENTS.RECEIVE_DROPPED_CARD,
       ({ data }: { data: { card: ICard } }) => {
-        if (data) {
-          setCards((prev) =>
-            prev.filter(({ cardId }) => cardId !== data.card.cardId)
-          );
-          setUsedCards((prev) => [...prev, data.card]);
-        }
+        if (!data.card) return;
+        setCards((prev) => prev.filter((d) => d.value !== data.card.value));
+        setUsedCards((prev) => [...prev, data.card]);
+      }
+    );
+
+    // get winner for a round
+    socket.on(
+      MAIN_NAMESPACE_EVENTS.ROUND_WINNER,
+      ({
+        data: { winnerUsername, bidPoints, cards },
+      }: {
+        data: {
+          winnerUsername: string;
+          bidPoints: IBidPoint[];
+          cards: ICard[];
+        };
+      }) => {
+        setBidPoints(bidPoints);
+        setUsedCards([]);
+        setCards(cards);
+        toast.success(
+          <p>
+            <span className="text-green-500">{winnerUsername}</span> won this
+            round
+          </p>,
+          { icon: "🎉" }
+        );
       }
     );
 
     return () => {
       socket.off(MAIN_NAMESPACE_EVENTS.GET_CARDS);
       socket.off(MAIN_NAMESPACE_EVENTS.NEW_BID);
-      socket.off(MAIN_NAMESPACE_EVENTS.CARD_DROPPED);
+      socket.off(MAIN_NAMESPACE_EVENTS.RECEIVE_DROPPED_CARD);
+      socket.off(MAIN_NAMESPACE_EVENTS.ROUND_WINNER);
     };
-  }, [socket]);
+  }, [socket, cards]);
 
   useEffect(() => {
     // reset game if player leave or disconnected

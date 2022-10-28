@@ -11,6 +11,7 @@ interface IProps {
 
 const PlayerCard: React.FC<IProps> = (props) => {
   const { username, bidPoint } = props;
+  const isPlayerBidSuccess = bidPoint.point >= bidPoint.bid;
   return (
     <div
       draggable
@@ -32,10 +33,16 @@ const PlayerCard: React.FC<IProps> = (props) => {
           <p className="text-center flex-1 font-semibold">{bidPoint.bid}</p>
         </FlexContainer>
         <FlexContainer>
-          <p className="bg-primary-700 flex-1 text-center rounded-bl-md">
+          <p className="bg-purple-700 flex-1 text-center rounded-bl-md">
             Point
           </p>
-          <p className="text-center flex-1 font-semibold">{bidPoint.point}</p>
+          <p
+            className={`text-center flex-1 font-semibold ${
+              isPlayerBidSuccess ? "text-green-500" : "text-red-500"
+            }`}
+          >
+            {bidPoint.point}
+          </p>
         </FlexContainer>
       </div>
     </div>

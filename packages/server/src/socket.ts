@@ -36,8 +36,8 @@ const MAIN_NAMESPACE_EVENTS = {
   ON_BID: "on::bid",
   NEW_BID: "new::bid",
   CARD_DROPPED: "card::dropped",
-  END_GAME: "end::game",
-  RESTART_GAME: "restart::game",
+  RECEIVE_DROPPED_CARD: "receive::dropped::card",
+  ROUND_WINNER: "round::winner",
 };
 
 const socketIO = (server: Server) => {
@@ -70,7 +70,6 @@ const socketIO = (server: Server) => {
       (joinInput: IRoomCreateIOrJoinInput, callback) => {
         try {
           // join socket with it's own id - for private events
-          socket.join(socket.id);
 
           const { roomId, username } = joinInput;
           const { error, data } = getPlayerIntoRoom(joinInput);
@@ -94,6 +93,7 @@ const socketIO = (server: Server) => {
           socket.join(roomId);
           socket.data.player = data?.player;
           socket.data.room = data?.room!;
+          socket.join(socket.id);
 
           callback({ data });
           updateActiveRooms();
@@ -317,23 +317,57 @@ const socketIO = (server: Server) => {
     /**
      * on card dropped
      */
-    socket.on(MAIN_NAMESPACE_EVENTS.CARD_DROPPED, (data: { card: ICard }) => {
-      try {
-        const roomId = getRoomId(socket);
-        const playerId = getPlayerId(socket);
+    socket.on(
+      MAIN_NAMESPACE_EVENTS.CARD_DROPPED,
+      ({ data }: { data: { card: ICard } }) => {
+        try {
+          const roomId = getRoomId(socket);
+          const playerId = getPlayerId(socket);
 
-        if (!roomId || !playerId) {
-          logger.error("error in card drop");
-          return;
+          if (!roomId || !playerId) {
+            logger.error("error in card drop");
+            return;
+          }
+
+          mainNameSpace
+            .to(roomId)
+            .emit(MAIN_NAMESPACE_EVENTS.RECEIVE_DROPPED_CARD, {
+              data: { card: data.card },
+            });
+        } catch (err) {
+          logger.error("error in card drop", err);
         }
-
-        mainNameSpace.to(roomId).emit(MAIN_NAMESPACE_EVENTS.CARD_DROPPED, {
-          data: { card: data.card },
-        });
-      } catch (err) {
-        logger.error("error in card drop", err);
       }
-    });
+    );
+
+    /**
+     * send round winner
+     */
+    socket.on(
+      MAIN_NAMESPACE_EVENTS.ROUND_WINNER,
+      ({
+        data,
+      }: {
+        data: {
+          winnerUsername: string;
+          bidPoints: IBidPoint[];
+          cards: ICard[];
+        };
+      }) => {
+        try {
+          const roomId = getRoomId(socket);
+          // time to wait for a round result default 2 sec
+          const roomRoundResultDelaySecond = 2;
+          setTimeout(() => {
+            mainNameSpace.to(roomId).emit(MAIN_NAMESPACE_EVENTS.ROUND_WINNER, {
+              data,
+            });
+          }, roomRoundResultDelaySecond * 1000);
+        } catch (err) {
+          logger.error("error in round winner", err);
+        }
+      }
+    );
 
     /**
      * leave room
