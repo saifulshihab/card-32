@@ -8,6 +8,11 @@ body {
   animation: scale-to-fit-animation 0.08s ease;
 }
 
+/* floating chat box animation */
+.floatingChatBox {
+  animation: floatingChatBoxAnimation 0.3s ease;
+}
+
 @keyframes scale-to-fit-animation {
   from {
     opacity: 0.5;
@@ -17,5 +22,19 @@ body {
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes floatingChatBoxAnimation {
+  from {
+    opacity: 0.5;
+    transform: scale(0.4);
+    height: 10%;
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+    height: 90%;
   }
 }
