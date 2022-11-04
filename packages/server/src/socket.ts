@@ -2,9 +2,10 @@ import { Server, Socket } from "socket.io";
 import {
   getPlayerIntoRoom,
   getRoomOnLeaveOrDisconnect,
+  updateRoomSettings,
 } from "./controller/roomController";
 import { IPlayer } from "./models/Player";
-import { IRoom } from "./models/Room";
+import { IRoom, IRoomSettings } from "./models/Room";
 import { rooms } from "./server";
 import { IBidPoint, ICard } from "./types/card";
 import { IGlobalMessage, IMessage } from "./types/player";
@@ -38,6 +39,7 @@ const MAIN_NAMESPACE_EVENTS = {
   CARD_DROPPED: "card::dropped",
   RECEIVE_DROPPED_CARD: "receive::dropped::card",
   ROUND_WINNER: "round::winner",
+  CHANGE_ROOM_SETTINGS: "change::room::settings",
 };
 
 const socketIO = (server: Server) => {
@@ -51,8 +53,11 @@ const socketIO = (server: Server) => {
   const updateActiveRooms = () =>
     mainNameSpace.emit(MAIN_NAMESPACE_EVENTS.ACTIVE_ROOMS, { rooms });
 
-  const getRoomId = (socket: Socket) => socket.data.room.roomId as string;
-  const getPlayerId = (socket: Socket) => socket.data.player.playerId as string;
+  const getSocketRoomId = (socket: Socket) => socket.data.room.roomId as string;
+  const getSocketRoom = (socket: Socket) =>
+    rooms.find((room) => room.roomId === socket.data.room.roomId);
+  const getSocketPlayerId = (socket: Socket) =>
+    socket.data.player.playerId as string;
 
   mainNameSpace.on("connection", (socket: Socket) => {
     /**
@@ -150,6 +155,27 @@ const socketIO = (server: Server) => {
             return;
           }
 
+          // join request auto accept in room
+          if (room.settings.autoAcceptJoinRequest) {
+            const { data: roomData } = getPlayerIntoRoom({ username, roomId });
+            updateActiveRooms();
+            mainNameSpace
+              .to(data.socketId)
+              .emit(MAIN_NAMESPACE_EVENTS.JOIN_REQUEST_RESPONSE, {
+                status: "accepted",
+                data: roomData,
+              });
+
+            // notify other players
+            mainNameSpace
+              .to(roomId)
+              .emit(MAIN_NAMESPACE_EVENTS.NEW_PLAYER_JOINED, {
+                message: `${username} has joined.`,
+                room: roomData?.room,
+              });
+            return;
+          }
+
           // send join request to room creator
           mainNameSpace
             .to(roomCreatorId)
@@ -189,6 +215,7 @@ const socketIO = (server: Server) => {
             const { data } = getPlayerIntoRoom({ username, roomId });
 
             updateActiveRooms();
+
             mainNameSpace
               .to(joinRequest.socketId)
               .emit(MAIN_NAMESPACE_EVENTS.JOIN_REQUEST_RESPONSE, {
@@ -241,7 +268,7 @@ const socketIO = (server: Server) => {
      */
     socket.on(MAIN_NAMESPACE_EVENTS.SEND_MESSAGE, (data: IMessage) => {
       try {
-        const roomId = getRoomId(socket);
+        const roomId = getSocketRoomId(socket);
         mainNameSpace
           .to(roomId)
           .emit(MAIN_NAMESPACE_EVENTS.NEW_MESSAGE, { data });
@@ -271,7 +298,7 @@ const socketIO = (server: Server) => {
      */
     socket.on(MAIN_NAMESPACE_EVENTS.START_GAME, () => {
       try {
-        const roomId = getRoomId(socket);
+        const roomId = getSocketRoomId(socket);
         const { cards } = generateCards(roomId);
         if (cards?.length) {
           mainNameSpace
@@ -290,8 +317,8 @@ const socketIO = (server: Server) => {
       MAIN_NAMESPACE_EVENTS.ON_BID,
       (data: { bid: number }, callback) => {
         try {
-          const roomId = getRoomId(socket);
-          const playerId = getPlayerId(socket);
+          const roomId = getSocketRoomId(socket);
+          const playerId = getSocketPlayerId(socket);
 
           if (!roomId || !playerId) {
             callback(undefined);
@@ -321,8 +348,8 @@ const socketIO = (server: Server) => {
       MAIN_NAMESPACE_EVENTS.CARD_DROPPED,
       ({ data }: { data: { card: ICard } }) => {
         try {
-          const roomId = getRoomId(socket);
-          const playerId = getPlayerId(socket);
+          const roomId = getSocketRoomId(socket);
+          const playerId = getSocketPlayerId(socket);
 
           if (!roomId || !playerId) {
             logger.error("error in card drop");
@@ -355,16 +382,54 @@ const socketIO = (server: Server) => {
         };
       }) => {
         try {
-          const roomId = getRoomId(socket);
+          const roomId = getSocketRoomId(socket);
           // time to wait for a round result default 2 sec
-          const roomRoundResultDelaySecond = 2;
+          const room = getSocketRoom(socket);
+          if (!room) {
+            throw new Error("Room not found");
+          }
+          const delay = room.settings.resultDelay || 2;
           setTimeout(() => {
             mainNameSpace.to(roomId).emit(MAIN_NAMESPACE_EVENTS.ROUND_WINNER, {
               data,
             });
-          }, roomRoundResultDelaySecond * 1000);
+          }, delay * 1000);
         } catch (err) {
           logger.error("error in round winner", err);
+        }
+      }
+    );
+
+    /**
+     * update room settings
+     */
+    socket.on(
+      MAIN_NAMESPACE_EVENTS.CHANGE_ROOM_SETTINGS,
+      (
+        {
+          data,
+        }: {
+          data: {
+            settings: IRoomSettings;
+          };
+        },
+        callback
+      ) => {
+        try {
+          const playerId = getSocketPlayerId(socket);
+          const roomId = getSocketRoomId(socket);
+          const { room } = updateRoomSettings(roomId, data.settings);
+          if (room?.creator.playerId !== playerId) {
+            callback("Only room creator can change settings", null);
+            return;
+          }
+          if (!room) {
+            callback("Something went wrong", null);
+            return;
+          }
+          callback(undefined, room);
+        } catch (err) {
+          logger.error("error in room settings", err);
         }
       }
     );

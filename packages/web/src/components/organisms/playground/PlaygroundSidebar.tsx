@@ -1,5 +1,6 @@
 import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
-import React, { useState } from "react";
+import { IRoom, IRoomSettings } from "@card-32/common/types/room";
+import React, { useCallback, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../../contexts/AuthProvider";
@@ -14,6 +15,7 @@ import Button from "../../atoms/button/Button";
 import Modal from "../../atoms/modal/Modal";
 import { ContentSubHeading } from "../../atoms/texts/ContentSubHeading";
 import { PlayerCard } from "./PlayerCard";
+import { RoomSettingsModal } from "./RoomSettingsModal";
 
 const PlaygroundSidebar: React.FC = () => {
   const navigate = useNavigate();
@@ -23,6 +25,7 @@ const PlaygroundSidebar: React.FC = () => {
   const { isSocketConnected, socket } = useSocketContext();
 
   const [leaveRoomModal, setLeaveRoomModal] = useState(false);
+  const [roomSettingsModal, setRoomSettingsModal] = useState(false);
 
   const onStartGame = () => {
     if (!socket) return;
@@ -36,6 +39,42 @@ const PlaygroundSidebar: React.FC = () => {
     }
     socket.emit(MAIN_NAMESPACE_EVENTS.START_GAME);
   };
+
+  const getBidPoint = (playerId: string) => {
+    if (!bidPoints?.length) {
+      return { bid: 0, point: 0 };
+    }
+    const player = bidPoints.find((data) => data.playerId === playerId);
+    if (!player) return { bid: 0, point: 0 };
+
+    return { bid: player.bid, point: player.point };
+  };
+
+  const onRoomSettingsSave = useCallback(
+    (roomSettings: IRoomSettings) => {
+      if (!socket) return;
+      socket.emit(
+        MAIN_NAMESPACE_EVENTS.CHANGE_ROOM_SETTINGS,
+        {
+          data: { settings: roomSettings },
+        },
+        (error?: string, room?: IRoom) => {
+          if (error) {
+            toast.error(error);
+            return;
+          }
+          if (!room) {
+            toast.error("Something went wrong");
+            return;
+          }
+          setRoom(room);
+          setRoomSettingsModal(false);
+          toast.success("Settings saved.");
+        }
+      );
+    },
+    [socket, setRoom]
+  );
 
   const onLeave = async () => {
     if (!socket) return;
@@ -51,16 +90,7 @@ const PlaygroundSidebar: React.FC = () => {
     window.open(HOME);
   };
 
-  const getBidPoint = (playerId: string) => {
-    if (!bidPoints?.length) {
-      return { bid: 0, point: 0 };
-    }
-    const player = bidPoints.find((data) => data.playerId === playerId);
-    if (!player) return { bid: 0, point: 0 };
-
-    return { bid: player.bid, point: player.point };
-  };
-
+  const isRoomCreator = room?.creator.playerId === player?.playerId;
   const isCardsReceived = !!cards.length;
 
   return (
@@ -104,10 +134,10 @@ const PlaygroundSidebar: React.FC = () => {
         </FlexContainer>
       </FlexContainer>
       <div className="hidden sm:block mt-20">
-        <FlexContainer className="flex-col justify-center gap-2">
+        <FlexContainer className="flex-col justify-center gap-2 text-gray-400">
           <FlexContainer>
             <div className="flex flex-col">
-              <p className="text-xs text-gray-400 -mb-1.5">Room ID</p>
+              <p className="text-xs -mb-1.5">Room ID</p>
               <div className="flex gap-1 items-center">
                 <AnimatedCircle socketConnected={isSocketConnected} />
                 <p className="text-lg select-all font-semibold text-ellipsis text-center">
@@ -116,11 +146,9 @@ const PlaygroundSidebar: React.FC = () => {
               </div>
             </div>
           </FlexContainer>
-          <FlexContainer className="text-xs justify-center font-thin gap-2">
+          <FlexContainer className="text-xs justify-center gap-2">
             <i className="fa-solid fa-users"></i>
-            <p className="text-xs text-white">{`${
-              room?.players.length || 0
-            } / 4`}</p>
+            <p>{`${room?.players.length || 0} / 4`}</p>
           </FlexContainer>
         </FlexContainer>
 
@@ -152,6 +180,14 @@ const PlaygroundSidebar: React.FC = () => {
             </div>
           </div>
           <FlexContainer className="gap-2">
+            {isRoomCreator ? (
+              <button
+                className="btn-primary border-2 border-zinc-700 p-1 text-xs"
+                onClick={() => setRoomSettingsModal(true)}
+              >
+                <i className="fa-solid fa-gear" />
+              </button>
+            ) : null}
             {isCardsReceived ? null : (
               <button
                 className="btn-primary p-1 text-xs border-2 border-blue-600 shadow-blue-600"
@@ -160,9 +196,6 @@ const PlaygroundSidebar: React.FC = () => {
                 Start Game
               </button>
             )}
-            {/* <button className="btn-primary p-1 text-xs border-2 border-primary shadow-primary">
-              Restart
-            </button> */}
           </FlexContainer>
         </FlexContainer>
 
@@ -180,7 +213,15 @@ const PlaygroundSidebar: React.FC = () => {
       </div>
       {/* sidebar bottom content */}
       <div className="hidden sm:flex w-full absolute bottom-0 p-2 flex-col gap-2">
-        <FlexContainer className="gap-2 justify-center">
+        <FlexContainer className="items-center justify-between">
+          {isRoomCreator ? (
+            <button
+              className="btn-primary border-2 border-zinc-700"
+              onClick={() => setRoomSettingsModal(true)}
+            >
+              <i className="fa-solid fa-gear" />
+            </button>
+          ) : null}
           {isCardsReceived ? null : (
             <button
               className="btn-primary border-2 border-blue-600 shadow-blue-600"
@@ -189,9 +230,6 @@ const PlaygroundSidebar: React.FC = () => {
               Start Game
             </button>
           )}
-          {/* <button className="btn-primary border-2 border-primary shadow-primary">
-            Restart
-          </button> */}
         </FlexContainer>
       </div>
 
@@ -216,6 +254,15 @@ const PlaygroundSidebar: React.FC = () => {
           </FlexContainer>
         </FlexContainer>
       </Modal>
+
+      {/* room settings modal */}
+      <RoomSettingsModal
+        visible={roomSettingsModal}
+        onClose={() => {
+          setRoomSettingsModal(false);
+        }}
+        onSave={onRoomSettingsSave}
+      />
     </div>
   );
 };

@@ -224,7 +224,7 @@ const Playground: React.FC = () => {
 
       {/* floating chat box */}
       <div
-        className={`w-[90%] border-2 rounded border-zinc-700 z-10 h-[93%] sm:h-[90%] absolute right-3 sm:w-[320px] sm:right-16 sm:mt-14 ${
+        className={`w-[90%] border-2 rounded border-zinc-700 z-10 h-[93%] sm:h-[90%] absolute right-3 sm:w-[320px] sm:right-16 sm:mt-14 floatingChatBox ${
           chatBoxVisible ? "block" : "hidden"
         }`}
       >
