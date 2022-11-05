@@ -39,9 +39,9 @@ const RoomSettingsModal: React.FC<IProps> = (props) => {
     []
   );
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     onSave && onSave(roomSettings);
-  };
+  }, [onSave, roomSettings]);
 
   return (
     <Modal visible={visible} width="max-w-screen-sm" onClose={onClose}>
