@@ -49,7 +49,7 @@ const RoomSettingsModal: React.FC<IProps> = (props) => {
         <FlexContainer>
           <p className="text-xl font-bold">Settings</p>
         </FlexContainer>
-
+        <div className="w-full h-[2px] bg-zinc-800" />
         {/* options */}
         <FlexContainer className="w-full flex-col gap-4 mt-3 mb-6">
           <FlexContainer className="w-full justify-between text-sm">
