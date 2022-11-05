@@ -1,0 +1,38 @@
+.hero_text {
+  line-height: 1.1 !important;
+}
+
+.playNow_btn {
+  position: relative;
+  border: 1px solid;
+  border-image-slice: 1;
+  border-image-source: linear-gradient(to left, #743ad5, #d53a9d);
+}
+
+.playNow_btn::after,
+.playNow_btn::before {
+  content: "";
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: inherit;
+  transition: all 0.5s;
+}
+
+.playNow_btn::before {
+  top: -15px;
+  left: -15px;
+  border-width: 1px 0 0 1px;
+}
+
+.playNow_btn::after {
+  bottom: -15px;
+  right: -15px;
+  border-width: 0 1px 1px 0;
+}
+
+.playNow_btn:hover::before,
+.playNow_btn:hover::after {
+  width: calc(100% + 30px);
+  height: calc(100% + 30px);
+}

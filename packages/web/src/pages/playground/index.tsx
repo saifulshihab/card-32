@@ -17,7 +17,7 @@ import { useAuthContext } from "../../contexts/AuthProvider";
 import { useCardsContext } from "../../contexts/CardsProvider";
 import { useRoomContext } from "../../contexts/RoomProvider";
 import { useSocketContext } from "../../contexts/SocketProvider";
-import { HOME } from "../../routes/routes";
+import { ROOMS } from "../../routes/routes";
 import { removeDataOnLocalStorage } from "../../utils/localStorage";
 
 const Playground: React.FC = () => {
@@ -35,7 +35,7 @@ const Playground: React.FC = () => {
 
   useEffect(() => {
     if (!player || !roomId) {
-      navigate(HOME);
+      navigate(ROOMS);
     }
   }, [player, roomId, navigate]);
 

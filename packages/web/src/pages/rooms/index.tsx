@@ -8,7 +8,7 @@ import {
 import { Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import AnimatedCircle from "../../components/atoms/box/AnimatedCircle";
 import FlexContainer from "../../components/atoms/box/FlexContainer";
 import TextInput from "../../components/atoms/inputs/TextInput";
@@ -19,7 +19,7 @@ import RoomCard from "../../components/organisms/rooms/RoomCard";
 import { useAuthContext } from "../../contexts/AuthProvider";
 import { useRoomContext } from "../../contexts/RoomProvider";
 import { useSocketContext } from "../../contexts/SocketProvider";
-import { PLAYGROUND } from "../../routes/routes";
+import { LANDING, PLAYGROUND } from "../../routes/routes";
 import { setPlayerAndRoomIdOnLocalStorage } from "../../utils/localStorage";
 import { usernameValidatorSchema } from "../../validators/playerValidators";
 
@@ -183,17 +183,22 @@ const Rooms: React.FC = () => {
   return (
     <div className="w-full h-full">
       <div className="w-full h-6 shadow-md bg-zinc-800 flex items-center">
-        <div className="container m-auto flex items-center justify-end gap-2 text-xs font-bold px-5 select-none">
-          <p>Server status</p>
-          <div className="flex items-center gap-1.5">
-            <AnimatedCircle socketConnected={isSocketConnected} />
-            <p
-              className={`${
-                isSocketConnected ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {isSocketConnected ? "Running" : "Stopped"}
-            </p>
+        <div className="container m-auto flex items-center justify-between text-xs font-bold select-none  px-5">
+          <NavLink to={LANDING}>
+          <p>Home</p>
+          </NavLink>
+          <div className="flex items-center gap-2">
+            <p>Server status</p>
+            <div className="flex items-center gap-1.5">
+              <AnimatedCircle socketConnected={isSocketConnected} />
+              <p
+                className={`${
+                  isSocketConnected ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {isSocketConnected ? "Running" : "Stopped"}
+              </p>
+            </div>
           </div>
         </div>
       </div>

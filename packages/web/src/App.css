@@ -38,3 +38,12 @@ body {
     height: 90%;
   }
 }
+
+/* gradient text */
+.gradient_text {
+  background: linear-gradient(45deg, rgb(123 0 222), rgb(255 126 0));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

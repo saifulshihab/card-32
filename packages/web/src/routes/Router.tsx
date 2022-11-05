@@ -2,16 +2,25 @@ import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { BlankLayout } from "../components/layouts/BlankLayout";
 import PageNotFound from "../pages/404/PageNotFound";
+import LandingPage from "../pages/landing";
 import Playground from "../pages/playground";
 import Rooms from "../pages/rooms";
-import { PLAYGROUND } from "./routes";
+import { LANDING, PLAYGROUND, ROOMS } from "./routes";
 
 const Router: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
         <Route
-          path={"/"}
+          path={LANDING}
+          element={
+            <BlankLayout>
+              <LandingPage />
+            </BlankLayout>
+          }
+        />
+        <Route
+          path={ROOMS}
           element={
             <BlankLayout>
               <Rooms />

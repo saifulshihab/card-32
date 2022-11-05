@@ -7,7 +7,7 @@ import { useAuthContext } from "../../../contexts/AuthProvider";
 import { useCardsContext } from "../../../contexts/CardsProvider";
 import { useRoomContext } from "../../../contexts/RoomProvider";
 import { useSocketContext } from "../../../contexts/SocketProvider";
-import { HOME } from "../../../routes/routes";
+import { ROOMS } from "../../../routes/routes";
 import { removeDataOnLocalStorage } from "../../../utils/localStorage";
 import AnimatedCircle from "../../atoms/box/AnimatedCircle";
 import FlexContainer from "../../atoms/box/FlexContainer";
@@ -83,11 +83,11 @@ const PlaygroundSidebar: React.FC = () => {
     setPlayer(undefined);
     setRoom(undefined);
     setLeaveRoomModal(false);
-    navigate(HOME);
+    navigate(ROOMS);
   };
 
   const onHomeButtonClick = () => {
-    window.open(HOME);
+    window.open(ROOMS);
   };
 
   const isRoomCreator = room?.creator.playerId === player?.playerId;

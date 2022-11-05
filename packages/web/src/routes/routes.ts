@@ -1,5 +1,4 @@
 export const LOGIN = "/login";
-export const HOME = "/";
 export const LANDING = "/";
 export const APPEARANCE = "/appearance";
 export const PROFILE = "/profile";
