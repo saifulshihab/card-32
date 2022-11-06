@@ -1,9 +1,9 @@
 import React, { PropsWithChildren, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
-import { BASE_URL } from "../constants/config";
+import { SERVER_URL } from "../constants/config";
 
 // Namespaces
-const mainNamespace = BASE_URL;
+const mainNamespace = SERVER_URL;
 
 interface ISocketContext {
   isSocketConnected: boolean;

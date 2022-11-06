@@ -14,16 +14,16 @@ const HeroSection: React.FC = () => {
   return (
     <SectionContainer>
       {/* hero left section */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col items-center md:items-start">
         <h1
-          className={`text-4xl sm:text-7xl font-extrabold gradient_text ${styles.hero_text}`}
+          className={`text-4xl text-center md:text-left sm:text-7xl font-extrabold gradient_text ${styles.hero_text}`}
         >
           A multiplayer card game. Create a room <br />
           and start playing
         </h1>
 
         <button
-          className={`ml-5 mt-16 btn-primary h-14 w-40 text-lg ${styles.playNow_btn}`}
+          className={`mt-16 md:ml-5 btn-primary h-14 w-40 text-lg ${styles.playNow_btn}`}
           onClick={onPlayNow}
         >
           Play now
