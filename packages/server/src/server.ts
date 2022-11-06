@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { NODE_ENV, PORT } from "./config/env";
+import { ALLOWED_ORIGINS, NODE_ENV, PORT } from "./config/env";
 import { IRoom } from "./models/Room";
 import { socketIO } from "./socket";
 import { logger } from "./utils/winston";
@@ -19,7 +19,7 @@ export const rooms: IRoom[] = [];
 
   const io = new Server(httpServer, {
     cors: {
-      origin: "*",
+      origin: ALLOWED_ORIGINS,
     },
   });
 
