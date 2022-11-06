@@ -1,21 +1,26 @@
 import React from "react";
+import RoomChat from "../../components/organisms/landing/features/RoomChat";
+import VoiceChat from "../../components/organisms/landing/features/VoiceChat";
+import Footer from "../../components/organisms/landing/footer";
+import GamePlay from "../../components/organisms/landing/gameplay";
+import Header from "../../components/organisms/landing/header";
+import HeroSection from "../../components/organisms/landing/hero";
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="container mx-auto">
-      <div className="w-full  relative min-h-screen">
-        <div className="py-24 px-5">
-          <h1 className="text-primary text-7xl font-extrabold">Card-32</h1>
-          <p className="text-gray-200 text-lg mt-2 ml-2">
-            A simple card game. Create room with <br /> a room ID and username
-            and invite others to play.
-          </p>
-          <button className="mt-12 btn-primary h-14 w-32 bg-rose-600 text-lg">
-            Play Now!
-          </button>
-        </div>
-      </div>
-    </div>
+    <main className="w-full min-h-screen">
+      {/* header */}
+      <Header />
+      {/* hero section */}
+      <HeroSection />
+      {/* gameplay section */}
+      <GamePlay />
+      {/* features */}
+      <RoomChat />
+      <VoiceChat />
+      {/* footer */}
+      <Footer />
+    </main>
   );
 };
 

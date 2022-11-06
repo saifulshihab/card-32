@@ -1,6 +1,6 @@
 import { v4 as uuidV4 } from "uuid";
 import Player from "../models/Player";
-import Room, { IRoom } from "../models/Room";
+import Room, { IRoomSettings } from "../models/Room";
 import { rooms } from "../server";
 import { IRoomCreateIOrJoinInput } from "../types/room";
 import { logger } from "../utils/winston";
@@ -14,7 +14,10 @@ export const getPlayerIntoRoom = (joinInput: IRoomCreateIOrJoinInput) => {
     if (!room) {
       const playerId = uuidV4();
       const newPlayer = new Player(playerId, username);
-      const newRoom = new Room(roomId, [newPlayer], newPlayer) as IRoom;
+      const newRoom = new Room(roomId, [newPlayer], newPlayer, {
+        autoAcceptJoinRequest: false,
+        resultDelay: 2,
+      });
 
       rooms.push(newRoom);
       const data = { room: newRoom, player: newPlayer };
@@ -72,6 +75,20 @@ export const getRoomOnLeaveOrDisconnect = (
     return { room };
   } catch (err) {
     logger.error("error in getRoomOnLeaveOrDisconnect", err);
+    return { room: undefined };
+  }
+};
+
+export const updateRoomSettings = (roomId: string, settings: IRoomSettings) => {
+  try {
+    const room = rooms.find((room) => room.roomId === roomId);
+    if (!room) {
+      return { room: undefined };
+    }
+    room.settings = settings;
+    return { room };
+  } catch (err) {
+    logger.error("error in updateRoomSettings", err);
     return { room: undefined };
   }
 };

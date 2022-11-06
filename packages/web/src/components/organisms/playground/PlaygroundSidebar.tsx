@@ -1,29 +1,34 @@
 import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
-import React, { useState } from "react";
+import { IRoom, IRoomSettings } from "@card-32/common/types/room";
+import React, { useCallback, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../../contexts/AuthProvider";
+import { useCardsContext } from "../../../contexts/CardsProvider";
 import { useRoomContext } from "../../../contexts/RoomProvider";
 import { useSocketContext } from "../../../contexts/SocketProvider";
-import { HOME } from "../../../routes/routes";
+import { ROOMS } from "../../../routes/routes";
 import { removeDataOnLocalStorage } from "../../../utils/localStorage";
 import AnimatedCircle from "../../atoms/box/AnimatedCircle";
 import FlexContainer from "../../atoms/box/FlexContainer";
 import Button from "../../atoms/button/Button";
 import Modal from "../../atoms/modal/Modal";
 import { ContentSubHeading } from "../../atoms/texts/ContentSubHeading";
-import { PlayerCard } from "../playerCard";
+import { PlayerCard } from "./PlayerCard";
+import { RoomSettingsModal } from "./RoomSettingsModal";
 
 const PlaygroundSidebar: React.FC = () => {
   const navigate = useNavigate();
   const { player, setPlayer } = useAuthContext();
   const { room, setRoom } = useRoomContext();
+  const { cards, bidPoints } = useCardsContext();
   const { isSocketConnected, socket } = useSocketContext();
 
   const [leaveRoomModal, setLeaveRoomModal] = useState(false);
-  const [bidModalVisible, setBidModalVisible] = useState(false);
+  const [roomSettingsModal, setRoomSettingsModal] = useState(false);
 
   const onStartGame = () => {
+    if (!socket) return;
     if (!room) return;
     if (room.players.length < 4) {
       toast.error(
@@ -32,7 +37,44 @@ const PlaygroundSidebar: React.FC = () => {
       );
       return;
     }
+    socket.emit(MAIN_NAMESPACE_EVENTS.START_GAME);
   };
+
+  const getBidPoint = (playerId: string) => {
+    if (!bidPoints?.length) {
+      return { bid: 0, point: 0 };
+    }
+    const player = bidPoints.find((data) => data.playerId === playerId);
+    if (!player) return { bid: 0, point: 0 };
+
+    return { bid: player.bid, point: player.point };
+  };
+
+  const onRoomSettingsSave = useCallback(
+    (roomSettings: IRoomSettings) => {
+      if (!socket) return;
+      socket.emit(
+        MAIN_NAMESPACE_EVENTS.CHANGE_ROOM_SETTINGS,
+        {
+          data: { settings: roomSettings },
+        },
+        (error?: string, room?: IRoom) => {
+          if (error) {
+            toast.error(error);
+            return;
+          }
+          if (!room) {
+            toast.error("Something went wrong");
+            return;
+          }
+          setRoom(room);
+          setRoomSettingsModal(false);
+          toast.success("Settings saved.");
+        }
+      );
+    },
+    [socket, setRoom]
+  );
 
   const onLeave = async () => {
     if (!socket) return;
@@ -41,12 +83,15 @@ const PlaygroundSidebar: React.FC = () => {
     setPlayer(undefined);
     setRoom(undefined);
     setLeaveRoomModal(false);
-    navigate(HOME);
+    navigate(ROOMS);
   };
 
   const onHomeButtonClick = () => {
-    window.open(HOME);
+    window.open(ROOMS);
   };
+
+  const isRoomCreator = room?.creator.playerId === player?.playerId;
+  const isCardsReceived = !!cards.length;
 
   return (
     <div className="w-full sm:w-[320px] bg-zinc-800 relative">
@@ -89,10 +134,10 @@ const PlaygroundSidebar: React.FC = () => {
         </FlexContainer>
       </FlexContainer>
       <div className="hidden sm:block mt-20">
-        <FlexContainer className="flex-col justify-center gap-2">
+        <FlexContainer className="flex-col justify-center gap-2 text-gray-400">
           <FlexContainer>
             <div className="flex flex-col">
-              <p className="text-xs text-gray-400 -mb-1.5">Room ID</p>
+              <p className="text-xs -mb-1.5">Room ID</p>
               <div className="flex gap-1 items-center">
                 <AnimatedCircle socketConnected={isSocketConnected} />
                 <p className="text-lg select-all font-semibold text-ellipsis text-center">
@@ -101,11 +146,9 @@ const PlaygroundSidebar: React.FC = () => {
               </div>
             </div>
           </FlexContainer>
-          <FlexContainer className="text-xs justify-center font-thin gap-2">
+          <FlexContainer className="text-xs justify-center gap-2">
             <i className="fa-solid fa-users"></i>
-            <p className="text-xs text-white">{`${
-              room?.players.length || 0
-            } / 4`}</p>
+            <p>{`${room?.players.length || 0} / 4`}</p>
           </FlexContainer>
         </FlexContainer>
 
@@ -114,7 +157,11 @@ const PlaygroundSidebar: React.FC = () => {
           {room?.players.length ? (
             <div className="inline-grid grid-cols-2 grid-rows-2 gap-4">
               {room.players.map((player) => (
-                <PlayerCard key={player.playerId} username={player.username} />
+                <PlayerCard
+                  key={player.playerId}
+                  username={player.username}
+                  bidPoint={getBidPoint(player.playerId)}
+                />
               ))}
             </div>
           ) : null}
@@ -133,59 +180,59 @@ const PlaygroundSidebar: React.FC = () => {
             </div>
           </div>
           <FlexContainer className="gap-2">
-            <button
-              className="btn-primary p-1 text-xs border-2 border-blue-600 shadow-blue-600"
-              onClick={onStartGame}
-            >
-              Start Game
-            </button>
-            <button className="btn-primary p-1 text-xs border-2 border-primary shadow-primary">
-              Restart
-            </button>
+            {isRoomCreator ? (
+              <button
+                className="btn-primary border-2 border-zinc-700 p-1 text-xs"
+                onClick={() => setRoomSettingsModal(true)}
+              >
+                <i className="fa-solid fa-gear" />
+              </button>
+            ) : null}
+            {isCardsReceived ? null : (
+              <button
+                className="btn-primary p-1 text-xs border-2 border-blue-600 shadow-blue-600"
+                onClick={onStartGame}
+              >
+                Start Game
+              </button>
+            )}
           </FlexContainer>
         </FlexContainer>
 
         {room?.players.length ? (
           <div className="mt-3 inline-grid grid-cols-4 grid-rows-1 gap-2">
             {room.players.map((player) => (
-              <PlayerCard key={player.playerId} username={player.username} />
+              <PlayerCard
+                key={player.playerId}
+                username={player.username}
+                bidPoint={getBidPoint(player.playerId)}
+              />
             ))}
           </div>
         ) : null}
       </div>
       {/* sidebar bottom content */}
       <div className="hidden sm:flex w-full absolute bottom-0 p-2 flex-col gap-2">
-        <FlexContainer className="gap-2 justify-center">
-          <button
-            className="btn-primary border-2 border-blue-600 shadow-blue-600"
-            onClick={onStartGame}
-          >
-            Start Game
-          </button>
-          <button className="btn-primary border-2 border-primary shadow-primary">
-            Restart
-          </button>
+        <FlexContainer className="items-center justify-between">
+          {isRoomCreator ? (
+            <button
+              className="btn-primary border-2 border-zinc-700"
+              onClick={() => setRoomSettingsModal(true)}
+            >
+              <i className="fa-solid fa-gear" />
+            </button>
+          ) : null}
+          {isCardsReceived ? null : (
+            <button
+              className="btn-primary border-2 border-blue-600 shadow-blue-600"
+              onClick={onStartGame}
+            >
+              Start Game
+            </button>
+          )}
         </FlexContainer>
       </div>
-      {/* bid select modal */}
-      <Modal visible={bidModalVisible} onClose={setBidModalVisible}>
-        <FlexContainer className="p-5 bg-zinc-900 text-white  flex-col gap-2">
-          <p className="text-xl font-bold">Select your bid point</p>
-          <select className="my-3 w-20 h-20 bg-zinc-800 shadow-md border-2 border-blue-700 border-dotted rounded py-1.5 text-center outline-none cursor-pointer focus:ring-2 ring-blue-700 text-2xl">
-            <option value={1}>1</option>
-            <option value={2}>2</option>
-            <option value={3}>3</option>
-            <option value={4}>4</option>
-            <option value={5}>5</option>
-            <option value={6}>6</option>
-            <option value={7}>7</option>
-            <option value={8}>8</option>
-          </select>
-          <button className="btn-primary  bg-blue-700 text-xs py-2 px-3">
-            Bid
-          </button>
-        </FlexContainer>
-      </Modal>
+
       {/* room leave modal */}
       <Modal visible={leaveRoomModal} onClose={() => setLeaveRoomModal(false)}>
         <FlexContainer className="flex-col gap-4 items-start text-white">
@@ -207,6 +254,15 @@ const PlaygroundSidebar: React.FC = () => {
           </FlexContainer>
         </FlexContainer>
       </Modal>
+
+      {/* room settings modal */}
+      <RoomSettingsModal
+        visible={roomSettingsModal}
+        onClose={() => {
+          setRoomSettingsModal(false);
+        }}
+        onSave={onRoomSettingsSave}
+      />
     </div>
   );
 };

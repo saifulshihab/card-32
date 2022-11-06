@@ -13,6 +13,11 @@ export const MAIN_NAMESPACE_EVENTS = {
   LEAVE_ROOM: "leave::room",
   PLAYER_DISCONNECTED: "player::disconnected",
   START_GAME: "start::game",
-  END_GAME: "end::game",
-  RESTART_GAME: "restart::game",
+  GET_CARDS: "get::cards",
+  ON_BID: "on::bid",
+  NEW_BID: "new::bid",
+  CARD_DROPPED: "card::dropped",
+  RECEIVE_DROPPED_CARD: "receive::dropped::card",
+  ROUND_WINNER: "round::winner",
+  CHANGE_ROOM_SETTINGS: "change::room::settings",
 };

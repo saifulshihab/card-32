@@ -3,11 +3,12 @@ import React, { Fragment, PropsWithChildren, useRef } from "react";
 
 export interface IModalProps {
   visible: boolean;
+  width?: string;
   onClose: (value: boolean) => void;
 }
 
 const Modal: React.FC<PropsWithChildren<IModalProps>> = (props) => {
-  const { visible, onClose, children } = props;
+  const { visible, width, onClose, children } = props;
   const cancelButtonRef = useRef(null);
   return (
     <Transition.Root show={visible} as={Fragment}>
@@ -40,7 +41,11 @@ const Modal: React.FC<PropsWithChildren<IModalProps>> = (props) => {
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-full sm:my-8 sm:max-w-md sm:w-full py-8 px-7 bg-zinc-900 text-white">
+              <Dialog.Panel
+                className={`relative rounded-lg text-left shadow-xl transform transition-all w-full sm:my-8 ${
+                  width || "max-w-md"
+                } sm:w-full py-8 px-7 bg-zinc-900 text-white`}
+              >
                 {children}
               </Dialog.Panel>
             </Transition.Child>
