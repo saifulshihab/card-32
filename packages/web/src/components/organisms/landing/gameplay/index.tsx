@@ -8,7 +8,7 @@ const GamePlay: React.FC = () => {
       {/* left section */}
       <div className="flex-1 flex flex-col">
         <SectionHeading text="Gameplay" />
-        <p className="text-gray-300">
+        <p className="text-gray-300 text-justify">
           Card 32 is a multiplayer card game where a player can join/create a
           room with a room id and username. A maximum of 4 players can join a
           room. At the start of the game, randomly 8 cards will be passed to
@@ -18,6 +18,7 @@ const GamePlay: React.FC = () => {
           wins that round. 8 rounds in total.
         </p>
       </div>
+      <div className="hidden md:block flex-1"></div>
     </SectionContainer>
   );
 };
