@@ -1,9 +1,15 @@
 import { IPlayer } from "./player";
 
+export interface IRoomSettings {
+  resultDelay?: number;
+  autoAcceptJoinRequest?: boolean;
+}
+
 export interface IRoom {
   roomId: string;
   players: IPlayer[];
   creator: IPlayer;
+  settings: IRoomSettings;
 }
 
 export interface IRoomCreateIOrJoinInput {

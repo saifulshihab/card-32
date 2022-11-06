@@ -26,7 +26,7 @@ const Chat: React.FC<IProps> = (props) => {
     <div className="w-full h-full flex flex-col bg-zinc-800">
       <div className="relative py-2 px-3 border-b-4 border-zinc-900">
         <p className="text-2xl font-bold">
-          {isGlobal ? "🌐 Global Chat" : "Chat"}
+          {isGlobal ? "🌏 Global Chat" : "Chat"}
         </p>
       </div>
       {/* messages */}
