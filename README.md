@@ -18,6 +18,7 @@ yarn start:server (run server)
 
 ## Attribution
 <a href="https://fontawesome.com/icons" title="Card 32 game icons">Icons from Font Awesome</a>
+<br />
 <a href="https://www.flaticon.com/free-icons/card-game" title="Card 32 game icons">Logo & favicon from Freepik - Flaticon</a>
 
 
