@@ -16,5 +16,9 @@ yarn start:server (run server)
 - Front-End: React.js, React DnD, Tailwind CSS, TypeScript
 - Back-End: Express, Socket.io, TypeScript
 
+## Attribution
+<a href="https://fontawesome.com/icons" title="Card 32 game icons">Icons from Font Awesome</a>
+<a href="https://www.flaticon.com/free-icons/card-game" title="Card 32 game icons">Logo & favicon from Freepik - Flaticon</a>
+
 
 Copyright © 2022. All Rights Reserved by Saiful Islam Shihab.
