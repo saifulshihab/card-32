@@ -5,3 +5,5 @@ server/node_modules
 .gitignore
 
 .prettierrc
+
+README.md

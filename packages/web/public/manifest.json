@@ -1,11 +1,17 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Card 32",
+  "name": "Card 32 Game",
+  "description": "A multiplayer card game",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
+      "src": "assets/images/card-32-favicon.png",
+      "sizes": "16x16",
       "type": "image/x-icon"
+    },
+    {
+      "src": "assets/images/card-32-logo.png",
+      "sizes": "32x32",
+      "type": "image/png"
     }
   ],
   "start_url": ".",
