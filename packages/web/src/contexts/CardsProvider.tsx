@@ -10,6 +10,7 @@ interface ICardsContext {
   bidPoints: IBidPoint[] | null;
   usedCards: ICard[];
   setCards: React.Dispatch<React.SetStateAction<ICard[]>>;
+  isBidDone?: boolean;
 }
 
 const CardsContext = React.createContext<ICardsContext | null>(null);
@@ -104,6 +105,7 @@ export const CardsProvider: React.FC<PropsWithChildren> = (props) => {
         bidPoints,
         usedCards,
         setCards,
+        isBidDone: (bidPoints || [])?.length === 4,
       }}
     >
       {props.children}

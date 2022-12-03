@@ -20,4 +20,5 @@ export const MAIN_NAMESPACE_EVENTS = {
   RECEIVE_DROPPED_CARD: "receive::dropped::card",
   ROUND_WINNER: "round::winner",
   CHANGE_ROOM_SETTINGS: "change::room::settings",
+  NEW_ROOM_CREATOR: "new::room::creator",
 };

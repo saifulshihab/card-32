@@ -58,9 +58,15 @@ const Playground: React.FC = () => {
       }
     );
 
+    // new room creator assigned
+    socket.on(MAIN_NAMESPACE_EVENTS.NEW_ROOM_CREATOR, () => {
+      toast.success("You are now room creator.");
+    });
+
     return () => {
       socket.off(MAIN_NAMESPACE_EVENTS.JOIN_REQUEST);
       socket.off(MAIN_NAMESPACE_EVENTS.NEW_MESSAGE);
+      socket.off(MAIN_NAMESPACE_EVENTS.NEW_ROOM_CREATOR);
     };
   }, [socket]);
 
@@ -273,7 +279,7 @@ const Playground: React.FC = () => {
             {cards.length
               ? cards
                   .filter((data) => data.playerId === player?.playerId)
-                  ?.map((card) => <Card key={card.cardId} card={card} noRef />)
+                  ?.map((card) => <Card key={card.cardId} card={card} />)
               : null}
           </div>
           <p className="text-sm font-semibold">Select your bid point</p>
