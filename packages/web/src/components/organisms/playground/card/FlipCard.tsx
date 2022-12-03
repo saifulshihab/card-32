@@ -10,7 +10,7 @@ interface IProps {
 const FlipCard: React.FC<PropsWithChildren<IProps>> = (props) => {
   const { card, isFlipCard } = props;
   return (
-    <div className="w-10 h-16 sm:w-12 sm:h-20 rounded shadow cursor-pointer relative select-none       ">
+    <div className="w-10 h-16 sm:w-12 sm:h-20 rounded shadow cursor-pointer relative select-none">
       <div
         className={`${styles.flip_card} ${
           isFlipCard ? styles.flip_card_open : ""
@@ -18,7 +18,7 @@ const FlipCard: React.FC<PropsWithChildren<IProps>> = (props) => {
       >
         <div className={styles.flip_card_inner}>
           <div
-            className={`bg-white text-black rounded text-4xl ${styles.flip_card_front}`}
+            className={`flipped_card bg-white text-black rounded text-4xl ${styles.flip_card_front}`}
           >
             ♠️
           </div>

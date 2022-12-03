@@ -20,35 +20,36 @@ import { RoomSettingsModal } from "./RoomSettingsModal";
 const PlaygroundSidebar: React.FC = () => {
   const navigate = useNavigate();
   const { player, setPlayer } = useAuthContext();
-  const { room, setRoom } = useRoomContext();
-  const { cards, bidPoints } = useCardsContext();
+  const { room, setRoom, isRoomFull } = useRoomContext();
+  const { cards, bidPoints, usedCards, isBidDone } = useCardsContext();
   const { isSocketConnected, socket } = useSocketContext();
-
   const [leaveRoomModal, setLeaveRoomModal] = useState(false);
   const [roomSettingsModal, setRoomSettingsModal] = useState(false);
 
   const onStartGame = () => {
     if (!socket) return;
     if (!room) return;
-    if (room.players.length < 4) {
-      toast.error(
+    if (!isRoomFull) {
+      return toast.error(
         `Invite ${4 - room.players.length} more players to start the game.`,
         { icon: "⚠️" }
       );
-      return;
     }
     socket.emit(MAIN_NAMESPACE_EVENTS.START_GAME);
   };
 
-  const getBidPoint = (playerId: string) => {
-    if (!bidPoints?.length) {
-      return { bid: 0, point: 0 };
-    }
-    const player = bidPoints.find((data) => data.playerId === playerId);
-    if (!player) return { bid: 0, point: 0 };
+  const getBidPoint = useCallback(
+    (playerId: string) => {
+      if (!bidPoints?.length) {
+        return { bid: 0, point: 0 };
+      }
+      const player = bidPoints.find((data) => data.playerId === playerId);
+      if (!player) return { bid: 0, point: 0 };
 
-    return { bid: player.bid, point: player.point };
-  };
+      return { bid: player.bid, point: player.point };
+    },
+    [bidPoints]
+  );
 
   const onRoomSettingsSave = useCallback(
     (roomSettings: IRoomSettings) => {
@@ -90,8 +91,17 @@ const PlaygroundSidebar: React.FC = () => {
     window.open(ROOMS);
   };
 
-  const isRoomCreator = room?.creator.playerId === player?.playerId;
+  const getCardServedStatus = useCallback(
+    (playerId: string) => {
+      if (!isBidDone) return undefined;
+      const isCardServed = usedCards.find((data) => data.playerId === playerId);
+      return !!isCardServed;
+    },
+    [isBidDone, usedCards]
+  );
+
   const isCardsReceived = !!cards.length;
+  const isRoomCreator = room?.creator.playerId === player?.playerId;
 
   return (
     <div className="w-full sm:w-[320px] bg-zinc-800 relative">
@@ -161,6 +171,7 @@ const PlaygroundSidebar: React.FC = () => {
                   key={player.playerId}
                   username={player.username}
                   bidPoint={getBidPoint(player.playerId)}
+                  isCardServed={getCardServedStatus(player.playerId)}
                 />
               ))}
             </div>
@@ -206,6 +217,7 @@ const PlaygroundSidebar: React.FC = () => {
                 key={player.playerId}
                 username={player.username}
                 bidPoint={getBidPoint(player.playerId)}
+                isCardServed={getCardServedStatus(player.playerId)}
               />
             ))}
           </div>

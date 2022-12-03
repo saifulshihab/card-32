@@ -5,6 +5,7 @@ import React from "react";
 import { useDrop } from "react-dnd";
 import { useAuthContext } from "../../../contexts/AuthProvider";
 import { useCardsContext } from "../../../contexts/CardsProvider";
+import { useRoomContext } from "../../../contexts/RoomProvider";
 import { useSocketContext } from "../../../contexts/SocketProvider";
 import { Card } from "./card/Card";
 import { FlipCard } from "./card/FlipCard";
@@ -12,7 +13,8 @@ import { FlipCard } from "./card/FlipCard";
 const Board: React.FC = () => {
   const { player } = useAuthContext();
   const { socket } = useSocketContext();
-  const { cards, bidPoints, usedCards } = useCardsContext();
+  const { isRoomFull } = useRoomContext();
+  const { cards, usedCards, isBidDone } = useCardsContext();
   const [{ isOver }, drop] = useDrop(
     {
       accept: DNDType.CARD,
@@ -29,8 +31,8 @@ const Board: React.FC = () => {
     []
   );
 
-  const cardNoRef =
-    bidPoints?.length !== 4 ||
+  const notDroppable =
+    !isBidDone ||
     !!usedCards.find((card) => card.playerId === player?.playerId);
 
   const isFlipCard = usedCards.length === 4;
@@ -41,7 +43,7 @@ const Board: React.FC = () => {
         <div className="w-full grow flex items-center justify-center p-2">
           {/* dropped cards board */}
           <div
-            ref={cardNoRef ? null : drop}
+            ref={notDroppable ? null : drop}
             className={`w-full h-full md:w-3/4 lg:w-[650px] md:h-3/4 bg-zinc-800 rounded-lg flex items-center justify-center border-2
             ${
               isOver
@@ -61,7 +63,18 @@ const Board: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-gray-500">Drop your card here</p>
+              <p className="text-xs text-gray-500 font-semibold">
+                {isBidDone ? (
+                  <span>Drop your card here</span>
+                ) : (
+                  <span className="text-rose-500 ">
+                    Can&apos;t drop,{" "}
+                    {!isRoomFull
+                      ? "Room is not full"
+                      : "bid is not completed yet"}
+                  </span>
+                )}
+              </p>
             )}
           </div>
         </div>
@@ -72,7 +85,7 @@ const Board: React.FC = () => {
               {cards
                 .filter((card) => card.playerId === player?.playerId)
                 .map((card) => (
-                  <Card key={card.cardId} card={card} noRef={cardNoRef} />
+                  <Card key={card.cardId} card={card} />
                 ))}
             </div>
           </div>

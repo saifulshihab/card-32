@@ -47,3 +47,8 @@ body {
   -moz-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+.flipped_card {
+  background-position: center;
+  background-image: url("./assets/images/card_bg_2.png");
+}

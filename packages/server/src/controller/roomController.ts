@@ -69,10 +69,22 @@ export const getRoomOnLeaveOrDisconnect = (
       );
       return { room: undefined };
     }
-    room.players = room.players.filter(
+
+    const newPlayers = room.players.filter(
       (player) => player.playerId !== playerId
     );
-    return { room };
+
+    room.players = newPlayers;
+
+    // room creator left, add new room creator
+    const isRoomCreatorLeft = room.creator.playerId === playerId;
+    const newRoomCreator = { ...newPlayers[0] };
+    if (isRoomCreatorLeft) room.creator = newRoomCreator;
+
+    return {
+      room,
+      newRoomCreatorId: isRoomCreatorLeft ? newRoomCreator.playerId : null,
+    };
   } catch (err) {
     logger.error("error in getRoomOnLeaveOrDisconnect", err);
     return { room: undefined };
