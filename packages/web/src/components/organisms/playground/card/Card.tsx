@@ -6,11 +6,11 @@ import { useDrag } from "react-dnd";
 interface IProps {
   card: ICard;
   hidden?: boolean;
-  noRef?: boolean;
+  notDraggable?: boolean;
 }
 
 const Card: React.FC<PropsWithChildren<IProps>> = (props) => {
-  const { card, noRef } = props;
+  const { card, notDraggable } = props;
   const [{ isDragging }, dragRef] = useDrag(
     {
       type: DNDType.CARD,
@@ -24,10 +24,10 @@ const Card: React.FC<PropsWithChildren<IProps>> = (props) => {
 
   return (
     <div
-      ref={noRef ? null : dragRef}
+      ref={notDraggable ? undefined : dragRef}
       draggable
-      className={`w-10 h-16 sm:w-12 sm:h-20 bg-white rounded shadow cursor-pointer relative select-none card_animated
-      ${isDragging ? "opacity-50" : "opacity-100"}
+      className={`card w-10 h-16 sm:w-12 sm:h-20 bg-white rounded shadow cursor-pointer relative select-none card_animated
+      ${isDragging ? "opacity-0" : "opacity-100"}
       `}
     >
       <div className="flex items-center h-full justify-center">

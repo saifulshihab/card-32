@@ -40,6 +40,7 @@ const MAIN_NAMESPACE_EVENTS = {
   RECEIVE_DROPPED_CARD: "receive::dropped::card",
   ROUND_WINNER: "round::winner",
   CHANGE_ROOM_SETTINGS: "change::room::settings",
+  NEW_ROOM_CREATOR: "new::room::creator",
 };
 
 const socketIO = (server: Server) => {
@@ -451,7 +452,7 @@ const socketIO = (server: Server) => {
 
         socket.leave(socketRoom.roomId);
 
-        const { room } = getRoomOnLeaveOrDisconnect(
+        const { room, newRoomCreatorId } = getRoomOnLeaveOrDisconnect(
           socketRoom.roomId,
           player.playerId
         );
@@ -463,6 +464,15 @@ const socketIO = (server: Server) => {
             message: `${player.username} has left.`,
             room,
           });
+
+          if (newRoomCreatorId) {
+            mainNameSpace.sockets.forEach((socket) => {
+              if (socket.data.player.playerId === newRoomCreatorId) {
+                socket.join(newRoomCreatorId);
+                socket.emit(MAIN_NAMESPACE_EVENTS.NEW_ROOM_CREATOR);
+              }
+            });
+          }
         }
       } catch (err) {
         logger.error("error in leave room", err);
