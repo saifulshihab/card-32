@@ -75,8 +75,6 @@ const socketIO = (server: Server) => {
       MAIN_NAMESPACE_EVENTS.JOIN_ROOM,
       (joinInput: IRoomCreateIOrJoinInput, callback) => {
         try {
-          // join socket with it's own id - for private events
-
           const { roomId, username } = joinInput;
           const { error, data } = getPlayerIntoRoom(joinInput);
 
@@ -99,6 +97,7 @@ const socketIO = (server: Server) => {
           socket.join(roomId);
           socket.data.player = data?.player;
           socket.data.room = data?.room!;
+          // join socket with it's own id - for private events
           socket.join(socket.id);
 
           callback({ data });
