@@ -7,14 +7,16 @@ import { useAuthContext } from "../../../contexts/AuthProvider";
 import { useCardsContext } from "../../../contexts/CardsProvider";
 import { useRoomContext } from "../../../contexts/RoomProvider";
 import { useSocketContext } from "../../../contexts/SocketProvider";
+import FlexContainer from "../../atoms/box/FlexContainer";
 import { Card } from "./card/Card";
 import { FlipCard } from "./card/FlipCard";
+import { PlayerCard } from "./PlayerCard";
 
 const Board: React.FC = () => {
   const { player } = useAuthContext();
   const { socket } = useSocketContext();
   const { isRoomFull } = useRoomContext();
-  const { cards, usedCards, isBidDone } = useCardsContext();
+  const { cards, usedCards, isBidDone, leaderboard } = useCardsContext();
   const [{ isOver }, drop] = useDrop(
     {
       accept: DNDType.CARD,
@@ -62,18 +64,33 @@ const Board: React.FC = () => {
                   />
                 ))}
               </div>
+            ) : isBidDone ? (
+              leaderboard.length && !cards.length ? (
+                <FlexContainer className="flex-col gap-5 card_animated">
+                  <p className="text-5xl">🏆</p>
+                  <PlayerCard
+                    username={leaderboard[0].username}
+                    bidPoint={{
+                      bid: leaderboard[0].bid,
+                      point: leaderboard[0].point,
+                    }}
+                    isCardServed
+                  />
+                  <p className="text-3xl font-bold mt-2">Winner</p>
+                </FlexContainer>
+              ) : (
+                <p className="text-xs text-gray-500 font-semibold">
+                  Drop your card here
+                </p>
+              )
             ) : (
-              <p className="text-xs text-gray-500 font-semibold">
-                {isBidDone ? (
-                  <span>Drop your card here</span>
-                ) : (
-                  <span className="text-rose-500 ">
-                    Can&apos;t drop,{" "}
-                    {!isRoomFull
-                      ? "Room is not full"
-                      : "bid is not completed yet"}
-                  </span>
-                )}
+              <p className="text-xs font-semibold">
+                <span className="text-rose-500 ">
+                  Can&apos;t drop,{" "}
+                  {!isRoomFull
+                    ? "Room is not full"
+                    : "bid is not completed yet"}
+                </span>
               </p>
             )}
           </div>

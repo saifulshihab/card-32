@@ -59,6 +59,7 @@ const socketIO = (server: Server) => {
     rooms.find((room) => room.roomId === socket.data.room.roomId);
   const getSocketPlayerId = (socket: Socket) =>
     socket.data.player.playerId as string;
+  const getSocketPlayer = (socket: Socket) => socket.data.player as IPlayer;
 
   mainNameSpace.on("connection", (socket: Socket) => {
     /**
@@ -318,9 +319,9 @@ const socketIO = (server: Server) => {
       (data: { bid: number }, callback) => {
         try {
           const roomId = getSocketRoomId(socket);
-          const playerId = getSocketPlayerId(socket);
+          const player = getSocketPlayer(socket);
 
-          if (!roomId || !playerId) {
+          if (!roomId || !player.playerId) {
             callback(undefined);
             logger.error("error in bid");
             return;
@@ -328,7 +329,8 @@ const socketIO = (server: Server) => {
 
           const newBid: IBidPoint = {
             bid: data.bid,
-            playerId,
+            playerId: player.playerId,
+            username: player.username,
             point: 0,
           };
           mainNameSpace
