@@ -6,6 +6,7 @@ export interface ICard {
 
 export interface IBidPoint {
   playerId: string;
+  username: string;
   bid: number;
   point: number;
 }

@@ -1,6 +1,6 @@
 import { MAIN_NAMESPACE_EVENTS } from "@card-32/common/constant/socket/events";
 import { IBidPoint, ICard } from "@card-32/common/types/card";
-import React, { PropsWithChildren, useEffect, useState } from "react";
+import React, { PropsWithChildren, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { useRoomContext } from "./RoomProvider";
 import { useSocketContext } from "./SocketProvider";
@@ -9,6 +9,7 @@ interface ICardsContext {
   cards: ICard[];
   bidPoints: IBidPoint[] | null;
   usedCards: ICard[];
+  leaderboard: IBidPoint[];
   setCards: React.Dispatch<React.SetStateAction<ICard[]>>;
   isBidDone?: boolean;
 }
@@ -98,6 +99,13 @@ export const CardsProvider: React.FC<PropsWithChildren> = (props) => {
     }
   }, [isRoomFull]);
 
+  const leaderboard = useMemo(() => {
+    if (!bidPoints?.length) return [];
+    if (bidPoints?.length < 4) return [];
+    const list = bidPoints.sort((a, b) => (a.point > b.point ? -1 : 1));
+    return list;
+  }, [bidPoints]);
+
   return (
     <CardsContext.Provider
       value={{
@@ -105,6 +113,7 @@ export const CardsProvider: React.FC<PropsWithChildren> = (props) => {
         bidPoints,
         usedCards,
         setCards,
+        leaderboard,
         isBidDone: (bidPoints || [])?.length === 4,
       }}
     >

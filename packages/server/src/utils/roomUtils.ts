@@ -7,14 +7,32 @@ export const isRoomExist = (roomId: string) =>
 const getRoom = (roomId: string) =>
   rooms.find((room) => room.roomId === roomId);
 
+function shuffleArray<A>(array: A[]): A[] {
+  let currentIndex = array.length;
+  let temporaryValue;
+  let randomIndex;
+
+  // While there remain elements to shuffle...
+  while (currentIndex !== 0) {
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
 const getRandomNumbers = () => {
   const numbers: number[] = [];
-
   for (let i = 0; i < 32; i += 1) {
     numbers.push(i + 1);
   }
-
-  return numbers.sort(() => 0.7 - Math.random());
+  return shuffleArray(numbers);
 };
 
 const generateCards = (roomId: string) => {
