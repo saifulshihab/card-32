@@ -65,17 +65,7 @@ const ChatMessage: React.FC<IProps> = (props) => {
           {emoji[emojiIndex]}
         </span>
       )}
-
-      <span
-        className="font-bold"
-        style={{
-          color: `${colors[colorIndex]}`,
-        }}
-      >
-        :
-      </span>
-
-      <p>{message.message}</p>
+      <p className="ml-1">{message.message}</p>
     </div>
   );
 };

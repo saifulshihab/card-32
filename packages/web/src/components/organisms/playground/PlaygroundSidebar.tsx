@@ -21,7 +21,8 @@ const PlaygroundSidebar: React.FC = () => {
   const navigate = useNavigate();
   const { player, setPlayer } = useAuthContext();
   const { room, setRoom, isRoomFull } = useRoomContext();
-  const { cards, bidPoints, usedCards, isBidDone } = useCardsContext();
+  const { cards, bidPoints, usedCards, isBidDone, leaderboard } =
+    useCardsContext();
   const { isSocketConnected, socket } = useSocketContext();
   const [leaveRoomModal, setLeaveRoomModal] = useState(false);
   const [roomSettingsModal, setRoomSettingsModal] = useState(false);
@@ -143,7 +144,7 @@ const PlaygroundSidebar: React.FC = () => {
           </button>
         </FlexContainer>
       </FlexContainer>
-      <div className="hidden sm:block mt-20">
+      <div className="hidden sm:block mt-16">
         <FlexContainer className="flex-col justify-center gap-2 text-gray-400">
           <FlexContainer>
             <div className="flex flex-col">
@@ -163,7 +164,7 @@ const PlaygroundSidebar: React.FC = () => {
         </FlexContainer>
 
         {/* player cards */}
-        <FlexContainer className="justify-center my-4 mt-8">
+        <FlexContainer className="justify-center my-8 mt-8">
           {room?.players.length ? (
             <div className="inline-grid grid-cols-2 grid-rows-2 gap-4">
               {room.players.map((player) => (
@@ -223,6 +224,40 @@ const PlaygroundSidebar: React.FC = () => {
           </div>
         ) : null}
       </div>
+
+      {/* leader board */}
+      {leaderboard.length ? (
+        <div className="hidden md:flex flex-col gap-2 mt-5 mx-2 border-2 border-zinc-700 bg-zinc-800 h-auto rounded shadow-md">
+          <p className="bg-zinc-700 py-2 text-lg text-center font-semibold border-b-2 border-zinc-700">
+            Leaderboard
+          </p>
+          <div className="flex flex-col my-2">
+            {leaderboard.map((data, idx) => (
+              <FlexContainer
+                key={idx}
+                className="py-1 justify-between text-sm font-semibold hover:bg-zinc-900 transform transition-all hover:scale-95 cursor-pointer px-3"
+              >
+                <FlexContainer className="gap-2">
+                  <span className="text-lg">
+                    {data.point >= data.bid
+                      ? idx === 0
+                        ? "🥇"
+                        : idx === 1
+                        ? "🥈"
+                        : idx === 2
+                        ? "🥉"
+                        : "🥲"
+                      : "🥲"}
+                  </span>
+                  <p>{data.username}</p>
+                </FlexContainer>
+                <p>{data.point}</p>
+              </FlexContainer>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       {/* sidebar bottom content */}
       <div className="hidden sm:flex w-full absolute bottom-0 p-2 flex-col gap-2">
         <FlexContainer className="items-center justify-between">
