@@ -20,7 +20,10 @@ import { useAuthContext } from "../../contexts/AuthProvider";
 import { useRoomContext } from "../../contexts/RoomProvider";
 import { useSocketContext } from "../../contexts/SocketProvider";
 import { LANDING, PLAYGROUND } from "../../routes/routes";
-import { setPlayerAndRoomIdOnLocalStorage } from "../../utils/localStorage";
+import {
+  removeDataOnLocalStorage,
+  setPlayerAndRoomIdOnLocalStorage,
+} from "../../utils/localStorage";
 import { usernameValidatorSchema } from "../../validators/playerValidators";
 
 const Rooms: React.FC = () => {
@@ -110,7 +113,16 @@ const Rooms: React.FC = () => {
   ) => {
     if (!socket) return;
     if (player && roomId) {
-      return toast.error("You are already in a room.");
+      // room is active
+      const room = activeRooms.find((data) => data.roomId === roomId);
+      if (room) {
+        return toast.error("You are already in a room.");
+      } else {
+        // logout - room is not active anymore
+        setPlayer(undefined);
+        setRoom(undefined);
+        removeDataOnLocalStorage();
+      }
     }
     socket.emit(
       MAIN_NAMESPACE_EVENTS.JOIN_ROOM,
@@ -185,7 +197,7 @@ const Rooms: React.FC = () => {
       <div className="w-full h-6 shadow-md bg-zinc-800 flex items-center">
         <div className="container m-auto flex items-center justify-between text-xs font-bold select-none  px-5">
           <NavLink to={LANDING}>
-          <p>Home</p>
+            <p>Home</p>
           </NavLink>
           <div className="flex items-center gap-2">
             <p>Server status</p>
