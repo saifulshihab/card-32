@@ -1,3 +1,9 @@
 {
-  "cSpell.words": ["headlessui", "Leaderboard", "tailwindcss", "formik"]
+  "cSpell.words": [
+    "formik",
+    "gameplay",
+    "headlessui",
+    "Leaderboard",
+    "tailwindcss"
+  ]
 }
