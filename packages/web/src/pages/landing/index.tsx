@@ -8,7 +8,7 @@ import HeroSection from "../../components/organisms/landing/hero";
 
 const LandingPage: React.FC = () => {
   return (
-    <main className="w-full min-h-screen">
+    <main className="w-full min-h-screen bg-zinc-900 text-zinc-100">
       {/* header */}
       <Header />
       {/* hero section */}
