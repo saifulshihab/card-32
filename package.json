@@ -9,7 +9,7 @@
     "start:web": "lerna exec --scope @card-32/web -- yarn dev",
     "start:server": "lerna exec --scope @card-32/server -- yarn dev",
     "lerna:bootstrap": "lerna bootstrap",
-    "test:web": "lerna exec --scope @card-32/web -- yarn test",
+    "test:web": "lerna exec --scope @card-32/web -- yarn test && lerna exec --scope @card-32/web -- yarn test:coverage",
     "build": "lerna exec --scope @card-32/web -- yarn build && lerna exec --scope @card-32/server -- yarn build"
   },
   "author": "Saiful Islam Shihab",
