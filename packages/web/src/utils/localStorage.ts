@@ -5,7 +5,7 @@ interface ILocalStorageKeys {
   roomId: string;
 }
 
-const LOCAL_STORAGE_KEYS: ILocalStorageKeys = {
+export const LOCAL_STORAGE_KEYS: ILocalStorageKeys = {
   player: "card-32.player",
   roomId: "card-32.roomId",
 };
