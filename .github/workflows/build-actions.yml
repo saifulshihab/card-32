@@ -23,5 +23,5 @@ jobs:
       - name: Install dependencies, run tests and build
         run: |
           yarn
-          yarn test
+          yarn test:web   # run client side tests
           yarn build
