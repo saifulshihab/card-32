@@ -27,7 +27,7 @@ function shuffleArray<A>(array: A[]): A[] {
   return array;
 }
 
-const getRandomNumbers = () => {
+export const getRandomNumbers = () => {
   const numbers: number[] = [];
   for (let i = 0; i < 32; i += 1) {
     numbers.push(i + 1);
