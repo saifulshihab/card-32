@@ -24,4 +24,5 @@ jobs:
         run: |
           yarn
           yarn test:web   # run client side tests
+          yarn test:server   # run server side tests
           yarn build  # build both client & server app
