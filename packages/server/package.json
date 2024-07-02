@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "build": "yarn install && tsc",
     "start": "node dist/server"
   },
