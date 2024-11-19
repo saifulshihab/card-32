@@ -23,6 +23,8 @@ jobs:
       - name: Install dependencies, run tests and build
         run: |
           yarn
-          yarn test:web   # run client side tests
-          yarn test:server   # run server side tests
+          yarn typecheck:web
+          yarn typecheck:server
+          yarn test:web
+          yarn test:server
           yarn build  # build both client & server app
